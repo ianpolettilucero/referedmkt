@@ -110,6 +110,10 @@ $router->group('/admin', function (Router $r) {
     $r->get('/uploads.json',         [A\UploadsController::class, 'listJson']);
     $r->post('/uploads/{id}/delete', [A\UploadsController::class, 'destroy']);
 
+    // Settings
+    $r->get('/settings',  [A\SettingsController::class, 'index']);
+    $r->post('/settings', [A\SettingsController::class, 'update']);
+
     // Analytics
     $r->get('/analytics', [A\AnalyticsController::class, 'index']);
 });

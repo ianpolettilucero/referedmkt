@@ -22,6 +22,10 @@ Fase 1 en curso: motor base.
 - [x] Redirects desde tabla `redirects` (middleware previo al router)
 - [x] Uploads de imagenes con MIME-check real, SVG sanitization, picker reusable
 - [x] Tests smoke (50 tests: Router, Markdown, SEO, Site, slugify, Upload, RateLimiter)
+- [x] CI: GitHub Actions corre lint + tests en PHP 8.1/8.2/8.3
+- [x] Backup DB CLI (`bin/backup-db.php`) con mysqldump + fallback PHP y rotacion
+- [x] Health check `/healthz` (JSON + 503 si la DB falla)
+- [x] Newsletter signup con config por sitio (ConvertKit / Buttondown / etc.)
 
 ## Stack
 

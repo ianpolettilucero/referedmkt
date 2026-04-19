@@ -28,6 +28,7 @@ function admin_nav_active(string $href): string {
             <a class="admin-nav-link<?= admin_nav_active('/admin/uploads') ?>" href="/admin/uploads">Imágenes</a>
             <a class="admin-nav-link<?= admin_nav_active('/admin/redirects') ?>" href="/admin/redirects">Redirects</a>
             <a class="admin-nav-link<?= admin_nav_active('/admin/analytics') ?>" href="/admin/analytics">Analytics</a>
+            <a class="admin-nav-link<?= admin_nav_active('/admin/settings') ?>" href="/admin/settings">Settings</a>
         </nav>
 
         <div class="admin-nav-right">

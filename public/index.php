@@ -27,6 +27,12 @@ if (strncmp($currentPath, '/admin', 6) === 0
     exit;
 }
 
+// Health check: global, sin dependencia de tenant. Para UptimeRobot / BetterStack.
+if ($currentPath === '/healthz') {
+    (new Controllers\HealthController())->check();
+    exit;
+}
+
 $site = Site::resolve();
 if ($site === null) {
     http_response_code(404);
