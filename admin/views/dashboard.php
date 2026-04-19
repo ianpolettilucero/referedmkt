@@ -1,0 +1,49 @@
+<?php
+/**
+ * @var \Admin\AdminView $view
+ * @var array|null $active_site
+ * @var array      $stats
+ */
+$view->layout('admin');
+?>
+<div class="admin-page-header">
+    <h1 class="admin-page-title">Dashboard</h1>
+    <?php if ($active_site): ?>
+        <span class="admin-muted">Sitio activo: <strong><?= htmlspecialchars($active_site['name'], ENT_QUOTES, 'UTF-8') ?></strong> (<?= htmlspecialchars($active_site['domain'], ENT_QUOTES, 'UTF-8') ?>)</span>
+    <?php endif; ?>
+</div>
+
+<?php if (!$active_site): ?>
+    <div class="admin-card">
+        <p>No hay sitio seleccionado. <a href="/admin/sites">Crear uno</a> o elegir uno existente en el selector de arriba.</p>
+    </div>
+<?php else: ?>
+    <div class="admin-stats">
+        <div class="admin-stat">
+            <div class="admin-stat-value"><?= (int)$stats['products'] ?></div>
+            <div class="admin-stat-label">Productos</div>
+        </div>
+        <div class="admin-stat">
+            <div class="admin-stat-value"><?= (int)$stats['articles'] ?></div>
+            <div class="admin-stat-label">Artículos publicados</div>
+        </div>
+        <div class="admin-stat">
+            <div class="admin-stat-value"><?= (int)$stats['affiliate_links'] ?></div>
+            <div class="admin-stat-label">Afiliados activos</div>
+        </div>
+        <div class="admin-stat">
+            <div class="admin-stat-value"><?= (int)$stats['clicks_30d'] ?></div>
+            <div class="admin-stat-label">Clicks últimos 30d</div>
+        </div>
+    </div>
+
+    <div class="admin-card" style="margin-top:1rem;">
+        <h2 style="margin:0 0 0.5rem;">Accesos rápidos</h2>
+        <p>
+            <a class="admin-btn" href="/admin/articles/new">+ Nuevo artículo</a>
+            <a class="admin-btn" href="/admin/products/new">+ Nuevo producto</a>
+            <a class="admin-btn" href="/admin/affiliate-links/new">+ Nuevo afiliado</a>
+            <a class="admin-btn" href="/admin/analytics">Ver analytics</a>
+        </p>
+    </div>
+<?php endif; ?>

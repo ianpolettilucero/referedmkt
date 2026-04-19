@@ -36,5 +36,6 @@ if ($config['app']['debug']) {
 \Core\Database::boot($config['db']);
 
 require APP_ROOT . '/core/helpers/functions.php';
+require APP_ROOT . '/core/helpers/slug.php';
 
 return $config;

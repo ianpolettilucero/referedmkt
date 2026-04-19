@@ -8,12 +8,17 @@ multiples dominios, admin panel unificado, deploy por `git push` a Hostinger.
 Fase 1 en curso: motor base.
 
 - [x] Schema SQL inicial (`migrations/001_initial_schema.sql`)
-- [x] Core: `Autoloader`, `Database` (PDO), `Site` (tenant resolver), `Router`
+- [x] Core: `Autoloader`, `Database` (PDO), `Site` (tenant resolver), `Router`,
+      `View`, `SEO`, `Markdown`, `Session`, `Csrf`, `Flash`, `Auth`
 - [x] Entry point `public/index.php` + `.htaccess` con HTTPS forzado y security headers
 - [x] Migration runner CLI (`migrate.php`)
-- [ ] Admin panel (login + CRUD sites/products/articles/affiliate_links)
-- [ ] Tema `default` con layouts/partials/views y schema.org JSON-LD
-- [ ] Modelos (`Article`, `Product`, `Category`, `AffiliateLink`, `Site`)
+- [x] Modelos (`Article`, `Product`, `Category`, `AffiliateLink`, `Author`, `Site`)
+- [x] Tema `default` con layouts/partials/views y schema.org JSON-LD
+- [x] Frontend publico navegable: home, catalogo, categoria, producto, 4 tipos de articulo,
+      sitemap, robots, tracking `/go/{slug}`
+- [x] Admin panel (login + CRUD sites/categories/authors/affiliate_links/products/articles + analytics)
+- [ ] RSS `/feed.xml` y redirects desde tabla `redirects`
+- [ ] Tests (smoke de Router, Markdown, SEO)
 
 ## Stack
 
@@ -29,9 +34,22 @@ Fase 1 en curso: motor base.
 cp .env.example .env
 # editar credenciales de DB
 php migrate.php
+php bin/create-admin.php admin@ejemplo.com "Tu Nombre" superadmin   # crea tu user
 php -S localhost:8080 -t public
 # visitar http://localhost:8080 con DEV_SITE_DOMAIN apuntando a un dominio registrado en la tabla sites
+# admin en http://localhost:8080/admin/login
 ```
+
+## Admin
+
+El admin es global (no tenant-scoped) y vive bajo `/admin` de cualquier dominio
+registrado. Incluye:
+
+- Login bcrypt + CSRF en todos los POST, session cookie `Secure`+`HttpOnly`+`SameSite=Lax`.
+- Selector de sitio activo (stored en session; autoseleccion si el user solo tiene un sitio).
+- CRUD: sites, categorias, autores, afiliados, productos, articulos (con preview de Markdown).
+- Dashboard de analytics: clicks 30d, top afiliados/articulos/productos, serie diaria.
+- Roles: `superadmin` (acceso global), `admin`, `editor` (scope via `user_site_access`).
 
 ## Deploy
 
@@ -57,4 +75,7 @@ config/        config.php + .env (no commiteado)
 - Hash de IP con `APP_SALT` para clicks (no se guarda IP plana).
 - HTTPS forzado por `.htaccess`.
 - Headers: `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`.
-- Admin (pendiente): bcrypt + CSRF tokens + sesiones PHP.
+- Admin: passwords bcrypt (cost 12), CSRF en toda mutacion, `session_regenerate_id`
+  post-login, `noindex` en admin, `admin/.htaccess` con deny de .php directos.
+- Markdown sanitizado (escape HTML input, block de `javascript:` / `data:` en
+  href/src, `rel="nofollow noopener" target="_blank"` en links externos).

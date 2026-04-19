@@ -15,6 +15,14 @@ use Controllers\RedirectController;
 use Controllers\RobotsController;
 use Controllers\SitemapController;
 
+// El admin es global (no requiere tenant). Se delega antes de resolver Site.
+$currentPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?? '/';
+if (strncmp($currentPath, '/admin', 6) === 0
+    && ($currentPath === '/admin' || $currentPath[6] === '/')) {
+    require APP_ROOT . '/admin/entry.php';
+    exit;
+}
+
 $site = Site::resolve();
 if ($site === null) {
     http_response_code(404);
