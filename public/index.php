@@ -7,6 +7,13 @@ require dirname(__DIR__) . '/core/bootstrap.php';
 
 use Core\Router;
 use Core\Site;
+use Controllers\ArticleController;
+use Controllers\CategoryController;
+use Controllers\HomeController;
+use Controllers\ProductController;
+use Controllers\RedirectController;
+use Controllers\RobotsController;
+use Controllers\SitemapController;
 
 $site = Site::resolve();
 if ($site === null) {
@@ -18,22 +25,43 @@ if ($site === null) {
 
 $router = new Router();
 
-// Placeholders que se iran completando en siguientes iteraciones.
-// Por ahora: home stub, tracking stub, sitemap stub, 404 default.
+// Home
+$router->get('/', [HomeController::class, 'index']);
 
-$router->get('/', function () use ($site) {
-    header('Content-Type: text/plain; charset=utf-8');
-    echo "OK - Sitio activo: {$site->name} ({$site->domain}) - tema: {$site->themeName}";
-});
+// Catalogo / categorias
+$router->get('/productos',                 [CategoryController::class, 'index']);
+$router->get('/productos/{slug}',          [CategoryController::class, 'show']);
+$router->get('/producto/{slug}',           [ProductController::class,  'show']);
 
-$router->get('/go/{slug}', [\Controllers\RedirectController::class, 'affiliate']);
-$router->get('/sitemap.xml', [\Controllers\SitemapController::class, 'index']);
-$router->get('/robots.txt',  [\Controllers\RobotsController::class,  'index']);
+// Articulos por tipo. Cada tipo tiene un indice y una pagina de detalle.
+// El __type se inyecta como parametro para que el controller sepa el contexto.
+$router->get('/guias',            fn($p) => (new ArticleController())->indexByType(['__type' => 'guide']));
+$router->get('/guia/{slug}',      fn($p) => (new ArticleController())->show(array_merge($p, ['__type' => 'guide'])));
 
-$router->setNotFound(function (string $path) use ($site) {
+$router->get('/comparativas',     fn($p) => (new ArticleController())->indexByType(['__type' => 'comparison']));
+$router->get('/comparativa/{slug}', fn($p) => (new ArticleController())->show(array_merge($p, ['__type' => 'comparison'])));
+
+$router->get('/resenas',          fn($p) => (new ArticleController())->indexByType(['__type' => 'review']));
+$router->get('/resena/{slug}',    fn($p) => (new ArticleController())->show(array_merge($p, ['__type' => 'review'])));
+
+$router->get('/noticias',         fn($p) => (new ArticleController())->indexByType(['__type' => 'news']));
+$router->get('/noticia/{slug}',   fn($p) => (new ArticleController())->show(array_merge($p, ['__type' => 'news'])));
+
+// Afiliados + SEO infra
+$router->get('/go/{slug}',    [RedirectController::class, 'affiliate']);
+$router->get('/sitemap.xml',  [SitemapController::class,  'index']);
+$router->get('/robots.txt',   [RobotsController::class,   'index']);
+
+$router->setNotFound(function (string $path) {
     http_response_code(404);
-    header('Content-Type: text/plain; charset=utf-8');
-    echo "404 - {$path} no encontrado en {$site->domain}";
+    $seo = new \Core\SEO(\Core\Site::current());
+    $seo->rawTitle('404 - ' . \Core\Site::current()->name)->noindex();
+    $view = new \Core\View();
+    echo $view->render('404', [
+        'site'    => \Core\Site::current(),
+        'seo'     => $seo,
+        'message' => "La ruta $path no existe.",
+    ]);
 });
 
 try {
@@ -45,6 +73,7 @@ try {
         echo "500 - " . $e->getMessage() . "\n" . $e->getTraceAsString();
     } else {
         error_log('[referedmkt] ' . $e->getMessage() . ' @ ' . $e->getFile() . ':' . $e->getLine());
+        header('Content-Type: text/plain; charset=utf-8');
         echo "500 - Error interno";
     }
 }
