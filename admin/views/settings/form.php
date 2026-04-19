@@ -18,24 +18,30 @@ $view->layout('admin');
 
     <h2 style="margin-top:0;font-size:1.1rem">Tema visual</h2>
     <p class="admin-muted" style="margin-top:0">
-        Preset de colores + tipografía + radios. Cambia todo el look del sitio público con un click.
+        Click en un preset para cambiar todo el look del sitio público. El preview muestra
+        los colores principales del tema.
     </p>
-    <div class="admin-field">
-        <label>Preset</label>
-        <select name="theme_preset">
-            <?php foreach (\Core\ThemePresets::all() as $id => $preset): ?>
-                <option value="<?= htmlspecialchars($id, ENT_QUOTES, 'UTF-8') ?>" <?= ($values['theme_preset'] ?? 'indigo-night') === $id ? 'selected' : '' ?>>
-                    <?= htmlspecialchars($preset['name'], ENT_QUOTES, 'UTF-8') ?> — <?= htmlspecialchars($preset['vibe'], ENT_QUOTES, 'UTF-8') ?>
-                </option>
-            <?php endforeach; ?>
-        </select>
-        <small class="admin-hint">
-            <?php
-            $active = \Core\ThemePresets::get($values['theme_preset'] ?? 'indigo-night');
-            if ($active) echo htmlspecialchars($active['description'], ENT_QUOTES, 'UTF-8');
-            ?>
-        </small>
+    <?php $currentPreset = $values['theme_preset'] ?? 'indigo-night'; ?>
+    <div class="preset-grid">
+        <?php foreach (\Core\ThemePresets::all() as $id => $preset): ?>
+            <?php $isSelected = $currentPreset === $id; ?>
+            <label class="preset-card<?= $isSelected ? ' is-selected' : '' ?>">
+                <input type="radio" name="theme_preset" value="<?= htmlspecialchars($id, ENT_QUOTES, 'UTF-8') ?>" <?= $isSelected ? 'checked' : '' ?>
+                       onchange="this.closest('.preset-grid').querySelectorAll('.preset-card').forEach(c=>c.classList.remove('is-selected')); this.closest('.preset-card').classList.add('is-selected');">
+                <div class="preset-swatches">
+                    <?php foreach ($preset['swatches'] as $swatch): ?>
+                        <span style="background: <?= htmlspecialchars($swatch, ENT_QUOTES, 'UTF-8') ?>"></span>
+                    <?php endforeach; ?>
+                </div>
+                <div class="preset-name"><?= htmlspecialchars($preset['name'], ENT_QUOTES, 'UTF-8') ?></div>
+                <div class="preset-vibe"><?= htmlspecialchars($preset['vibe'], ENT_QUOTES, 'UTF-8') ?></div>
+                <span class="preset-mode-badge"><?= htmlspecialchars($preset['mode'], ENT_QUOTES, 'UTF-8') ?></span>
+            </label>
+        <?php endforeach; ?>
     </div>
+    <small class="admin-hint" style="margin-top:0.5rem;display:block">
+        Acordate de hacer click en <strong>Guardar</strong> abajo para que el preset se aplique.
+    </small>
 
     <h2 style="margin-top:2rem;font-size:1.1rem">Newsletter</h2>
     <p class="admin-muted" style="margin-top:0">
