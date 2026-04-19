@@ -6,6 +6,7 @@ use Admin\Context;
 use Core\Auth;
 use Core\Csrf;
 use Core\Flash;
+use Core\Migrator;
 
 /**
  * Base de admin controllers.
@@ -30,13 +31,36 @@ abstract class BaseController
     protected function render(string $view, array $data = []): void
     {
         $data = array_merge([
-            'user'        => $this->user,
-            'active_site' => Context::activeSite(),
-            'sites'       => Context::visibleSites(),
-            'csrf_token'  => Csrf::token(),
-            'flashes'     => Flash::consume(),
+            'user'               => $this->user,
+            'active_site'        => Context::activeSite(),
+            'sites'              => Context::visibleSites(),
+            'csrf_token'         => Csrf::token(),
+            'flashes'            => Flash::consume(),
+            'pending_migrations' => $this->pendingMigrationsCount(),
         ], $data);
         echo $this->view->render($view, $data);
+    }
+
+    /**
+     * Cuenta cheap de migraciones pendientes para el banner. Cacheada 60s via
+     * APCu si esta disponible para no golpear la DB en cada request del admin.
+     */
+    private function pendingMigrationsCount(): int
+    {
+        $cacheKey = 'refmkt_pending_migrations';
+        if (function_exists('apcu_fetch')) {
+            $hit = apcu_fetch($cacheKey, $ok);
+            if ($ok) { return (int)$hit; }
+        }
+        try {
+            $n = count(Migrator::pending());
+        } catch (\Throwable $e) {
+            $n = 0;
+        }
+        if (function_exists('apcu_store')) {
+            apcu_store($cacheKey, $n, 60);
+        }
+        return $n;
     }
 
     protected function redirect(string $path, int $code = 302): void

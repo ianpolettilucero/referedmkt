@@ -46,4 +46,12 @@ $view->layout('admin');
             <a class="admin-btn" href="/admin/analytics">Ver analytics</a>
         </p>
     </div>
+
+    <div class="admin-card" style="margin-top:1rem;">
+        <h2 style="margin:0 0 0.5rem;">Mantenimiento</h2>
+        <p class="admin-muted" style="margin-top:0">Backups on-demand. Descargá un dump <code>.sql.gz</code> antes de cambios importantes.</p>
+        <p>
+            <a class="admin-btn" href="/admin/maintenance/backup">Descargar backup de DB</a>
+        </p>
+    </div>
 <?php endif; ?>
