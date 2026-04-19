@@ -33,12 +33,16 @@ if (!function_exists('site_url')) {
 
 if (!function_exists('theme_asset')) {
     /**
-     * URL a un asset del tema activo (css/js/img dentro de /themes/{theme}/assets/).
+     * URL publica a un asset del tema activo.
+     *
+     * Los assets (CSS, JS, imagenes) viven en public/theme-assets/{theme}/...
+     * para que Apache los sirva directo (no dependen del docroot) mientras que
+     * los templates PHP (layouts/partials/views) siguen fuera del docroot.
      */
     function theme_asset(string $path): string
     {
         $site = \Core\Site::current();
-        return '/themes/' . $site->themeName . '/assets/' . ltrim($path, '/');
+        return '/theme-assets/' . $site->themeName . '/' . ltrim($path, '/');
     }
 }
 
