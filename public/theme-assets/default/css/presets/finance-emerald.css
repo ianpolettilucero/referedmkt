@@ -1,0 +1,46 @@
+/* Finance Emerald — Verde esmeralda + dorado + navy. Fintech / inversiones / trading. */
+:root, [data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #041512;
+    --bg-elevated: #0a1f1a;
+    --surface: #0f2722;
+    --surface-hover: #163530;
+    --surface-glass: rgba(15, 39, 34, 0.8);
+    --border: #1c3a34;
+    --border-strong: #2c5a50;
+
+    --text: #ecfdf5;
+    --text-muted: #86efac;
+    --text-subtle: #4ade80;
+
+    --primary: #059669;
+    --primary-hover: #10b981;
+    --primary-soft: rgba(5, 150, 105, 0.15);
+    --secondary: #d4af37;
+    --accent: #d4af37;
+    --accent-soft: rgba(212, 175, 55, 0.12);
+    --danger: #f87171;
+    --success: #10b981;
+
+    --glow-primary: 0 0 40px rgba(16, 185, 129, 0.3);
+    --glow-accent: 0 0 24px rgba(212, 175, 55, 0.28);
+    --gradient-primary: linear-gradient(135deg, #047857 0%, #059669 50%, #d4af37 100%);
+    --gradient-card: linear-gradient(180deg, #0f2722 0%, #0a1f1a 100%);
+    --gradient-hero: radial-gradient(ellipse at top, rgba(16, 185, 129, 0.18) 0%, transparent 70%);
+    --gradient-text: linear-gradient(135deg, #6ee7b7 0%, #fbbf24 50%, #d4af37 100%);
+}
+[data-theme="light"] {
+    color-scheme: light;
+    --bg: #f0fdf4;
+    --bg-elevated: #ffffff;
+    --surface: #ffffff;
+    --surface-hover: #dcfce7;
+    --border: #bbf7d0;
+    --text: #052e23;
+    --text-muted: #047857;
+    --primary-soft: rgba(5, 150, 105, 0.08);
+    --gradient-text: linear-gradient(135deg, #047857 0%, #b45309 50%, #d4af37 100%);
+}
+.product-price, .article-meta, .specs td { font-variant-numeric: tabular-nums; }
+h1, h2 { font-weight: 800; letter-spacing: -0.025em; }
+.site-brand::before { background: var(--gradient-primary); }

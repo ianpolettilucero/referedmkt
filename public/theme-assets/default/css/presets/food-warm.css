@@ -1,0 +1,46 @@
+/* Food & Warm — Tomato + verde olivo + crema. Friendly, alimentos/recetas/delivery. */
+:root {
+    color-scheme: light;
+    --bg: #fffaf3;
+    --bg-elevated: #ffffff;
+    --surface: #ffffff;
+    --surface-hover: #fef3e7;
+    --surface-glass: rgba(255, 250, 243, 0.88);
+    --border: #f5e1c7;
+    --border-strong: #e6c896;
+
+    --text: #3a1d0a;
+    --text-muted: #7c4a1f;
+    --text-subtle: #b07640;
+
+    --primary: #dc2626;
+    --primary-hover: #ef4444;
+    --primary-soft: rgba(220, 38, 38, 0.08);
+    --secondary: #65a30d;
+    --accent: #16a34a;
+    --accent-soft: rgba(22, 163, 74, 0.1);
+
+    --glow-primary: 0 0 32px rgba(220, 38, 38, 0.2);
+    --gradient-primary: linear-gradient(135deg, #dc2626 0%, #f97316 50%, #fbbf24 100%);
+    --gradient-card: linear-gradient(180deg, #ffffff 0%, #fffaf3 100%);
+    --gradient-hero: radial-gradient(ellipse at top, rgba(220, 38, 38, 0.08) 0%, transparent 60%);
+    --gradient-text: linear-gradient(135deg, #dc2626 0%, #ea580c 50%, #16a34a 100%);
+
+    --radius: 14px;
+    --radius-lg: 22px;
+}
+[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #1a110a;
+    --bg-elevated: #2a1a10;
+    --surface: #2d1b12;
+    --surface-hover: #3d261a;
+    --border: #4a2d1f;
+    --text: #fef3e7;
+    --text-muted: #fde8c8;
+    --primary-soft: rgba(220, 38, 38, 0.18);
+    --gradient-text: linear-gradient(135deg, #fca5a5 0%, #fed7aa 50%, #bbf7d0 100%);
+}
+h1, h2 { font-weight: 800; letter-spacing: -0.02em; }
+.product-card, .article-card { border-radius: 18px; }
+.btn { border-radius: 99px; }

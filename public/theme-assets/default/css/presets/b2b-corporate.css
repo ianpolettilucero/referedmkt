@@ -1,0 +1,55 @@
+/* B2B Corporate — Navy + gris profesional. Light default. Consultoría / legal / B2B serio. */
+:root {
+    color-scheme: light;
+    --bg: #f8fafc;
+    --bg-elevated: #ffffff;
+    --surface: #ffffff;
+    --surface-hover: #f1f5f9;
+    --surface-glass: rgba(255, 255, 255, 0.88);
+    --border: #e2e8f0;
+    --border-strong: #cbd5e1;
+
+    --text: #0f172a;
+    --text-muted: #475569;
+    --text-subtle: #94a3b8;
+    --text-on-primary: #ffffff;
+
+    --primary: #1e40af;
+    --primary-hover: #2563eb;
+    --primary-soft: rgba(30, 64, 175, 0.08);
+    --secondary: #0891b2;
+    --accent: #b45309;
+    --accent-soft: rgba(180, 83, 9, 0.08);
+
+    --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
+    --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
+    --shadow-lg: 0 14px 40px rgba(15, 23, 42, 0.1);
+    --glow-primary: 0 0 32px rgba(30, 64, 175, 0.14);
+
+    --gradient-primary: linear-gradient(135deg, #1e40af 0%, #2563eb 50%, #0891b2 100%);
+    --gradient-card: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    --gradient-hero: radial-gradient(ellipse at top, rgba(30, 64, 175, 0.08) 0%, transparent 60%);
+    --gradient-text: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #0891b2 100%);
+
+    --radius: 8px;
+    --radius-lg: 12px;
+}
+[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #0f172a;
+    --bg-elevated: #1e293b;
+    --surface: #1e293b;
+    --surface-hover: #334155;
+    --surface-glass: rgba(30, 41, 59, 0.8);
+    --border: #334155;
+    --border-strong: #475569;
+    --text: #f1f5f9;
+    --text-muted: #94a3b8;
+    --text-subtle: #64748b;
+    --primary: #60a5fa;
+    --primary-soft: rgba(96, 165, 250, 0.15);
+    --gradient-text: linear-gradient(135deg, #93c5fd 0%, #bae6fd 50%, #fde68a 100%);
+}
+h1, h2 { font-weight: 700; letter-spacing: -0.025em; }
+.site-header { box-shadow: var(--shadow-sm); }
+.btn-primary { box-shadow: var(--shadow-md); }
