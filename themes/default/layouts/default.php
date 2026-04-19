@@ -22,6 +22,15 @@
     <?php endif; ?>
     <link rel="stylesheet" href="<?= e(theme_asset('css/site.css')) ?>">
     <link rel="alternate" type="application/rss+xml" title="<?= e($site->name) ?>" href="/feed.xml">
+    <?php
+    // CSS personalizado por sitio (editable desde /admin/settings).
+    $customCss = (string)\Core\Settings::get($site->id, 'custom_css', '');
+    if ($customCss !== ''):
+        // Bloquear cierre de </style> embebido (defensa XSS minima).
+        $customCss = str_replace('</style>', '<\\/style>', $customCss);
+    ?>
+    <style id="refmkt-custom-css"><?= $customCss ?></style>
+    <?php endif; ?>
     <script>
         // Anti-FOUC: aplicar tema guardado antes del render.
         (function () {

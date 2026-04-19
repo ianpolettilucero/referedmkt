@@ -67,5 +67,24 @@ $view->layout('admin');
         <small class="admin-hint">Solo informativo (el proveedor generalmente redirige a su propia pagina de thanks).</small>
     </div>
 
+    <h2 style="margin-top:2rem;font-size:1.1rem">CSS personalizado</h2>
+    <p class="admin-muted" style="margin-top:0">
+        CSS que se inyecta al final del <code>&lt;head&gt;</code> del sitio publico. Override rapido
+        de colores, espaciados o cualquier estilo sin tocar el tema. Las variables clave:
+        <code>--primary</code>, <code>--accent</code>, <code>--bg</code>, <code>--surface</code>,
+        <code>--text</code>. Ejemplo:
+    </p>
+    <pre style="background:var(--a-bg);padding:0.75rem;border-radius:var(--a-radius);font-size:0.8rem;overflow:auto"><code>:root {
+  --primary: #ef4444;          /* rojo en vez de indigo */
+  --accent: #10b981;           /* verde mint en vez de dorado */
+}
+.hero h1 { font-weight: 900; }
+.site-footer { background: var(--bg-elevated); }</code></pre>
+
+    <div class="admin-field">
+        <label>custom_css</label>
+        <textarea name="custom_css" style="min-height:220px;font-family:ui-monospace,Menlo,monospace;font-size:13px"><?= htmlspecialchars($values['custom_css'] ?? '', ENT_QUOTES, 'UTF-8') ?></textarea>
+    </div>
+
     <button type="submit" class="admin-btn admin-btn-primary">Guardar</button>
 </form>

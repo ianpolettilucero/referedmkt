@@ -18,6 +18,7 @@ final class SettingsController extends BaseController
         'newsletter_email_field_name'  => 'email',
         'newsletter_hidden_fields_json'=> '',
         'newsletter_success_message'   => 'Listo. Revisá tu email para confirmar.',
+        'custom_css'                   => '',
     ];
 
     public function index(): void
