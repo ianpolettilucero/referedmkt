@@ -169,24 +169,28 @@ if (is_file($envFile)) {
     try {
         bootstrapDb($envConfig);
         \Core\Migrator::ensureTable();
-        $pending  = \Core\Migrator::pending();
-        $userCount = (int)\Core\Database::instance()->fetchColumn('SELECT COUNT(*) FROM users');
-        $realSite  = \Core\Database::instance()->fetch(
-            "SELECT * FROM sites WHERE active = 1 AND domain <> 'demo.localhost' LIMIT 1"
-        );
+        $pending = \Core\Migrator::pending();
 
         if ($pending) {
+            // Schema incompleto: no consultar users/sites todavia (tablas quizas
+            // no existen). Pasar directo al paso migrate.
             $state = 'migrate';
-        } elseif ($userCount === 0) {
-            $state = 'admin';
-        } elseif (!$realSite) {
-            $state = 'site';
         } else {
-            // Todo listo: marcar como instalado.
-            @file_put_contents($installedFlag, date('c'));
-            @chmod($installedFlag, 0600);
-            $state = 'done';
-            $doneSite = $realSite;
+            $userCount = (int)\Core\Database::instance()->fetchColumn('SELECT COUNT(*) FROM users');
+            $realSite  = \Core\Database::instance()->fetch(
+                "SELECT * FROM sites WHERE active = 1 AND domain <> 'demo.localhost' LIMIT 1"
+            );
+            if ($userCount === 0) {
+                $state = 'admin';
+            } elseif (!$realSite) {
+                $state = 'site';
+            } else {
+                // Todo listo: marcar como instalado.
+                @file_put_contents($installedFlag, date('c'));
+                @chmod($installedFlag, 0600);
+                $state = 'done';
+                $doneSite = $realSite;
+            }
         }
     } catch (Throwable $e) {
         $errors[] = 'Error: ' . $e->getMessage();
