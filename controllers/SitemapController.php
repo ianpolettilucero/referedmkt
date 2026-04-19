@@ -33,18 +33,45 @@ final class SitemapController
             ['site' => $site->id]
         );
 
+        $categories = $db->fetchAll(
+            "SELECT slug, updated_at AS lastmod
+             FROM categories WHERE site_id = :site
+             ORDER BY updated_at DESC",
+            ['site' => $site->id]
+        );
+
+        $authors = $db->fetchAll(
+            "SELECT a.slug, MAX(art.updated_at) AS lastmod
+             FROM authors a
+             LEFT JOIN articles art
+               ON art.author_id = a.id AND art.site_id = a.site_id AND art.status = 'published'
+             WHERE a.site_id = :site
+             GROUP BY a.id, a.slug",
+            ['site' => $site->id]
+        );
+
         header('Content-Type: application/xml; charset=utf-8');
         echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
         echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
 
         $this->url($base . '/', null);
+        $this->url($base . '/productos', null);
+        foreach (['guias','comparativas','resenas','noticias'] as $section) {
+            $this->url($base . '/' . $section, null);
+        }
 
+        foreach ($categories as $c) {
+            $this->url($base . '/productos/' . $c['slug'], $c['lastmod']);
+        }
         foreach ($articles as $a) {
             $path = $this->articlePath($a['article_type'], $a['slug']);
             $this->url($base . $path, $a['lastmod']);
         }
         foreach ($products as $p) {
             $this->url($base . '/producto/' . $p['slug'], $p['lastmod']);
+        }
+        foreach ($authors as $au) {
+            $this->url($base . '/autor/' . $au['slug'], $au['lastmod']);
         }
 
         echo '</urlset>';

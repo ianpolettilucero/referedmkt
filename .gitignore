@@ -4,6 +4,7 @@ config/config.local.php
 vendor/
 /public/uploads/*
 !/public/uploads/.gitkeep
+/backups/
 *.log
 .DS_Store
 .idea/

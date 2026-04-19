@@ -1,0 +1,17 @@
+# Proteccion extra para el directorio /admin si queda servible directamente.
+# El admin siempre se sirve via /admin front controller en public/index.php;
+# este archivo evita listings accidentales y permite bloquear por IP si se desea.
+
+Options -Indexes
+
+# Deny de archivos sensibles
+<FilesMatch "\.(php|env|log|sql)$">
+    # Todos los .php aca son vistas/controllers que NO deben ejecutarse directamente.
+    # Si Hostinger intenta ejecutarlos, devolvemos 403.
+    Require all denied
+</FilesMatch>
+
+# Permitir assets estaticos del admin (/admin/assets/...)
+<FilesMatch "\.(css|js|png|jpg|jpeg|gif|svg|woff2?|ico)$">
+    Require all granted
+</FilesMatch>

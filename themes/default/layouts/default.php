@@ -15,6 +15,7 @@
     <link rel="icon" href="<?= e($site->faviconUrl) ?>">
     <?php endif; ?>
     <link rel="stylesheet" href="<?= e(theme_asset('css/site.css')) ?>">
+    <link rel="alternate" type="application/rss+xml" title="<?= e($site->name) ?>" href="/feed.xml">
     <?php if ($site->googleAnalyticsId): ?>
     <script async src="https://www.googletagmanager.com/gtag/js?id=<?= e($site->googleAnalyticsId) ?>"></script>
     <script>

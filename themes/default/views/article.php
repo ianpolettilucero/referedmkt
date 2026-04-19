@@ -42,4 +42,6 @@ $view->layout('default');
             </div>
         </section>
     <?php endif; ?>
+
+    <?= $view->partial('newsletter_signup') ?>
 </article>
