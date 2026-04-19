@@ -5,6 +5,7 @@ use Admin\AdminView;
 use Core\Auth;
 use Core\Csrf;
 use Core\Flash;
+use Core\RateLimiter;
 
 final class AuthController
 {
@@ -34,8 +35,19 @@ final class AuthController
             return;
         }
 
-        if (!Auth::attempt($email, $pass)) {
-            // Rate-limit simple (duerme 400ms ante fallo para frenar brute force basico).
+        if (!RateLimiter::check($email)) {
+            // Mensaje generico para no filtrar si el limite es por IP o por email.
+            Flash::error('Demasiados intentos fallidos. Probá de nuevo en 15 minutos.');
+            header('Location: /admin/login', true, 302);
+            return;
+        }
+
+        $ok = Auth::attempt($email, $pass);
+        RateLimiter::record($email, $ok);
+        RateLimiter::maybeGC();
+
+        if (!$ok) {
+            // Delay fijo ante fallo (suma una barrera al brute force distribuido).
             usleep(400000);
             Flash::error('Credenciales invalidas.');
             header('Location: /admin/login', true, 302);

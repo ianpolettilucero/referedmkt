@@ -91,7 +91,10 @@ if (!empty($row['published_at'])) {
     <div class="admin-grid admin-grid-2">
         <div class="admin-field">
             <label>Imagen destacada</label>
-            <input name="featured_image" value="<?= htmlspecialchars($row['featured_image'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
+            <div style="display:flex;gap:0.3rem">
+                <input name="featured_image" id="featured_image" value="<?= htmlspecialchars($row['featured_image'] ?? '', ENT_QUOTES, 'UTF-8') ?>" style="flex:1">
+                <button type="button" class="admin-btn" data-picker-target="featured_image">Elegir…</button>
+            </div>
         </div>
         <div class="admin-field">
             <label>Fecha de publicación</label>
@@ -114,8 +117,9 @@ if (!empty($row['published_at'])) {
     <div class="admin-field">
         <label>Contenido (Markdown)</label>
         <textarea name="content" id="content" style="min-height:360px" required><?= htmlspecialchars($row['content'] ?? '', ENT_QUOTES, 'UTF-8') ?></textarea>
-        <div style="display:flex;gap:0.5rem;align-items:center;margin-top:0.3rem">
+        <div style="display:flex;gap:0.5rem;align-items:center;margin-top:0.3rem;flex-wrap:wrap">
             <button type="button" id="preview-btn" class="admin-btn admin-btn-subtle">Previsualizar</button>
+            <button type="button" class="admin-btn admin-btn-subtle" data-picker-target="content" data-picker-mode="markdown">Insertar imagen…</button>
             <small class="admin-hint">Markdown soportado: #, listas, **bold**, *italic*, `code`, ```fences```, [link](url), ![img](src), > quote.</small>
         </div>
         <div id="preview" class="admin-card" style="margin-top:0.5rem;display:none"></div>
@@ -134,6 +138,7 @@ if (!empty($row['published_at'])) {
     <button type="submit" class="admin-btn admin-btn-primary">Guardar</button>
 </form>
 
+<?= $view->partial('image_picker', ['csrf_token' => $csrf_token]) ?>
 <script>
 (function(){
     const btn = document.getElementById('preview-btn');

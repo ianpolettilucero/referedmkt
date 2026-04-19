@@ -104,6 +104,12 @@ $router->group('/admin', function (Router $r) {
     $r->post('/redirects/{id}',        [A\RedirectsController::class, 'update']);
     $r->post('/redirects/{id}/delete', [A\RedirectsController::class, 'destroy']);
 
+    // Uploads
+    $r->get('/uploads',              [A\UploadsController::class, 'index']);
+    $r->post('/uploads',             [A\UploadsController::class, 'store']);
+    $r->get('/uploads.json',         [A\UploadsController::class, 'listJson']);
+    $r->post('/uploads/{id}/delete', [A\UploadsController::class, 'destroy']);
+
     // Analytics
     $r->get('/analytics', [A\AnalyticsController::class, 'index']);
 });

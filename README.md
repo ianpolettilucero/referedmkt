@@ -15,10 +15,13 @@ Fase 1 en curso: motor base.
 - [x] Modelos (`Article`, `Product`, `Category`, `AffiliateLink`, `Author`, `Site`)
 - [x] Tema `default` con layouts/partials/views y schema.org JSON-LD
 - [x] Frontend publico navegable: home, catalogo, categoria, producto, 4 tipos de articulo,
-      sitemap, robots, tracking `/go/{slug}`, autor `/autor/{slug}`, RSS `/feed.xml`
-- [x] Admin panel (login + CRUD sites/categories/authors/affiliate_links/products/articles/redirects + analytics)
+      sitemap, robots, tracking `/go/{slug}`, autor `/autor/{slug}`, RSS `/feed.xml`,
+      busqueda `/buscar`, comparador `/comparar?ids=`
+- [x] Admin panel (login con rate limit + CRUD sites/categories/authors/affiliate_links/
+      products/articles/redirects + biblioteca de imagenes + analytics)
 - [x] Redirects desde tabla `redirects` (middleware previo al router)
-- [x] Tests smoke (40 tests: Router, Markdown, SEO, Site, slugify)
+- [x] Uploads de imagenes con MIME-check real, SVG sanitization, picker reusable
+- [x] Tests smoke (50 tests: Router, Markdown, SEO, Site, slugify, Upload, RateLimiter)
 
 ## Stack
 

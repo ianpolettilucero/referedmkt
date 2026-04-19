@@ -10,11 +10,13 @@ use Core\Site;
 use Controllers\ArticleController;
 use Controllers\AuthorController;
 use Controllers\CategoryController;
+use Controllers\CompareController;
 use Controllers\FeedController;
 use Controllers\HomeController;
 use Controllers\ProductController;
 use Controllers\RedirectController;
 use Controllers\RobotsController;
+use Controllers\SearchController;
 use Controllers\SitemapController;
 
 // El admin es global (no requiere tenant). Se delega antes de resolver Site.
@@ -63,6 +65,10 @@ $router->get('/noticia/{slug}',   fn($p) => (new ArticleController())->show(arra
 
 // Autores
 $router->get('/autor/{slug}', [AuthorController::class, 'show']);
+
+// Busqueda + comparador
+$router->get('/buscar',   [SearchController::class,  'index']);
+$router->get('/comparar', [CompareController::class, 'index']);
 
 // Afiliados + SEO infra
 $router->get('/go/{slug}',    [RedirectController::class, 'affiliate']);

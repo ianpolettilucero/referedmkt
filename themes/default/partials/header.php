@@ -13,6 +13,7 @@
             <a href="/guias">Guías</a>
             <a href="/comparativas">Comparativas</a>
             <a href="/resenas">Reseñas</a>
+            <a href="/buscar" aria-label="Buscar">🔍</a>
         </nav>
     </div>
 </header>

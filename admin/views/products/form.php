@@ -70,7 +70,10 @@ $specsToText = function ($specs) {
         </div>
         <div class="admin-field">
             <label>Logo URL</label>
-            <input name="logo_url" value="<?= htmlspecialchars($row['logo_url'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
+            <div style="display:flex;gap:0.3rem">
+                <input name="logo_url" id="logo_url" value="<?= htmlspecialchars($row['logo_url'] ?? '', ENT_QUOTES, 'UTF-8') ?>" style="flex:1">
+                <button type="button" class="admin-btn" data-picker-target="logo_url">Elegir…</button>
+            </div>
         </div>
     </div>
 
@@ -142,3 +145,5 @@ $specsToText = function ($specs) {
 
     <button type="submit" class="admin-btn admin-btn-primary">Guardar</button>
 </form>
+
+<?= $view->partial('image_picker', ['csrf_token' => $csrf_token]) ?>
