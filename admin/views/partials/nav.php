@@ -25,6 +25,7 @@ function admin_nav_active(string $href): string {
             <a class="admin-nav-link<?= admin_nav_active('/admin/articles') ?>" href="/admin/articles">Artículos</a>
             <a class="admin-nav-link<?= admin_nav_active('/admin/authors') ?>" href="/admin/authors">Autores</a>
             <a class="admin-nav-link<?= admin_nav_active('/admin/affiliate-links') ?>" href="/admin/affiliate-links">Afiliados</a>
+            <a class="admin-nav-link<?= admin_nav_active('/admin/redirects') ?>" href="/admin/redirects">Redirects</a>
             <a class="admin-nav-link<?= admin_nav_active('/admin/analytics') ?>" href="/admin/analytics">Analytics</a>
         </nav>
 

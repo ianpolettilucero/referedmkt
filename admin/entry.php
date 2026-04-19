@@ -96,6 +96,14 @@ $router->group('/admin', function (Router $r) {
     $r->post('/articles/{id}/delete', [A\ArticlesController::class, 'destroy']);
     $r->post('/articles/preview',     [A\ArticlesController::class, 'preview']);
 
+    // Redirects
+    $r->get('/redirects',              [A\RedirectsController::class, 'index']);
+    $r->get('/redirects/new',          [A\RedirectsController::class, 'create']);
+    $r->post('/redirects',             [A\RedirectsController::class, 'store']);
+    $r->get('/redirects/{id}/edit',    [A\RedirectsController::class, 'edit']);
+    $r->post('/redirects/{id}',        [A\RedirectsController::class, 'update']);
+    $r->post('/redirects/{id}/delete', [A\RedirectsController::class, 'destroy']);
+
     // Analytics
     $r->get('/analytics', [A\AnalyticsController::class, 'index']);
 });

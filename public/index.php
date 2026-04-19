@@ -8,7 +8,9 @@ require dirname(__DIR__) . '/core/bootstrap.php';
 use Core\Router;
 use Core\Site;
 use Controllers\ArticleController;
+use Controllers\AuthorController;
 use Controllers\CategoryController;
+use Controllers\FeedController;
 use Controllers\HomeController;
 use Controllers\ProductController;
 use Controllers\RedirectController;
@@ -30,6 +32,10 @@ if ($site === null) {
     echo "Sitio no configurado para este dominio.";
     exit;
 }
+
+// Si el operador definio un redirect en el admin para este path, ejecutarlo
+// antes de cualquier routing (preserva SEO ante cambios de URL).
+\Core\Redirects::maybeHandle($site->id, $currentPath);
 
 $router = new Router();
 
@@ -55,10 +61,14 @@ $router->get('/resena/{slug}',    fn($p) => (new ArticleController())->show(arra
 $router->get('/noticias',         fn($p) => (new ArticleController())->indexByType(['__type' => 'news']));
 $router->get('/noticia/{slug}',   fn($p) => (new ArticleController())->show(array_merge($p, ['__type' => 'news'])));
 
+// Autores
+$router->get('/autor/{slug}', [AuthorController::class, 'show']);
+
 // Afiliados + SEO infra
 $router->get('/go/{slug}',    [RedirectController::class, 'affiliate']);
 $router->get('/sitemap.xml',  [SitemapController::class,  'index']);
 $router->get('/robots.txt',   [RobotsController::class,   'index']);
+$router->get('/feed.xml',     [FeedController::class,     'index']);
 
 $router->setNotFound(function (string $path) {
     http_response_code(404);

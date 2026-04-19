@@ -15,10 +15,10 @@ Fase 1 en curso: motor base.
 - [x] Modelos (`Article`, `Product`, `Category`, `AffiliateLink`, `Author`, `Site`)
 - [x] Tema `default` con layouts/partials/views y schema.org JSON-LD
 - [x] Frontend publico navegable: home, catalogo, categoria, producto, 4 tipos de articulo,
-      sitemap, robots, tracking `/go/{slug}`
-- [x] Admin panel (login + CRUD sites/categories/authors/affiliate_links/products/articles + analytics)
-- [ ] RSS `/feed.xml` y redirects desde tabla `redirects`
-- [ ] Tests (smoke de Router, Markdown, SEO)
+      sitemap, robots, tracking `/go/{slug}`, autor `/autor/{slug}`, RSS `/feed.xml`
+- [x] Admin panel (login + CRUD sites/categories/authors/affiliate_links/products/articles/redirects + analytics)
+- [x] Redirects desde tabla `redirects` (middleware previo al router)
+- [x] Tests smoke (40 tests: Router, Markdown, SEO, Site, slugify)
 
 ## Stack
 
@@ -39,6 +39,15 @@ php -S localhost:8080 -t public
 # visitar http://localhost:8080 con DEV_SITE_DOMAIN apuntando a un dominio registrado en la tabla sites
 # admin en http://localhost:8080/admin/login
 ```
+
+## Tests
+
+```bash
+php tests/run.php
+```
+
+Corre 40 tests smoke sin necesidad de DB. Sin framework: `tests/TestRunner.php`
+es un runner minimal ~50 lineas de PHP puro.
 
 ## Admin
 
