@@ -1,0 +1,17 @@
+# Root-level fallback: si Hostinger sirve desde el root del repo y no desde /public,
+# redirige todo a public/ para que el front controller reciba las requests.
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>
+
+# Bloqueo explicito de carpetas sensibles al nivel del repo.
+RedirectMatch 404 /\.git(/|$)
+RedirectMatch 404 /config(/|$)
+RedirectMatch 404 /core(/|$)
+RedirectMatch 404 /models(/|$)
+RedirectMatch 404 /controllers(/|$)
+RedirectMatch 404 /migrations(/|$)
+RedirectMatch 404 /vendor(/|$)
+RedirectMatch 404 /tests(/|$)
