@@ -10,6 +10,7 @@ final class SettingsController extends BaseController
      * Keys expuestas al form. value = default si no existe.
      */
     private const KEYS = [
+        'theme_preset'                 => 'indigo-night',
         'newsletter_enabled'           => '0',
         'newsletter_heading'           => 'Suscribite al newsletter',
         'newsletter_description'       => 'Recibí guías nuevas y análisis sin spam.',
@@ -45,6 +46,11 @@ final class SettingsController extends BaseController
             // Validaciones especificas.
             if ($k === 'newsletter_enabled') {
                 $v = $this->boolInput('newsletter_enabled') ? '1' : '0';
+            }
+            if ($k === 'theme_preset' && $v !== '' && !\Core\ThemePresets::exists($v)) {
+                Flash::error('Preset de tema desconocido.');
+                $this->redirect('/admin/settings');
+                return;
             }
             if ($k === 'newsletter_hidden_fields_json' && $v !== '') {
                 $decoded = json_decode($v, true);

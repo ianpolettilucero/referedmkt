@@ -16,7 +16,28 @@ $view->layout('admin');
 <form method="post" action="/admin/settings" class="admin-form admin-card">
     <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrf_token, ENT_QUOTES, 'UTF-8') ?>">
 
-    <h2 style="margin-top:0;font-size:1.1rem">Newsletter</h2>
+    <h2 style="margin-top:0;font-size:1.1rem">Tema visual</h2>
+    <p class="admin-muted" style="margin-top:0">
+        Preset de colores + tipografía + radios. Cambia todo el look del sitio público con un click.
+    </p>
+    <div class="admin-field">
+        <label>Preset</label>
+        <select name="theme_preset">
+            <?php foreach (\Core\ThemePresets::all() as $id => $preset): ?>
+                <option value="<?= htmlspecialchars($id, ENT_QUOTES, 'UTF-8') ?>" <?= ($values['theme_preset'] ?? 'indigo-night') === $id ? 'selected' : '' ?>>
+                    <?= htmlspecialchars($preset['name'], ENT_QUOTES, 'UTF-8') ?> — <?= htmlspecialchars($preset['vibe'], ENT_QUOTES, 'UTF-8') ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+        <small class="admin-hint">
+            <?php
+            $active = \Core\ThemePresets::get($values['theme_preset'] ?? 'indigo-night');
+            if ($active) echo htmlspecialchars($active['description'], ENT_QUOTES, 'UTF-8');
+            ?>
+        </small>
+    </div>
+
+    <h2 style="margin-top:2rem;font-size:1.1rem">Newsletter</h2>
     <p class="admin-muted" style="margin-top:0">
         Form embebido que postea directo a tu proveedor (ConvertKit, Buttondown, Mailchimp, etc).
         No guardamos emails en esta base de datos.

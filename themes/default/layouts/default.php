@@ -21,9 +21,16 @@
     <link rel="icon" href="<?= e($site->faviconUrl) ?>">
     <?php endif; ?>
     <link rel="stylesheet" href="<?= e(theme_asset('css/site.css')) ?>">
+    <?php
+    // Preset visual seleccionado desde /admin/settings (theme_preset).
+    $preset = (string)\Core\Settings::get($site->id, 'theme_preset', 'indigo-night');
+    if ($preset !== '' && $preset !== 'indigo-night' && \Core\ThemePresets::exists($preset)):
+    ?>
+    <link rel="stylesheet" href="<?= e(theme_asset('css/presets/' . $preset . '.css')) ?>">
+    <?php endif; ?>
     <link rel="alternate" type="application/rss+xml" title="<?= e($site->name) ?>" href="/feed.xml">
     <?php
-    // CSS personalizado por sitio (editable desde /admin/settings).
+    // CSS personalizado por sitio (override final, despues del preset).
     $customCss = (string)\Core\Settings::get($site->id, 'custom_css', '');
     if ($customCss !== ''):
         // Bloquear cierre de </style> embebido (defensa XSS minima).

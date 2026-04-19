@@ -1,0 +1,51 @@
+/* Luxury Gold — Negro absoluto + dorado real. Letter-spacing amplio, editorial. */
+:root, [data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #000000;
+    --bg-elevated: #0a0906;
+    --surface: #14110a;
+    --surface-hover: #1e1810;
+    --surface-glass: rgba(10, 9, 6, 0.9);
+    --border: #2a2318;
+    --border-strong: #4a3d28;
+
+    --text: #fff9ec;
+    --text-muted: #c9b88f;
+    --text-subtle: #8a7a56;
+    --text-on-primary: #000000;
+
+    --primary: #d4af37;
+    --primary-hover: #e8c855;
+    --primary-soft: rgba(212, 175, 55, 0.14);
+    --secondary: #c0a062;
+    --accent: #ffffff;
+    --accent-soft: rgba(255, 255, 255, 0.08);
+
+    --shadow-lg: 0 22px 60px rgba(0, 0, 0, 0.85);
+    --glow-primary: 0 0 48px rgba(212, 175, 55, 0.35);
+    --glow-accent: 0 0 24px rgba(255, 255, 255, 0.2);
+
+    --gradient-primary: linear-gradient(135deg, #d4af37 0%, #ffd700 50%, #c0a062 100%);
+    --gradient-card: linear-gradient(180deg, #14110a 0%, #0a0906 100%);
+    --gradient-hero: radial-gradient(ellipse at top, rgba(212, 175, 55, 0.2) 0%, transparent 70%);
+    --gradient-text: linear-gradient(135deg, #fff1b8 0%, #d4af37 50%, #8b6914 100%);
+
+    --radius: 2px;
+    --radius-lg: 4px;
+    --radius-xl: 6px;
+}
+[data-theme="light"] {
+    --bg: #faf7f0;
+    --bg-elevated: #ffffff;
+    --surface: #ffffff;
+    --text: #1a1408;
+    --text-muted: #6b5a2e;
+    --gradient-text: linear-gradient(135deg, #8b6914 0%, #d4af37 50%, #b8860b 100%);
+}
+h1, h2, h3 { font-weight: 300; letter-spacing: 0.04em; text-transform: uppercase; }
+.hero h1 { font-weight: 200; letter-spacing: 0.08em; }
+.site-brand { text-transform: uppercase; letter-spacing: 0.25em; font-size: 0.9rem; font-weight: 500; }
+.site-brand::before { border-radius: 0; width: 2px; height: 24px; }
+.btn { text-transform: uppercase; letter-spacing: 0.18em; font-weight: 500; font-size: 0.8rem; padding: 0.9rem 2rem; }
+.btn-primary { color: #000; }
+.product-card, .article-card, .product-header { border-radius: 2px; border-width: 1px; }

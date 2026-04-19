@@ -1,0 +1,46 @@
+/* Retail Vibrant — Magenta + amarillo + naranja. Energético, consumer. */
+:root {
+    color-scheme: light;
+    --bg: #fff7fb;
+    --bg-elevated: #ffffff;
+    --surface: #ffffff;
+    --surface-hover: #fef2f8;
+    --surface-glass: rgba(255, 255, 255, 0.88);
+    --border: #fbcfe8;
+    --border-strong: #f9a8d4;
+
+    --text: #3f0d26;
+    --text-muted: #831843;
+    --text-subtle: #be185d;
+
+    --primary: #ec4899;
+    --primary-hover: #f472b6;
+    --primary-soft: rgba(236, 72, 153, 0.1);
+    --secondary: #f97316;
+    --accent: #eab308;
+    --accent-soft: rgba(234, 179, 8, 0.12);
+
+    --glow-primary: 0 0 40px rgba(236, 72, 153, 0.28);
+    --gradient-primary: linear-gradient(135deg, #ec4899 0%, #f97316 50%, #eab308 100%);
+    --gradient-card: linear-gradient(180deg, #ffffff 0%, #fef2f8 100%);
+    --gradient-hero: radial-gradient(ellipse at top, rgba(236, 72, 153, 0.14) 0%, transparent 65%);
+    --gradient-text: linear-gradient(135deg, #be185d 0%, #f97316 50%, #eab308 100%);
+
+    --radius: 16px;
+    --radius-lg: 24px;
+}
+[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #1a0b14;
+    --bg-elevated: #2a0f20;
+    --surface: #2d1224;
+    --surface-hover: #3d1830;
+    --border: #4a1f3a;
+    --text: #fce7f3;
+    --text-muted: #fbcfe8;
+    --primary-soft: rgba(236, 72, 153, 0.18);
+    --gradient-text: linear-gradient(135deg, #f9a8d4 0%, #fed7aa 50%, #fde68a 100%);
+}
+.product-card, .article-card { border-radius: 20px; }
+.btn { border-radius: 99px; font-weight: 700; }
+.hero h1 { font-weight: 900; }
