@@ -46,8 +46,9 @@ $action = $is_new ? '/admin/categories' : '/admin/categories/' . (int)$row['id']
     </div>
 
     <div class="admin-field">
-        <label>Descripción</label>
-        <textarea name="description"><?= htmlspecialchars($row['description'] ?? '', ENT_QUOTES, 'UTF-8') ?></textarea>
+        <label>Descripción (soporta Markdown)</label>
+        <textarea name="description" style="min-height:140px"><?= htmlspecialchars($row['description'] ?? '', ENT_QUOTES, 'UTF-8') ?></textarea>
+        <small class="admin-hint">Podés usar <strong>Markdown</strong>: títulos, negrita, listas, links, citas, tablas. Aparece arriba del listado de productos de la categoría.</small>
     </div>
 
     <div class="admin-field">

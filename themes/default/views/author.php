@@ -19,7 +19,9 @@ $social = is_array($author['social_links'] ?? null) ? $author['social_links'] : 
                 <p class="muted"><?= e($author['expertise']) ?></p>
             <?php endif; ?>
             <?php if (!empty($author['bio'])): ?>
-                <p><?= e($author['bio']) ?></p>
+                <div class="author-bio">
+                    <?= \Core\Markdown::toHtml($author['bio']) ?>
+                </div>
             <?php endif; ?>
             <?php if ($social): ?>
                 <p>

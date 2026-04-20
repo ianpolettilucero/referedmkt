@@ -38,8 +38,9 @@ $social = is_array($row['social_links'] ?? null) ? $row['social_links'] : [];
     </div>
 
     <div class="admin-field">
-        <label>Bio</label>
-        <textarea name="bio"><?= htmlspecialchars($row['bio'] ?? '', ENT_QUOTES, 'UTF-8') ?></textarea>
+        <label>Bio (soporta Markdown)</label>
+        <textarea name="bio" style="min-height:160px"><?= htmlspecialchars($row['bio'] ?? '', ENT_QUOTES, 'UTF-8') ?></textarea>
+        <small class="admin-hint">Podés usar <strong>Markdown</strong>: títulos (<code>## </code>), negrita (<code>**texto**</code>), listas (<code>- item</code>), links (<code>[texto](url)</code>), citas (<code>&gt; </code>), tablas. Ver la cheatsheet completa en el editor de artículos.</small>
     </div>
 
     <div class="admin-grid admin-grid-2">
