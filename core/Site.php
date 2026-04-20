@@ -28,6 +28,7 @@ final class Site
     public ?string $affiliateDisclosureText;
     public ?string $googleAnalyticsId;
     public ?string $googleSearchConsoleVerification;
+    public ?string $googleTagManagerId;
     public string $defaultLanguage;
     public string $defaultCountry;
     public ?string $metaTitleTemplate;
@@ -47,6 +48,7 @@ final class Site
         $this->affiliateDisclosureText         = $row['affiliate_disclosure_text'];
         $this->googleAnalyticsId               = $row['google_analytics_id'];
         $this->googleSearchConsoleVerification = $row['google_search_console_verification'];
+        $this->googleTagManagerId              = $row['google_tag_manager_id'] ?? null;
         $this->defaultLanguage                 = $row['default_language'] ?: 'es';
         $this->defaultCountry                  = $row['default_country'] ?: 'AR';
         $this->metaTitleTemplate               = $row['meta_title_template'];
