@@ -50,12 +50,14 @@
         })();
     </script>
     <?php if ($site->googleAnalyticsId): ?>
-    <script async src="https://www.googletagmanager.com/gtag/js?id=<?= e($site->googleAnalyticsId) ?>"></script>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=<?= e($site->googleAnalyticsId) ?>"
+            onerror="console.warn('[GA4] gtag.js no cargo para ID ' + <?= json_encode($site->googleAnalyticsId) ?> + '. Verificar en analytics.google.com que el Data Stream este activo y reciba datos, o esperar hasta 24h si el stream es nuevo.');"></script>
     <script>
-      window.dataLayer=window.dataLayer||[];
+      window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-      gtag('config', <?= json_encode($site->googleAnalyticsId) ?>, {anonymize_ip:true});
+      gtag('config', <?= json_encode($site->googleAnalyticsId) ?>);
     </script>
     <?php endif; ?>
     <?php if ($site->googleTagManagerId): ?>
