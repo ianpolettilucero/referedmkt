@@ -12,7 +12,9 @@ use Controllers\AuthorController;
 use Controllers\CategoryController;
 use Controllers\CompareController;
 use Controllers\FeedController;
+use Controllers\HealthController;
 use Controllers\HomeController;
+use Controllers\LlmsController;
 use Controllers\ProductController;
 use Controllers\RedirectController;
 use Controllers\RobotsController;
@@ -78,9 +80,11 @@ $router->get('/comparar', [CompareController::class, 'index']);
 
 // Afiliados + SEO infra
 $router->get('/go/{slug}',    [RedirectController::class, 'affiliate']);
-$router->get('/sitemap.xml',  [SitemapController::class,  'index']);
-$router->get('/robots.txt',   [RobotsController::class,   'index']);
-$router->get('/feed.xml',     [FeedController::class,     'index']);
+$router->get('/sitemap.xml',     [SitemapController::class, 'index']);
+$router->get('/robots.txt',      [RobotsController::class,  'index']);
+$router->get('/feed.xml',        [FeedController::class,    'index']);
+$router->get('/llms.txt',        [LlmsController::class,    'index']);
+$router->get('/llms-full.txt',   [LlmsController::class,    'full']);
 
 $router->setNotFound(function (string $path) {
     http_response_code(404);
