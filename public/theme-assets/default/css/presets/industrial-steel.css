@@ -1,26 +1,37 @@
-/* Industrial Steel — Naranja construcción + hierro + negro. Bordes rectos, bold. */
+/* Industrial Steel — Naranja construcción + hierro + negro. Bold uppercase. Ambos modos. */
 :root, [data-theme="dark"] {
     color-scheme: dark;
+
     --bg: #111111;
     --bg-elevated: #1a1a1a;
     --surface: #1f1f1f;
     --surface-hover: #2a2a2a;
-    --surface-glass: rgba(26, 26, 26, 0.85);
+    --surface-glass: rgba(26, 26, 26, 0.88);
     --border: #2f2f2f;
     --border-strong: #4a4a4a;
 
     --text: #f5f5f5;
     --text-muted: #a3a3a3;
     --text-subtle: #737373;
+    --text-on-primary: #ffffff;
 
     --primary: #f97316;
     --primary-hover: #fb923c;
     --primary-soft: rgba(249, 115, 22, 0.15);
+    --secondary: #ea580c;
     --accent: #fbbf24;
     --accent-soft: rgba(251, 191, 36, 0.15);
+    --danger: #dc2626;
+    --danger-soft: rgba(220, 38, 38, 0.15);
+    --success: #16a34a;
+    --success-soft: rgba(22, 163, 74, 0.15);
 
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.6);
     --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.6);
+    --shadow-lg: 0 18px 50px rgba(0, 0, 0, 0.8);
     --glow-primary: 0 0 30px rgba(249, 115, 22, 0.35);
+    --glow-accent: 0 0 24px rgba(251, 191, 36, 0.3);
+
     --gradient-primary: linear-gradient(135deg, #ea580c 0%, #f97316 50%, #fbbf24 100%);
     --gradient-card: linear-gradient(180deg, #1f1f1f 0%, #141414 100%);
     --gradient-hero: radial-gradient(ellipse at top, rgba(249, 115, 22, 0.18) 0%, transparent 65%);
@@ -29,15 +40,34 @@
     --radius-sm: 2px;
     --radius: 3px;
     --radius-lg: 4px;
-    --radius-xl: 6px;
 }
 [data-theme="light"] {
+    color-scheme: light;
+
     --bg: #fafafa;
     --bg-elevated: #ffffff;
     --surface: #ffffff;
     --surface-hover: #f5f5f5;
+    --surface-glass: rgba(255, 255, 255, 0.9);
+    --border: #d4d4d4;
+    --border-strong: #a3a3a3;
+
     --text: #171717;
     --text-muted: #525252;
+    --text-subtle: #737373;
+
+    --primary-soft: rgba(249, 115, 22, 0.08);
+    --accent-soft: rgba(251, 191, 36, 0.1);
+    --danger-soft: rgba(220, 38, 38, 0.08);
+    --success-soft: rgba(22, 163, 74, 0.08);
+
+    --gradient-card: linear-gradient(180deg, #ffffff 0%, #fafafa 100%);
+    --gradient-hero: radial-gradient(ellipse at top, rgba(249, 115, 22, 0.08) 0%, transparent 60%);
+    --gradient-text: linear-gradient(135deg, #c2410c 0%, #ea580c 50%, #f59e0b 100%);
+
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 18px 50px rgba(0, 0, 0, 0.12);
 }
 h1, h2, h3 { font-weight: 900; text-transform: uppercase; letter-spacing: -0.01em; }
 .site-brand { text-transform: uppercase; letter-spacing: 0.08em; }

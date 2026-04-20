@@ -1,0 +1,70 @@
+/* Forest Green — Verde bosque + tierra + crema. Outdoor/naturaleza. Ambos modos. */
+:root, [data-theme="dark"] {
+    color-scheme: dark;
+
+    --bg: #0a1410;
+    --bg-elevated: #0f1f18;
+    --surface: #142822;
+    --surface-hover: #1c3830;
+    --surface-glass: rgba(20, 40, 34, 0.82);
+    --border: #1e3c32;
+    --border-strong: #2d5a48;
+
+    --text: #ecfccb;
+    --text-muted: #bef264;
+    --text-subtle: #84cc16;
+    --text-on-primary: #ffffff;
+
+    --primary: #65a30d;
+    --primary-hover: #84cc16;
+    --primary-soft: rgba(101, 163, 13, 0.15);
+    --secondary: #a16207;
+    --accent: #fbbf24;
+    --accent-soft: rgba(251, 191, 36, 0.12);
+    --danger: #f97316;
+    --danger-soft: rgba(249, 115, 22, 0.15);
+    --success: #84cc16;
+    --success-soft: rgba(132, 204, 22, 0.15);
+
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.5);
+    --shadow-lg: 0 18px 50px rgba(0, 0, 0, 0.6);
+    --glow-primary: 0 0 40px rgba(132, 204, 22, 0.25);
+    --glow-accent: 0 0 24px rgba(251, 191, 36, 0.25);
+
+    --gradient-primary: linear-gradient(135deg, #3f6212 0%, #65a30d 50%, #a16207 100%);
+    --gradient-card: linear-gradient(180deg, #142822 0%, #0a1410 100%);
+    --gradient-hero: radial-gradient(ellipse at top, rgba(132, 204, 22, 0.18) 0%, transparent 70%);
+    --gradient-text: linear-gradient(135deg, #bef264 0%, #fde68a 50%, #fdba74 100%);
+}
+[data-theme="light"] {
+    color-scheme: light;
+
+    --bg: #f7f8f2;
+    --bg-elevated: #ffffff;
+    --surface: #ffffff;
+    --surface-hover: #ecfccb;
+    --surface-glass: rgba(255, 255, 255, 0.88);
+    --border: #d9f99d;
+    --border-strong: #bef264;
+
+    --text: #1a2e05;
+    --text-muted: #4d7c0f;
+    --text-subtle: #84cc16;
+
+    --primary: #4d7c0f;
+    --primary-hover: #65a30d;
+    --primary-soft: rgba(77, 124, 15, 0.08);
+    --accent: #b45309;
+
+    --shadow-sm: 0 1px 3px rgba(26, 46, 5, 0.06);
+    --shadow-md: 0 4px 16px rgba(26, 46, 5, 0.08);
+    --shadow-lg: 0 18px 50px rgba(26, 46, 5, 0.14);
+
+    --gradient-card: linear-gradient(180deg, #ffffff 0%, #f7f8f2 100%);
+    --gradient-hero: radial-gradient(ellipse at top, rgba(77, 124, 15, 0.08) 0%, transparent 60%);
+    --gradient-text: linear-gradient(135deg, #3f6212 0%, #a16207 50%, #b45309 100%);
+}
+h1, h2 { font-weight: 700; letter-spacing: -0.02em; }
+.product-card, .article-card { border-radius: 14px; }
+.btn { border-radius: 10px; }

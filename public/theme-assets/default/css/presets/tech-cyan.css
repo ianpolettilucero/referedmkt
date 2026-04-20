@@ -1,37 +1,68 @@
-/* Tech Cyan — Navy profundo + cyan eléctrico. Clean, Apple/Cloudflare vibe. */
+/* Tech Cyan — Navy profundo + cyan eléctrico. Ambos modos. */
 :root, [data-theme="dark"] {
     color-scheme: dark;
+
     --bg: #0b1120;
     --bg-elevated: #101828;
     --surface: #14202d;
     --surface-hover: #1c2d3e;
-    --surface-glass: rgba(20, 32, 45, 0.75);
+    --surface-glass: rgba(20, 32, 45, 0.78);
     --border: #1e2b3d;
     --border-strong: #334155;
 
     --text: #f1f5f9;
     --text-muted: #94a3b8;
     --text-subtle: #64748b;
+    --text-on-primary: #0b1120;
 
     --primary: #06b6d4;
     --primary-hover: #22d3ee;
     --primary-soft: rgba(6, 182, 212, 0.14);
     --secondary: #0ea5e9;
     --accent: #facc15;
+    --accent-soft: rgba(250, 204, 21, 0.14);
+    --danger: #f43f5e;
+    --danger-soft: rgba(244, 63, 94, 0.14);
+    --success: #22c55e;
+    --success-soft: rgba(34, 197, 94, 0.14);
 
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 20px rgba(6, 182, 212, 0.1);
+    --shadow-lg: 0 18px 50px rgba(0, 0, 0, 0.5);
     --glow-primary: 0 0 40px rgba(6, 182, 212, 0.35);
+    --glow-accent: 0 0 24px rgba(250, 204, 21, 0.25);
+
     --gradient-primary: linear-gradient(135deg, #06b6d4 0%, #0ea5e9 50%, #6366f1 100%);
+    --gradient-card: linear-gradient(180deg, #14202d 0%, #0b1120 100%);
     --gradient-hero: radial-gradient(ellipse at top, rgba(6, 182, 212, 0.22) 0%, transparent 70%);
     --gradient-text: linear-gradient(135deg, #67e8f9 0%, #a5f3fc 50%, #c7d2fe 100%);
 }
 [data-theme="light"] {
+    color-scheme: light;
+
     --bg: #f8fafc;
     --bg-elevated: #ffffff;
     --surface: #ffffff;
     --surface-hover: #f1f5f9;
+    --surface-glass: rgba(255, 255, 255, 0.86);
+    --border: #e2e8f0;
+    --border-strong: #cbd5e1;
+
     --text: #0f172a;
     --text-muted: #475569;
-    --primary-soft: rgba(6, 182, 212, 0.1);
+    --text-subtle: #94a3b8;
+
+    --primary-soft: rgba(6, 182, 212, 0.08);
+    --accent-soft: rgba(250, 204, 21, 0.1);
+    --danger-soft: rgba(244, 63, 94, 0.08);
+    --success-soft: rgba(34, 197, 94, 0.08);
+
+    --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.05);
+    --shadow-md: 0 6px 20px rgba(6, 182, 212, 0.1);
+    --shadow-lg: 0 18px 50px rgba(15, 23, 42, 0.12);
+    --glow-primary: 0 0 40px rgba(6, 182, 212, 0.18);
+
+    --gradient-card: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    --gradient-hero: radial-gradient(ellipse at top, rgba(6, 182, 212, 0.1) 0%, transparent 60%);
     --gradient-text: linear-gradient(135deg, #0891b2 0%, #0284c7 50%, #4f46e5 100%);
 }
-.site-brand::before { background: var(--gradient-primary); border-radius: 10px; }

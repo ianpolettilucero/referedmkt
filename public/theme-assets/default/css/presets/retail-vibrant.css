@@ -1,6 +1,7 @@
-/* Retail Vibrant — Magenta + amarillo + naranja. Energético, consumer. */
-:root {
+/* Retail Vibrant — Magenta + amarillo + naranja. Light default. Ambos modos. */
+:root, [data-theme="light"] {
     color-scheme: light;
+
     --bg: #fff7fb;
     --bg-elevated: #ffffff;
     --surface: #ffffff;
@@ -12,33 +13,58 @@
     --text: #3f0d26;
     --text-muted: #831843;
     --text-subtle: #be185d;
+    --text-on-primary: #ffffff;
 
-    --primary: #ec4899;
-    --primary-hover: #f472b6;
+    --primary: #db2777;
+    --primary-hover: #ec4899;
     --primary-soft: rgba(236, 72, 153, 0.1);
     --secondary: #f97316;
-    --accent: #eab308;
-    --accent-soft: rgba(234, 179, 8, 0.12);
+    --accent: #ca8a04;
+    --accent-soft: rgba(202, 138, 4, 0.12);
+    --danger: #dc2626;
+    --danger-soft: rgba(220, 38, 38, 0.1);
+    --success: #16a34a;
+    --success-soft: rgba(22, 163, 74, 0.1);
 
+    --shadow-sm: 0 1px 3px rgba(190, 24, 93, 0.08);
+    --shadow-md: 0 4px 20px rgba(236, 72, 153, 0.15);
+    --shadow-lg: 0 18px 50px rgba(190, 24, 93, 0.2);
     --glow-primary: 0 0 40px rgba(236, 72, 153, 0.28);
+    --glow-accent: 0 0 24px rgba(234, 179, 8, 0.25);
+
     --gradient-primary: linear-gradient(135deg, #ec4899 0%, #f97316 50%, #eab308 100%);
     --gradient-card: linear-gradient(180deg, #ffffff 0%, #fef2f8 100%);
     --gradient-hero: radial-gradient(ellipse at top, rgba(236, 72, 153, 0.14) 0%, transparent 65%);
-    --gradient-text: linear-gradient(135deg, #be185d 0%, #f97316 50%, #eab308 100%);
+    --gradient-text: linear-gradient(135deg, #be185d 0%, #ea580c 50%, #ca8a04 100%);
 
     --radius: 16px;
     --radius-lg: 24px;
 }
 [data-theme="dark"] {
     color-scheme: dark;
+
     --bg: #1a0b14;
     --bg-elevated: #2a0f20;
     --surface: #2d1224;
     --surface-hover: #3d1830;
+    --surface-glass: rgba(45, 18, 36, 0.85);
     --border: #4a1f3a;
+    --border-strong: #6b2a50;
+
     --text: #fce7f3;
-    --text-muted: #fbcfe8;
-    --primary-soft: rgba(236, 72, 153, 0.18);
+    --text-muted: #f9a8d4;
+    --text-subtle: #d973a8;
+
+    --primary: #ec4899;
+    --primary-soft: rgba(236, 72, 153, 0.2);
+    --accent: #fde047;
+
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.5);
+    --shadow-md: 0 4px 20px rgba(236, 72, 153, 0.18);
+    --shadow-lg: 0 18px 50px rgba(0, 0, 0, 0.6);
+
+    --gradient-card: linear-gradient(180deg, #2d1224 0%, #1a0b14 100%);
+    --gradient-hero: radial-gradient(ellipse at top, rgba(236, 72, 153, 0.22) 0%, transparent 70%);
     --gradient-text: linear-gradient(135deg, #f9a8d4 0%, #fed7aa 50%, #fde68a 100%);
 }
 .product-card, .article-card { border-radius: 20px; }

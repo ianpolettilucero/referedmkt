@@ -21,21 +21,56 @@ final class Product extends Model
         return self::hydrateAll($stmt->fetchAll());
     }
 
+    public const SORTS = [
+        'featured'   => 'Destacados primero',
+        'rating'     => 'Mejor rating',
+        'price-asc'  => 'Precio: menor a mayor',
+        'price-desc' => 'Precio: mayor a menor',
+        'recent'     => 'Actualizado recientemente',
+        'az'         => 'Nombre A-Z',
+    ];
+
     /**
-     * Catalogo paginado con filtro opcional por categoria.
-     * @return array{items: array<int, array<string, mixed>>, total: int, page: int, per_page: int}
+     * Catalogo paginado con filtros + orden. Opcional: categoria, brand,
+     * rating minimo, precio max, orden.
+     *
+     * @param array{category_id?:?int, brand?:string, min_rating?:?float, max_price?:?float, sort?:string} $filters
+     * @return array{items: array<int, array<string, mixed>>, total: int, page: int, per_page: int, brands: array<int,string>}
      */
-    public static function catalog(int $siteId, ?int $categoryId, int $page = 1, int $perPage = 24): array
+    public static function catalog(int $siteId, array $filters = [], int $page = 1, int $perPage = 24): array
     {
         $page = max(1, $page);
         $offset = ($page - 1) * $perPage;
 
-        $where = 'p.site_id = :site';
+        $where  = 'p.site_id = :site';
         $params = ['site' => $siteId];
-        if ($categoryId !== null) {
+
+        if (!empty($filters['category_id'])) {
             $where .= ' AND p.category_id = :cat';
-            $params['cat'] = $categoryId;
+            $params['cat'] = (int)$filters['category_id'];
         }
+        if (!empty($filters['brand'])) {
+            $where .= ' AND p.brand = :brand';
+            $params['brand'] = (string)$filters['brand'];
+        }
+        if (!empty($filters['min_rating'])) {
+            $where .= ' AND p.rating >= :minr';
+            $params['minr'] = (float)$filters['min_rating'];
+        }
+        if (!empty($filters['max_price'])) {
+            $where .= ' AND (p.price_from IS NULL OR p.price_from <= :maxp)';
+            $params['maxp'] = (float)$filters['max_price'];
+        }
+
+        $sort = $filters['sort'] ?? 'featured';
+        $orderBy = match ($sort) {
+            'rating'     => 'p.rating DESC, p.updated_at DESC',
+            'price-asc'  => 'p.price_from IS NULL, p.price_from ASC, p.rating DESC',
+            'price-desc' => 'p.price_from DESC, p.rating DESC',
+            'recent'     => 'p.updated_at DESC',
+            'az'         => 'p.name ASC',
+            default      => 'p.featured DESC, p.rating DESC, p.updated_at DESC',
+        };
 
         $total = (int)self::db()->fetchColumn(
             "SELECT COUNT(*) FROM products p WHERE $where",
@@ -47,16 +82,26 @@ final class Product extends Model
              FROM products p
              LEFT JOIN categories c ON c.id = p.category_id
              WHERE $where
-             ORDER BY p.featured DESC, p.rating DESC, p.updated_at DESC
+             ORDER BY $orderBy
              LIMIT $perPage OFFSET $offset",
             $params
         );
+
+        // Lista de brands distintas para el filtro del front (limite 200).
+        $brandRows = self::db()->fetchAll(
+            "SELECT DISTINCT brand FROM products
+             WHERE site_id = :site AND brand IS NOT NULL AND brand <> ''
+             ORDER BY brand ASC LIMIT 200",
+            ['site' => $siteId]
+        );
+        $brands = array_column($brandRows, 'brand');
 
         return [
             'items'    => self::hydrateAll($rows),
             'total'    => $total,
             'page'     => $page,
             'per_page' => $perPage,
+            'brands'   => $brands,
         ];
     }
 
