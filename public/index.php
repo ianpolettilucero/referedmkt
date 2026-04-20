@@ -98,12 +98,21 @@ try {
     $router->dispatch();
 } catch (\Throwable $e) {
     http_response_code(500);
+
+    // Ref corto para correlacionar error log <-> mensaje al usuario.
+    $ref = substr(bin2hex(random_bytes(4)), 0, 8);
+    error_log(sprintf(
+        '[referedmkt][%s] %s @ %s:%d',
+        $ref, $e->getMessage(), $e->getFile(), $e->getLine()
+    ));
+    error_log('[referedmkt][' . $ref . '] trace: ' . $e->getTraceAsString());
+
+    header('Content-Type: text/plain; charset=utf-8');
     if (filter_var(getenv('APP_DEBUG') ?: 'false', FILTER_VALIDATE_BOOLEAN)) {
-        header('Content-Type: text/plain; charset=utf-8');
-        echo "500 - " . $e->getMessage() . "\n" . $e->getTraceAsString();
+        echo "500 [$ref] " . $e->getMessage() . "\n";
+        echo "en " . $e->getFile() . ":" . $e->getLine() . "\n\n";
+        echo $e->getTraceAsString();
     } else {
-        error_log('[referedmkt] ' . $e->getMessage() . ' @ ' . $e->getFile() . ':' . $e->getLine());
-        header('Content-Type: text/plain; charset=utf-8');
-        echo "500 - Error interno";
+        echo "500 - Error interno (ref: $ref)";
     }
 }
