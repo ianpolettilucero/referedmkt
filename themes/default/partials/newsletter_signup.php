@@ -7,7 +7,9 @@
  * No pasa por nuestro backend -> no guardamos emails, menos superficie de ataque.
  */
 use Core\Settings;
+use Core\Site;
 
+$site = $site ?? Site::current();
 $enabled = Settings::getBool($site->id, 'newsletter_enabled', false);
 $action  = (string)Settings::get($site->id, 'newsletter_action_url', '');
 if (!$enabled || $action === '') {
