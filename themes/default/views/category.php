@@ -17,7 +17,9 @@ $basePath = $all_products ? '/productos' : category_url($category);
     <header>
         <h1><?= e($title) ?></h1>
         <?php if (!$all_products && !empty($category['description'])): ?>
-            <p><?= e($category['description']) ?></p>
+            <div class="category-description">
+                <?= \Core\Markdown::toHtml($category['description']) ?>
+            </div>
         <?php endif; ?>
         <p class="muted"><?= e($total) ?> productos</p>
     </header>
