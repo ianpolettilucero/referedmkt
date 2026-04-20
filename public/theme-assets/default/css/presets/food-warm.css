@@ -1,6 +1,7 @@
-/* Food & Warm — Tomato + verde olivo + crema. Friendly, alimentos/recetas/delivery. */
-:root {
+/* Food & Warm — Tomato + verde olivo + crema. Friendly. Ambos modos. */
+:root, [data-theme="light"] {
     color-scheme: light;
+
     --bg: #fffaf3;
     --bg-elevated: #ffffff;
     --surface: #ffffff;
@@ -12,34 +13,59 @@
     --text: #3a1d0a;
     --text-muted: #7c4a1f;
     --text-subtle: #b07640;
+    --text-on-primary: #ffffff;
 
-    --primary: #dc2626;
-    --primary-hover: #ef4444;
+    --primary: #c2410c;
+    --primary-hover: #dc2626;
     --primary-soft: rgba(220, 38, 38, 0.08);
     --secondary: #65a30d;
     --accent: #16a34a;
     --accent-soft: rgba(22, 163, 74, 0.1);
+    --danger: #b91c1c;
+    --danger-soft: rgba(185, 28, 28, 0.08);
+    --success: #15803d;
+    --success-soft: rgba(21, 128, 61, 0.1);
 
-    --glow-primary: 0 0 32px rgba(220, 38, 38, 0.2);
+    --shadow-sm: 0 1px 3px rgba(124, 74, 31, 0.08);
+    --shadow-md: 0 4px 16px rgba(124, 74, 31, 0.12);
+    --shadow-lg: 0 18px 50px rgba(124, 74, 31, 0.18);
+    --glow-primary: 0 0 32px rgba(220, 38, 38, 0.18);
+    --glow-accent: 0 0 24px rgba(22, 163, 74, 0.2);
+
     --gradient-primary: linear-gradient(135deg, #dc2626 0%, #f97316 50%, #fbbf24 100%);
     --gradient-card: linear-gradient(180deg, #ffffff 0%, #fffaf3 100%);
     --gradient-hero: radial-gradient(ellipse at top, rgba(220, 38, 38, 0.08) 0%, transparent 60%);
-    --gradient-text: linear-gradient(135deg, #dc2626 0%, #ea580c 50%, #16a34a 100%);
+    --gradient-text: linear-gradient(135deg, #c2410c 0%, #ea580c 50%, #16a34a 100%);
 
     --radius: 14px;
     --radius-lg: 22px;
 }
 [data-theme="dark"] {
     color-scheme: dark;
+
     --bg: #1a110a;
     --bg-elevated: #2a1a10;
     --surface: #2d1b12;
     --surface-hover: #3d261a;
+    --surface-glass: rgba(45, 27, 18, 0.85);
     --border: #4a2d1f;
+    --border-strong: #6b4230;
+
     --text: #fef3e7;
     --text-muted: #fde8c8;
-    --primary-soft: rgba(220, 38, 38, 0.18);
-    --gradient-text: linear-gradient(135deg, #fca5a5 0%, #fed7aa 50%, #bbf7d0 100%);
+    --text-subtle: #d9ae88;
+
+    --primary: #ef4444;
+    --primary-soft: rgba(239, 68, 68, 0.18);
+    --accent: #86efac;
+
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.5);
+    --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.5);
+    --shadow-lg: 0 18px 50px rgba(0, 0, 0, 0.6);
+
+    --gradient-card: linear-gradient(180deg, #2d1b12 0%, #1a110a 100%);
+    --gradient-hero: radial-gradient(ellipse at top, rgba(239, 68, 68, 0.18) 0%, transparent 65%);
+    --gradient-text: linear-gradient(135deg, #fca5a5 0%, #fed7aa 50%, #86efac 100%);
 }
 h1, h2 { font-weight: 800; letter-spacing: -0.02em; }
 .product-card, .article-card { border-radius: 18px; }

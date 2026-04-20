@@ -1,17 +1,19 @@
-/* Finance Emerald — Verde esmeralda + dorado + navy. Fintech / inversiones / trading. */
+/* Finance Emerald — Verde esmeralda + dorado + navy. Tabular numerals. Ambos modos. */
 :root, [data-theme="dark"] {
     color-scheme: dark;
+
     --bg: #041512;
     --bg-elevated: #0a1f1a;
     --surface: #0f2722;
     --surface-hover: #163530;
-    --surface-glass: rgba(15, 39, 34, 0.8);
+    --surface-glass: rgba(15, 39, 34, 0.82);
     --border: #1c3a34;
     --border-strong: #2c5a50;
 
     --text: #ecfdf5;
     --text-muted: #86efac;
     --text-subtle: #4ade80;
+    --text-on-primary: #ffffff;
 
     --primary: #059669;
     --primary-hover: #10b981;
@@ -20,10 +22,16 @@
     --accent: #d4af37;
     --accent-soft: rgba(212, 175, 55, 0.12);
     --danger: #f87171;
+    --danger-soft: rgba(248, 113, 113, 0.15);
     --success: #10b981;
+    --success-soft: rgba(16, 185, 129, 0.15);
 
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.5);
+    --shadow-lg: 0 18px 50px rgba(0, 0, 0, 0.6);
     --glow-primary: 0 0 40px rgba(16, 185, 129, 0.3);
     --glow-accent: 0 0 24px rgba(212, 175, 55, 0.28);
+
     --gradient-primary: linear-gradient(135deg, #047857 0%, #059669 50%, #d4af37 100%);
     --gradient-card: linear-gradient(180deg, #0f2722 0%, #0a1f1a 100%);
     --gradient-hero: radial-gradient(ellipse at top, rgba(16, 185, 129, 0.18) 0%, transparent 70%);
@@ -31,16 +39,29 @@
 }
 [data-theme="light"] {
     color-scheme: light;
+
     --bg: #f0fdf4;
     --bg-elevated: #ffffff;
     --surface: #ffffff;
     --surface-hover: #dcfce7;
+    --surface-glass: rgba(255, 255, 255, 0.88);
     --border: #bbf7d0;
+    --border-strong: #86efac;
+
     --text: #052e23;
     --text-muted: #047857;
+    --text-subtle: #059669;
+
     --primary-soft: rgba(5, 150, 105, 0.08);
+    --accent-soft: rgba(180, 83, 9, 0.12);
+
+    --shadow-sm: 0 1px 3px rgba(5, 46, 35, 0.06);
+    --shadow-md: 0 4px 16px rgba(5, 46, 35, 0.08);
+    --shadow-lg: 0 18px 50px rgba(5, 46, 35, 0.14);
+
+    --gradient-card: linear-gradient(180deg, #ffffff 0%, #f0fdf4 100%);
+    --gradient-hero: radial-gradient(ellipse at top, rgba(5, 150, 105, 0.08) 0%, transparent 60%);
     --gradient-text: linear-gradient(135deg, #047857 0%, #b45309 50%, #d4af37 100%);
 }
 .product-price, .article-meta, .specs td { font-variant-numeric: tabular-nums; }
 h1, h2 { font-weight: 800; letter-spacing: -0.025em; }
-.site-brand::before { background: var(--gradient-primary); }

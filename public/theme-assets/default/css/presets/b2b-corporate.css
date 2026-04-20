@@ -1,6 +1,7 @@
-/* B2B Corporate — Navy + gris profesional. Light default. Consultoría / legal / B2B serio. */
-:root {
+/* B2B Corporate — Navy + gris profesional. Light default, soporta dark. */
+:root, [data-theme="light"] {
     color-scheme: light;
+
     --bg: #f8fafc;
     --bg-elevated: #ffffff;
     --surface: #ffffff;
@@ -20,11 +21,16 @@
     --secondary: #0891b2;
     --accent: #b45309;
     --accent-soft: rgba(180, 83, 9, 0.08);
+    --danger: #b91c1c;
+    --danger-soft: rgba(185, 28, 28, 0.08);
+    --success: #15803d;
+    --success-soft: rgba(21, 128, 61, 0.08);
 
-    --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
-    --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
-    --shadow-lg: 0 14px 40px rgba(15, 23, 42, 0.1);
+    --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
+    --shadow-md: 0 4px 16px rgba(15, 23, 42, 0.08);
+    --shadow-lg: 0 14px 40px rgba(15, 23, 42, 0.12);
     --glow-primary: 0 0 32px rgba(30, 64, 175, 0.14);
+    --glow-accent: 0 0 24px rgba(180, 83, 9, 0.18);
 
     --gradient-primary: linear-gradient(135deg, #1e40af 0%, #2563eb 50%, #0891b2 100%);
     --gradient-card: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
@@ -36,18 +42,30 @@
 }
 [data-theme="dark"] {
     color-scheme: dark;
+
     --bg: #0f172a;
     --bg-elevated: #1e293b;
     --surface: #1e293b;
     --surface-hover: #334155;
-    --surface-glass: rgba(30, 41, 59, 0.8);
+    --surface-glass: rgba(30, 41, 59, 0.82);
     --border: #334155;
     --border-strong: #475569;
+
     --text: #f1f5f9;
     --text-muted: #94a3b8;
     --text-subtle: #64748b;
+
     --primary: #60a5fa;
+    --primary-hover: #93c5fd;
     --primary-soft: rgba(96, 165, 250, 0.15);
+    --accent: #fbbf24;
+    --accent-soft: rgba(251, 191, 36, 0.14);
+
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 18px 50px rgba(0, 0, 0, 0.5);
+
+    --gradient-card: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
     --gradient-text: linear-gradient(135deg, #93c5fd 0%, #bae6fd 50%, #fde68a 100%);
 }
 h1, h2 { font-weight: 700; letter-spacing: -0.025em; }

@@ -88,6 +88,41 @@ final class ThemePresets
                 'swatches'    => ['#f0f9ff', '#0ea5e9', '#22c55e', '#bae6fd'],
                 'mode'        => 'light',
             ],
+            'minimal-mono' => [
+                'name'        => 'Minimal Mono',
+                'description' => 'Blanco y negro con un solo accent rojo. Zine/editorial minimalista.',
+                'vibe'        => 'minimal · editorial · tipografia',
+                'swatches'    => ['#fafaf9', '#18181b', '#dc2626', '#a8a29e'],
+                'mode'        => 'light',
+            ],
+            'forest-green' => [
+                'name'        => 'Forest Green',
+                'description' => 'Verde bosque + tierra + crema. Outdoor, naturaleza, sustentable.',
+                'vibe'        => 'naturaleza · outdoor · sustentable',
+                'swatches'    => ['#0a1410', '#65a30d', '#a16207', '#fbbf24'],
+                'mode'        => 'dark',
+            ],
+            'ocean-blue' => [
+                'name'        => 'Ocean Blue',
+                'description' => 'Azul océano + turquesa. Calm, wellness, productos zen.',
+                'vibe'        => 'viajes · wellness · zen',
+                'swatches'    => ['#051b2e', '#0284c7', '#14b8a6', '#5eead4'],
+                'mode'        => 'dark',
+            ],
+            'sunset-gradient' => [
+                'name'        => 'Sunset Gradient',
+                'description' => 'Naranja + rosa + violeta. Creativo, artistico, diseño.',
+                'vibe'        => 'diseño · arte · creatividad',
+                'swatches'    => ['#1a0b1f', '#f97316', '#ec4899', '#a855f7'],
+                'mode'        => 'dark',
+            ],
+            'paper-editorial' => [
+                'name'        => 'Paper Editorial',
+                'description' => 'Color papel + tinta azul. Serif. Blog largo form, revistas, libros.',
+                'vibe'        => 'blog · revistas · libros · long-form',
+                'swatches'    => ['#faf7f0', '#1e3a8a', '#991b1b', '#b8a986'],
+                'mode'        => 'light',
+            ],
         ];
     }
 
