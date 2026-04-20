@@ -102,6 +102,7 @@ final class SitesController extends BaseController
             'primary_color' => '', 'logo_url' => '', 'favicon_url' => '',
             'affiliate_disclosure_text' => '', 'google_analytics_id' => '',
             'google_search_console_verification' => '',
+            'google_tag_manager_id' => '',
             'default_language' => 'es', 'default_country' => 'AR',
             'meta_title_template' => '', 'meta_description_template' => '',
             'active' => 1,
@@ -114,6 +115,17 @@ final class SitesController extends BaseController
         $slug = trim((string)$this->input('slug', ''));
         if ($slug === '') { $slug = slugify($name); }
 
+        // Validacion suave de IDs de Google: si el formato es claramente invalido,
+        // lo descartamos para evitar inyectar snippets rotos en el head.
+        $ga = trim((string)$this->input('google_analytics_id', ''));
+        if ($ga !== '' && !preg_match('/^G-[A-Z0-9]{4,20}$/', $ga)) {
+            $ga = ''; // formato GA4 esperado: G-XXXXXXXXXX
+        }
+        $gtm = trim((string)$this->input('google_tag_manager_id', ''));
+        if ($gtm !== '' && !preg_match('/^GTM-[A-Z0-9]{4,20}$/', $gtm)) {
+            $gtm = ''; // formato GTM esperado: GTM-XXXXXXX
+        }
+
         return [
             'domain'                             => strtolower(trim((string)$this->input('domain', ''))),
             'name'                               => $name,
@@ -123,8 +135,9 @@ final class SitesController extends BaseController
             'logo_url'                           => trim((string)$this->input('logo_url', '')) ?: null,
             'favicon_url'                        => trim((string)$this->input('favicon_url', '')) ?: null,
             'affiliate_disclosure_text'          => trim((string)$this->input('affiliate_disclosure_text', '')) ?: null,
-            'google_analytics_id'                => trim((string)$this->input('google_analytics_id', '')) ?: null,
+            'google_analytics_id'                => $ga ?: null,
             'google_search_console_verification' => trim((string)$this->input('google_search_console_verification', '')) ?: null,
+            'google_tag_manager_id'              => $gtm ?: null,
             'default_language'                   => substr(trim((string)$this->input('default_language', 'es')), 0, 5) ?: 'es',
             'default_country'                    => strtoupper(substr(trim((string)$this->input('default_country', 'AR')), 0, 2)) ?: 'AR',
             'meta_title_template'                => trim((string)$this->input('meta_title_template', '')) ?: null,

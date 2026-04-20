@@ -55,14 +55,23 @@ $action = $is_new ? '/admin/sites' : '/admin/sites/' . (int)$row['id'];
             <input name="favicon_url" value="<?= htmlspecialchars($row['favicon_url'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
         </div>
         <div class="admin-field">
-            <label>Google Analytics ID</label>
-            <input name="google_analytics_id" value="<?= htmlspecialchars($row['google_analytics_id'] ?? '', ENT_QUOTES, 'UTF-8') ?>" placeholder="G-XXXXXXX">
+            <label>Google Analytics 4 ID</label>
+            <input name="google_analytics_id" value="<?= htmlspecialchars($row['google_analytics_id'] ?? '', ENT_QUOTES, 'UTF-8') ?>" placeholder="G-XXXXXXXXXX">
+            <small class="admin-hint">Formato <code>G-XXXXXXXXXX</code>. De analytics.google.com → Admin → Streams.</small>
         </div>
     </div>
 
-    <div class="admin-field">
-        <label>Google Search Console verification</label>
-        <input name="google_search_console_verification" value="<?= htmlspecialchars($row['google_search_console_verification'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
+    <div class="admin-grid admin-grid-2">
+        <div class="admin-field">
+            <label>Google Tag Manager ID (opcional)</label>
+            <input name="google_tag_manager_id" value="<?= htmlspecialchars($row['google_tag_manager_id'] ?? '', ENT_QUOTES, 'UTF-8') ?>" placeholder="GTM-XXXXXXX">
+            <small class="admin-hint">Solo si usás GTM como contenedor. Formato <code>GTM-XXXXXXX</code>. No hace falta si ya pusiste GA4 directo arriba.</small>
+        </div>
+        <div class="admin-field">
+            <label>Google Search Console — código de verificación</label>
+            <input name="google_search_console_verification" value="<?= htmlspecialchars($row['google_search_console_verification'] ?? '', ENT_QUOTES, 'UTF-8') ?>" placeholder="abc123def456...">
+            <small class="admin-hint">Solo el valor del <code>content="..."</code> que te da Google. No el meta tag entero.</small>
+        </div>
     </div>
 
     <div class="admin-grid admin-grid-2">
