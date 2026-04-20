@@ -116,12 +116,57 @@ if (!empty($row['published_at'])) {
 
     <div class="admin-field">
         <label>Contenido (Markdown)</label>
-        <textarea name="content" id="content" style="min-height:360px" required><?= htmlspecialchars($row['content'] ?? '', ENT_QUOTES, 'UTF-8') ?></textarea>
+        <textarea name="content" id="content" style="min-height:400px" required><?= htmlspecialchars($row['content'] ?? '', ENT_QUOTES, 'UTF-8') ?></textarea>
         <div style="display:flex;gap:0.5rem;align-items:center;margin-top:0.3rem;flex-wrap:wrap">
             <button type="button" id="preview-btn" class="admin-btn admin-btn-subtle">Previsualizar</button>
             <button type="button" class="admin-btn admin-btn-subtle" data-picker-target="content" data-picker-mode="markdown">Insertar imagen…</button>
-            <small class="admin-hint">Markdown soportado: #, listas, **bold**, *italic*, `code`, ```fences```, [link](url), ![img](src), > quote.</small>
+            <button type="button" class="admin-btn admin-btn-subtle" onclick="document.getElementById('md-cheat').open=!document.getElementById('md-cheat').open">Sintaxis Markdown ▾</button>
         </div>
+        <details id="md-cheat" style="margin-top:0.5rem;background:var(--a-bg-elev);border:1px solid var(--a-border);border-radius:var(--a-radius);padding:0.75rem 1rem;font-size:0.85rem">
+            <summary style="cursor:pointer;font-weight:600;color:var(--a-text)">Sintaxis Markdown soportada (click para ver)</summary>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:0.75rem;font-family:ui-monospace,Menlo,monospace;font-size:12px">
+                <div>
+                    <strong style="font-family:var(--a-font)">Títulos</strong><br>
+                    <code># Título principal (H1)</code><br>
+                    <code>## Subtítulo (H2)</code><br>
+                    <code>### Sección (H3)</code><br><br>
+
+                    <strong style="font-family:var(--a-font)">Texto</strong><br>
+                    <code>**negrita**</code> → <strong>negrita</strong><br>
+                    <code>*cursiva*</code> → <em>cursiva</em><br>
+                    <code>`inline code`</code><br><br>
+
+                    <strong style="font-family:var(--a-font)">Listas</strong><br>
+                    <code>- item</code><br>
+                    <code>- otro item</code><br><br>
+                    <code>1. primero</code><br>
+                    <code>2. segundo</code><br>
+                </div>
+                <div>
+                    <strong style="font-family:var(--a-font)">Links e imágenes</strong><br>
+                    <code>[texto](https://url.com)</code><br>
+                    <code>![alt](https://url.com/img.jpg)</code><br><br>
+
+                    <strong style="font-family:var(--a-font)">Cita</strong><br>
+                    <code>&gt; Texto citado</code><br><br>
+
+                    <strong style="font-family:var(--a-font)">Código en bloque</strong><br>
+                    <code>```<br>codigo<br>```</code><br><br>
+
+                    <strong style="font-family:var(--a-font)">Tabla</strong><br>
+                    <code>| A | B |</code><br>
+                    <code>|---|---|</code><br>
+                    <code>| x | y |</code><br><br>
+
+                    <strong style="font-family:var(--a-font)">Separador</strong><br>
+                    <code>---</code> (línea horizontal)
+                </div>
+            </div>
+            <p style="margin:0.75rem 0 0;font-family:var(--a-font);color:var(--a-text-muted)">
+                Tip: dejá una línea en blanco entre párrafos. Los enlaces externos se agregan
+                automáticamente con <code>rel="nofollow noopener"</code> y <code>target="_blank"</code>.
+            </p>
+        </details>
         <div id="preview" class="admin-card" style="margin-top:0.5rem;display:none"></div>
     </div>
 

@@ -593,6 +593,34 @@ code, pre { font-family: var(--font-mono); font-size: 0.92em; }
 .article-body img { border-radius: var(--radius); margin: var(--s-3) 0; }
 .article-body a { text-decoration: underline; text-underline-offset: 3px; }
 
+.article-body table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: var(--s-3) 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    font-size: 0.95em;
+}
+.article-body table th,
+.article-body table td {
+    padding: 0.7rem 0.9rem;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+    vertical-align: top;
+}
+.article-body table th {
+    background: var(--bg-elevated);
+    font-weight: 700;
+    color: var(--text);
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+.article-body table tr:last-child td { border-bottom: none; }
+.article-body table tr:hover td { background: var(--surface-hover); }
+
 .related-products { margin-top: var(--s-5); }
 
 /* ==== PAGINATION ==== */

@@ -81,4 +81,28 @@ TestRunner::group('Markdown', function () {
         $h = Markdown::toHtml("---");
         assert_contains('<hr>', $h);
     });
+
+    TestRunner::run('tabla basica', function () {
+        $md = "| Nombre | Precio |\n|---|---|\n| Bitdefender | 50 |\n| ESET | 40 |";
+        $h = Markdown::toHtml($md);
+        assert_contains('<table>', $h);
+        assert_contains('<th>Nombre</th>', $h);
+        assert_contains('<th>Precio</th>', $h);
+        assert_contains('<td>Bitdefender</td>', $h);
+        assert_contains('<td>50</td>', $h);
+    });
+
+    TestRunner::run('tabla con alineamiento', function () {
+        $md = "| L | C | R |\n|:---|:---:|---:|\n| a | b | c |";
+        $h = Markdown::toHtml($md);
+        assert_contains('style="text-align:left"', $h);
+        assert_contains('style="text-align:center"', $h);
+        assert_contains('style="text-align:right"', $h);
+    });
+
+    TestRunner::run('tabla con bold en celdas', function () {
+        $md = "| col |\n|---|\n| **hola** |";
+        $h = Markdown::toHtml($md);
+        assert_contains('<strong>hola</strong>', $h);
+    });
 });
