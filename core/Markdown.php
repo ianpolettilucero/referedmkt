@@ -56,6 +56,54 @@ final class Markdown
                 continue;
             }
 
+            // Table (GitHub-Flavored Markdown):
+            //   | col1 | col2 |
+            //   |------|------|
+            //   | a    | b    |
+            // Soporta alineamiento con ":" (|:---|:---:|---:|).
+            if (preg_match('/^\s*\|.+\|\s*$/', $line)
+                && $i + 1 < $n
+                && preg_match('/^\s*\|[\s:\-|]+\|\s*$/', $lines[$i + 1])) {
+                $headerCells = self::splitTableRow($line);
+                $aligns = array_map(function ($c) {
+                    $c = trim($c);
+                    $l = substr($c, 0, 1) === ':';
+                    $r = substr($c, -1) === ':';
+                    if ($l && $r) return 'center';
+                    if ($r) return 'right';
+                    if ($l) return 'left';
+                    return null;
+                }, self::splitTableRow($lines[$i + 1]));
+
+                $rows = [];
+                $i += 2;
+                while ($i < $n && preg_match('/^\s*\|.+\|\s*$/', $lines[$i])) {
+                    $rows[] = self::splitTableRow($lines[$i]);
+                    $i++;
+                }
+
+                $out = '<table>';
+                $out .= '<thead><tr>';
+                foreach ($headerCells as $idx => $cell) {
+                    $al = $aligns[$idx] ?? null;
+                    $style = $al ? ' style="text-align:' . $al . '"' : '';
+                    $out .= '<th' . $style . '>' . self::inline($cell) . '</th>';
+                }
+                $out .= '</tr></thead><tbody>';
+                foreach ($rows as $row) {
+                    $out .= '<tr>';
+                    foreach ($row as $idx => $cell) {
+                        $al = $aligns[$idx] ?? null;
+                        $style = $al ? ' style="text-align:' . $al . '"' : '';
+                        $out .= '<td' . $style . '>' . self::inline($cell) . '</td>';
+                    }
+                    $out .= '</tr>';
+                }
+                $out .= '</tbody></table>';
+                $html[] = $out;
+                continue;
+            }
+
             // Heading
             if (preg_match('/^(#{1,6})\s+(.+?)\s*#*\s*$/', $line, $m)) {
                 $level = strlen($m[1]);
@@ -176,6 +224,20 @@ final class Markdown
     private static function escape(string $s): string
     {
         return htmlspecialchars($s, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    }
+
+    /**
+     * Divide una fila de tabla markdown en celdas, respetando el trim
+     * de pipes de borde y los espacios alrededor de cada celda.
+     *
+     * @return string[]
+     */
+    private static function splitTableRow(string $line): array
+    {
+        $line = trim($line);
+        // Quitar pipes de borde.
+        $line = preg_replace('/^\||\|$/', '', $line);
+        return array_map('trim', explode('|', $line));
     }
 
     /**
