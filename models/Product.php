@@ -119,4 +119,67 @@ final class Product extends Model
         );
         return self::hydrateAll($stmt->fetchAll());
     }
+
+    /**
+     * Catalogo agrupado por categoria: retorna solo categorias con productos,
+     * cada una con sus N mejores productos (destacados / rating / recientes).
+     *
+     * Ideal para renderizar el catalogo global como secciones H2 por categoria
+     * (mejor SEO: estructura de headings + keywords de cada nicho visibles).
+     *
+     * @return array<int, array{category:array<string,mixed>, products:array<int,array<string,mixed>>, total:int}>
+     */
+    public static function groupedByCategory(int $siteId, int $limitPerCat = 8): array
+    {
+        $cats = self::db()->fetchAll(
+            "SELECT c.id, c.slug, c.name, c.description
+             FROM categories c
+             WHERE c.site_id = :s
+               AND EXISTS (SELECT 1 FROM products p WHERE p.site_id = c.site_id AND p.category_id = c.id)
+             ORDER BY c.sort_order, c.name",
+            ['s' => $siteId]
+        );
+
+        $out = [];
+        foreach ($cats as $cat) {
+            $products = self::db()->fetchAll(
+                "SELECT p.*, c.slug AS category_slug, c.name AS category_name
+                 FROM products p
+                 LEFT JOIN categories c ON c.id = p.category_id
+                 WHERE p.site_id = :s AND p.category_id = :cid
+                 ORDER BY p.featured DESC, p.rating DESC, p.updated_at DESC
+                 LIMIT $limitPerCat",
+                ['s' => $siteId, 'cid' => $cat['id']]
+            );
+            $total = (int)self::db()->fetchColumn(
+                'SELECT COUNT(*) FROM products WHERE site_id = :s AND category_id = :cid',
+                ['s' => $siteId, 'cid' => $cat['id']]
+            );
+            if (!$products) { continue; }
+            $out[] = [
+                'category' => $cat,
+                'products' => self::hydrateAll($products),
+                'total'    => $total,
+            ];
+        }
+
+        // Productos sin categoria (opcional, al final)
+        $uncategorized = self::db()->fetchAll(
+            "SELECT p.*, NULL AS category_slug, NULL AS category_name
+             FROM products p
+             WHERE p.site_id = :s AND p.category_id IS NULL
+             ORDER BY p.featured DESC, p.rating DESC
+             LIMIT $limitPerCat",
+            ['s' => $siteId]
+        );
+        if ($uncategorized) {
+            $out[] = [
+                'category' => ['id' => 0, 'slug' => null, 'name' => 'Otros productos', 'description' => null],
+                'products' => self::hydrateAll($uncategorized),
+                'total'    => count($uncategorized),
+            ];
+        }
+
+        return $out;
+    }
 }

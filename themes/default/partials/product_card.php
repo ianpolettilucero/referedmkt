@@ -1,10 +1,20 @@
 <?php /** @var array $product */ ?>
 <article class="product-card">
-    <a class="product-card-link" href="<?= e(product_url($product)) ?>">
+    <?php if (!empty($product['category_name']) && !empty($product['category_slug'])): ?>
+        <a class="product-card-cat-chip" href="<?= e('/productos/' . $product['category_slug']) ?>" title="Ver toda la categoría">
+            <?= e($product['category_name']) ?>
+        </a>
+    <?php endif; ?>
+
+    <div class="product-card-body">
         <?php if (!empty($product['logo_url'])): ?>
             <img class="product-card-logo" src="<?= e($product['logo_url']) ?>" alt="<?= e($product['name']) ?>" loading="lazy">
         <?php endif; ?>
-        <h3 class="product-card-title"><?= e($product['name']) ?></h3>
+        <h3 class="product-card-title">
+            <a class="product-card-link" href="<?= e(product_url($product)) ?>">
+                <?= e($product['name']) ?>
+            </a>
+        </h3>
         <?php if (!empty($product['brand'])): ?>
             <p class="product-card-brand"><?= e($product['brand']) ?></p>
         <?php endif; ?>
@@ -21,5 +31,5 @@
                 $product['pricing_model'] ?? 'custom'
             )) ?>
         </p>
-    </a>
+    </div>
 </article>

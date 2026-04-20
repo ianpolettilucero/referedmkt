@@ -2,7 +2,9 @@
 /**
  * @var \Core\View $view
  * @var array|null $category
- * @var array      $products
+ * @var string     $view_mode    'grouped' | 'flat'
+ * @var array      $products     (flat)
+ * @var array      $grouped      (grouped) [{category, products, total}, ...]
  * @var int        $total
  * @var int        $page
  * @var int        $per_page
@@ -15,10 +17,10 @@
  */
 $view->layout('default');
 $title = $all_products ? 'Catálogo de productos' : $category['name'];
-$pages = (int)ceil($total / max(1, $per_page));
 $basePath = $all_products ? '/productos' : category_url($category);
 
-// Helper: preservar query string al paginar
+$pages = isset($per_page) && $per_page > 0 ? (int)ceil($total / $per_page) : 1;
+
 $buildUrl = function (array $override = []) use ($basePath, $filters) {
     $params = [];
     if (!empty($filters['brand']))       { $params['brand']      = $filters['brand']; }
@@ -111,7 +113,36 @@ $buildUrl = function (array $override = []) use ($basePath, $filters) {
         <?php endif; ?>
     </form>
 
-    <?php if ($products): ?>
+    <?php if (($view_mode ?? 'flat') === 'grouped' && !empty($grouped)): ?>
+        <?php foreach ($grouped as $group): ?>
+            <section class="category-group">
+                <div class="category-group-header">
+                    <h2 id="cat-<?= e($group['category']['slug'] ?? 'otros') ?>">
+                        <?php if (!empty($group['category']['slug'])): ?>
+                            <a href="<?= e('/productos/' . $group['category']['slug']) ?>">
+                                <?= e($group['category']['name']) ?>
+                            </a>
+                        <?php else: ?>
+                            <?= e($group['category']['name']) ?>
+                        <?php endif; ?>
+                    </h2>
+                    <?php if ((int)$group['total'] > count($group['products'])): ?>
+                        <a class="category-group-more" href="<?= e('/productos/' . $group['category']['slug']) ?>">
+                            Ver los <?= (int)$group['total'] ?> →
+                        </a>
+                    <?php endif; ?>
+                </div>
+                <?php if (!empty($group['category']['description'])): ?>
+                    <p class="category-group-desc"><?= e(excerpt($group['category']['description'], 200)) ?></p>
+                <?php endif; ?>
+                <div class="grid grid-cards">
+                    <?php foreach ($group['products'] as $p): ?>
+                        <?= $view->partial('product_card', ['product' => $p]) ?>
+                    <?php endforeach; ?>
+                </div>
+            </section>
+        <?php endforeach; ?>
+    <?php elseif (!empty($products)): ?>
         <div class="grid grid-cards">
             <?php foreach ($products as $p): ?>
                 <?= $view->partial('product_card', ['product' => $p]) ?>
@@ -121,7 +152,7 @@ $buildUrl = function (array $override = []) use ($basePath, $filters) {
         <p class="empty-state">No hay productos que coincidan con estos filtros. <a href="<?= e($basePath) ?>">Limpiar filtros</a>.</p>
     <?php endif; ?>
 
-    <?php if ($pages > 1): ?>
+    <?php if (($view_mode ?? 'flat') === 'flat' && $pages > 1): ?>
         <nav class="pagination" aria-label="Paginación">
             <?php for ($i = 1; $i <= $pages; $i++): ?>
                 <?php if ($i === $page): ?>
