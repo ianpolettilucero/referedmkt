@@ -69,7 +69,32 @@ final class ArticleController extends Controller
     {
         $type = $params['__type'] ?? 'guide';
         $page = max(1, (int)($_GET['page'] ?? 1));
-        $data = Article::paginate($this->site->id, $type, $page, 20);
+
+        // Filtros via query string
+        $filters = [
+            'type'        => $type,
+            'category_id' => null,
+            'sort'        => array_key_exists($_GET['sort'] ?? '', Article::SORTS)
+                             ? $_GET['sort'] : 'recent',
+        ];
+
+        // Filtro por categoria
+        if (!empty($_GET['cat'])) {
+            $catRow = \Core\Database::instance()->fetch(
+                'SELECT id FROM categories WHERE site_id = :s AND slug = :slug LIMIT 1',
+                ['s' => $this->site->id, 'slug' => (string)$_GET['cat']]
+            );
+            if ($catRow) {
+                $filters['category_id'] = (int)$catRow['id'];
+            }
+        }
+
+        $data = Article::paginate($this->site->id, $filters, $page, 20);
+
+        $categories = \Core\Database::instance()->fetchAll(
+            'SELECT id, slug, name FROM categories WHERE site_id = :s ORDER BY sort_order, name',
+            ['s' => $this->site->id]
+        );
 
         $label = $this->breadcrumbLabelForType($type);
 
@@ -80,12 +105,15 @@ final class ArticleController extends Controller
             ->breadcrumb([['Inicio', '/'], [$label, $this->sectionPathForType($type)]]);
 
         $this->render('article_list', [
-            'articles' => $data['items'],
-            'total'    => $data['total'],
-            'page'     => $data['page'],
-            'per_page' => $data['per_page'],
-            'type'     => $type,
-            'label'    => $label,
+            'articles'   => $data['items'],
+            'total'      => $data['total'],
+            'page'       => $data['page'],
+            'per_page'   => $data['per_page'],
+            'type'       => $type,
+            'label'      => $label,
+            'filters'    => $filters,
+            'sorts'      => Article::SORTS,
+            'categories' => $categories,
         ]);
     }
 

@@ -40,25 +40,51 @@ final class Article extends Model
         self::db()->query('UPDATE articles SET views_count = views_count + 1 WHERE id = :id', ['id' => $id]);
     }
 
+    public const SORTS = [
+        'recent'  => 'Más recientes',
+        'oldest'  => 'Más antiguos',
+        'popular' => 'Más vistos',
+        'az'      => 'Título A-Z',
+    ];
+
     /**
+     * @param array{type?:?string, category_id?:?int, sort?:string} $filters
      * @return array{items: array<int, array<string, mixed>>, total: int, page: int, per_page: int}
      */
-    public static function paginate(int $siteId, ?string $type, int $page = 1, int $perPage = 20): array
+    public static function paginate(int $siteId, array $filters = [], int $page = 1, int $perPage = 20): array
     {
         $page = max(1, $page);
         $offset = ($page - 1) * $perPage;
 
-        $where = "site_id = :site AND status = 'published' AND published_at <= NOW()";
+        $where = "a.site_id = :site AND a.status = 'published' AND a.published_at <= NOW()";
         $params = ['site' => $siteId];
-        if ($type !== null) {
-            $where .= ' AND article_type = :type';
-            $params['type'] = $type;
+
+        if (!empty($filters['type'])) {
+            $where .= ' AND a.article_type = :type';
+            $params['type'] = (string)$filters['type'];
+        }
+        if (!empty($filters['category_id'])) {
+            $where .= ' AND a.category_id = :cat';
+            $params['cat'] = (int)$filters['category_id'];
         }
 
-        $total = (int)self::db()->fetchColumn("SELECT COUNT(*) FROM articles WHERE $where", $params);
+        $sort = $filters['sort'] ?? 'recent';
+        $orderBy = match ($sort) {
+            'oldest'  => 'a.published_at ASC',
+            'popular' => 'a.views_count DESC, a.published_at DESC',
+            'az'      => 'a.title ASC',
+            default   => 'a.published_at DESC',
+        };
+
+        $total = (int)self::db()->fetchColumn("SELECT COUNT(*) FROM articles a WHERE $where", $params);
 
         $rows = self::db()->fetchAll(
-            "SELECT * FROM articles WHERE $where ORDER BY published_at DESC LIMIT $perPage OFFSET $offset",
+            "SELECT a.*, c.slug AS category_slug, c.name AS category_name
+             FROM articles a
+             LEFT JOIN categories c ON c.id = a.category_id
+             WHERE $where
+             ORDER BY $orderBy
+             LIMIT $perPage OFFSET $offset",
             $params
         );
 
