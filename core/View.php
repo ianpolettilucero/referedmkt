@@ -58,10 +58,17 @@ final class View
     /**
      * Render inline de un partial (devuelve HTML, no imprime).
      *
+     * Auto-inyecta $site (del singleton del request) si el caller no lo
+     * pasa explicitamente — los partials que viven en el layout (header,
+     * footer, newsletter, etc.) lo necesitan casi siempre.
+     *
      * @param array<string, mixed> $data
      */
     public function partial(string $name, array $data = []): string
     {
+        if (!isset($data['site']) && Site::hasCurrent()) {
+            $data['site'] = Site::current();
+        }
         return $this->renderFile($this->themePath . '/partials/' . $name . '.php', $data);
     }
 
