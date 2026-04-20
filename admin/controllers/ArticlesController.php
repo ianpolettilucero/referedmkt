@@ -11,23 +11,61 @@ final class ArticlesController extends BaseController
     public function index(): void
     {
         $site = $this->requireSite();
+
+        // Filtro por tipo via query string (?type=review|comparison|guide|news)
+        $validTypes = ['guide', 'review', 'comparison', 'news'];
+        $type = $_GET['type'] ?? null;
+        $typeFilter = in_array($type, $validTypes, true) ? $type : null;
+
+        $where = 'a.site_id = :s';
+        $params = ['s' => $site['id']];
+        if ($typeFilter !== null) {
+            $where .= ' AND a.article_type = :t';
+            $params['t'] = $typeFilter;
+        }
+
         $rows = Database::instance()->fetchAll(
-            'SELECT a.*, au.name AS author_name, c.name AS category_name
+            "SELECT a.*, au.name AS author_name, c.name AS category_name
              FROM articles a
              LEFT JOIN authors au ON au.id = a.author_id
              LEFT JOIN categories c ON c.id = a.category_id
-             WHERE a.site_id = :s
-             ORDER BY COALESCE(a.published_at, a.created_at) DESC',
+             WHERE $where
+             ORDER BY COALESCE(a.published_at, a.created_at) DESC",
+            $params
+        );
+
+        // Conteo por tipo para los tabs
+        $countsRaw = Database::instance()->fetchAll(
+            'SELECT article_type, COUNT(*) AS c FROM articles WHERE site_id = :s GROUP BY article_type',
             ['s' => $site['id']]
         );
-        $this->render('articles/list', ['rows' => $rows, 'page_title' => 'Artículos']);
+        $counts = ['all' => 0, 'guide' => 0, 'review' => 0, 'comparison' => 0, 'news' => 0];
+        foreach ($countsRaw as $r) {
+            $counts[$r['article_type']] = (int)$r['c'];
+            $counts['all'] += (int)$r['c'];
+        }
+
+        $this->render('articles/list', [
+            'rows'       => $rows,
+            'type'       => $typeFilter,
+            'counts'     => $counts,
+            'page_title' => 'Artículos',
+        ]);
     }
 
     public function create(): void
     {
         $site = $this->requireSite();
+        $row = $this->emptyRow();
+
+        // Si viene ?type=review|comparison|guide|news, pre-selecciona el tipo
+        $validTypes = ['guide', 'review', 'comparison', 'news'];
+        $type = $_GET['type'] ?? null;
+        if (in_array($type, $validTypes, true)) {
+            $row['article_type'] = $type;
+        }
         $this->render('articles/form', [
-            'row'        => $this->emptyRow(),
+            'row'        => $row,
             'is_new'     => true,
             'categories' => $this->categoryOptions($site['id']),
             'authors'    => $this->authorOptions($site['id']),

@@ -673,70 +673,127 @@ code, pre { font-family: var(--font-mono); font-size: 0.92em; }
     gap: var(--s-2);
     align-items: flex-end;
     flex-wrap: wrap;
-    padding: var(--s-2) var(--s-3);
+    padding: var(--s-3);
     margin: var(--s-3) 0 var(--s-4);
-    background: var(--surface);
+    background: var(--gradient-card);
     border: 1px solid var(--border);
-    border-radius: var(--radius);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    position: relative;
+}
+.filters-bar::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: var(--s-3);
+    right: var(--s-3);
+    height: 2px;
+    background: var(--gradient-primary);
+    border-radius: 2px;
+    opacity: 0.6;
 }
 .filter-group {
     display: flex;
     flex-direction: column;
-    gap: 0.3rem;
-    min-width: 140px;
+    gap: 0.35rem;
+    min-width: 150px;
     flex: 1;
 }
 .filter-group-sort { min-width: 200px; }
 .filter-group label {
-    font-size: 0.78rem;
-    font-weight: 600;
-    color: var(--text-muted);
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--text-subtle);
     text-transform: uppercase;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.1em;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
 }
 .filter-group select {
-    padding: 0.55rem 0.7rem;
-    background: var(--bg-elevated);
+    /* Reset del estilo nativo del navegador */
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+
+    padding: 0.65rem 2.4rem 0.65rem 0.85rem;
+    background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius);
     color: var(--text);
     font: inherit;
     font-size: 0.95rem;
+    font-weight: 500;
     cursor: pointer;
-    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+    transition: all var(--transition-fast);
     min-width: 0;
+    width: 100%;
+
+    /* Arrow custom: SVG inline chevron-down con currentColor simulado */
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238b93ad' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 0.85rem center;
+    background-size: 14px;
 }
-.filter-group select:hover { border-color: var(--border-strong); }
+.filter-group select:hover {
+    border-color: var(--border-strong);
+    background-color: var(--surface-hover);
+}
 .filter-group select:focus {
     outline: none;
     border-color: var(--primary);
     box-shadow: 0 0 0 3px var(--primary-soft);
 }
+.filter-group select option {
+    background: var(--bg-elevated);
+    color: var(--text);
+    padding: 0.5rem;
+}
 .filter-clear {
     align-self: center;
-    padding: 0.5rem 0.9rem;
+    padding: 0.65rem 1rem;
     color: var(--text-muted);
-    background: var(--bg-elevated);
+    background: transparent;
     border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius);
     font-size: 0.88rem;
-    font-weight: 500;
+    font-weight: 600;
     text-decoration: none;
     transition: all var(--transition-fast);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+.filter-clear::before {
+    content: "×";
+    font-size: 1.3em;
+    line-height: 1;
+    color: currentColor;
 }
 .filter-clear:hover {
-    color: var(--primary);
-    border-color: var(--primary);
-    background: var(--primary-soft);
+    color: var(--danger);
+    border-color: var(--danger);
+    background: var(--danger-soft);
     text-decoration: none;
 }
+
 .empty-state {
-    padding: var(--s-4);
+    padding: var(--s-5);
     text-align: center;
     color: var(--text-muted);
     background: var(--surface);
-    border: 1px dashed var(--border);
+    border: 1px dashed var(--border-strong);
     border-radius: var(--radius);
+    font-size: 1.05rem;
+}
+.empty-state a { font-weight: 600; }
+
+@media (max-width: 640px) {
+    .filters-bar {
+        padding: var(--s-2);
+        gap: var(--s-1);
+    }
+    .filter-group { min-width: 100%; }
 }
 
 /* ==== PAGINATION ==== */
