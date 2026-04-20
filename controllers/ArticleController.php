@@ -30,7 +30,18 @@ final class ArticleController extends Controller
 
         Article::incrementViews((int)$a['id']);
 
-        $contentHtml = Markdown::toHtml($a['content'] ?? '');
+        // Defensivo: si el parser falla por algun edge case, no damos 500 -
+        // mostramos el articulo con contenido escapado como texto plano y
+        // loggeamos el error para debugging.
+        try {
+            $contentHtml = Markdown::toHtml($a['content'] ?? '');
+        } catch (\Throwable $e) {
+            error_log('[referedmkt] Markdown parse failed for article #'
+                . $a['id'] . ': ' . $e->getMessage() . ' @ ' . $e->getFile() . ':' . $e->getLine());
+            $contentHtml = '<pre style="white-space:pre-wrap">'
+                . htmlspecialchars((string)($a['content'] ?? ''), ENT_QUOTES, 'UTF-8')
+                . '</pre>';
+        }
 
         $breadcrumb = [
             ['Inicio', '/'],
