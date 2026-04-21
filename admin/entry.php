@@ -73,6 +73,7 @@ $router->group('/admin', function (Router $r) {
 
     // Affiliate links
     $r->get('/affiliate-links',              [A\AffiliateLinksController::class, 'index']);
+    $r->get('/affiliate-links/health',       [A\AffiliateLinksController::class, 'health']);
     $r->get('/affiliate-links/new',          [A\AffiliateLinksController::class, 'create']);
     $r->post('/affiliate-links',             [A\AffiliateLinksController::class, 'store']);
     $r->get('/affiliate-links/{id}/edit',    [A\AffiliateLinksController::class, 'edit']);
