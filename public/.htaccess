@@ -19,13 +19,35 @@
 </IfModule>
 
 # -----------------------------------------------------------------------------
-# Security headers sanos por default.
+# Security headers.
 # -----------------------------------------------------------------------------
 <IfModule mod_headers.c>
+    # HSTS: fuerza HTTPS por 1 año, incluye subdominios. Activar preload solo
+    # cuando estes seguro de que TODO el sitio es HTTPS, porque es dificil
+    # revertir (Chrome/Firefox/Safari mantienen la preload list).
+    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+
+    # Impide MIME sniffing.
     Header set X-Content-Type-Options "nosniff"
+
+    # Impide clickjacking (iframe externo).
     Header set X-Frame-Options "SAMEORIGIN"
+
+    # Controla que info se filtra en Referer.
     Header set Referrer-Policy "strict-origin-when-cross-origin"
-    Header set Permissions-Policy "interest-cohort=()"
+
+    # Desactiva FLoC + permisos innecesarios.
+    Header set Permissions-Policy "interest-cohort=(), camera=(), microphone=(), geolocation=(), payment=()"
+
+    # Cross-Origin-Opener-Policy: aisla browsing context (mitiga Spectre).
+    Header set Cross-Origin-Opener-Policy "same-origin"
+
+    # Cross-Origin-Resource-Policy: impide que terceros embedan tu contenido.
+    Header set Cross-Origin-Resource-Policy "same-origin"
+
+    # Oculta version de PHP / tecnologia (defensa contra fingerprinting).
+    Header unset X-Powered-By
+    Header unset Server
 </IfModule>
 
 # -----------------------------------------------------------------------------

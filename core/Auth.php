@@ -76,7 +76,11 @@ final class Auth
 
     public static function logout(): void
     {
+        $userId = is_array(self::$cache) ? (int)self::$cache['id'] : null;
         self::$cache = null;
+        if ($userId) {
+            Security::logEvent('logout', ['user_id' => $userId]);
+        }
         Session::destroy();
     }
 
