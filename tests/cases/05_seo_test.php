@@ -45,6 +45,26 @@ TestRunner::group('SEO', function () {
         assert_contains('<title>Mi pagina | Example</title>', $head);
     });
 
+    TestRunner::run('title NO duplica cuando coincide con site name', function () {
+        // Caso tipico: home del site, ->title($site->name) no deberia generar
+        // "Example | Example" (template).
+        $site = make_fake_site();
+        $seo = new SEO($site);
+        $seo->title('Example');
+        $head = $seo->renderHead();
+        assert_contains('<title>Example</title>', $head);
+        assert_not_contains('Example | Example', $head);
+    });
+
+    TestRunner::run('title NO duplica case-insensitive', function () {
+        $site = make_fake_site();
+        $seo = new SEO($site);
+        $seo->title('EXAMPLE'); // uppercase
+        $head = $seo->renderHead();
+        assert_not_contains('EXAMPLE | Example', $head);
+        assert_not_contains('Example | EXAMPLE', $head);
+    });
+
     TestRunner::run('meta description y canonical', function () {
         $site = make_fake_site();
         $seo = new SEO($site);
