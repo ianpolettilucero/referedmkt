@@ -33,7 +33,9 @@ final class AuthorController extends Controller
             ->description($author['bio'])
             ->canonical('/autor/' . $author['slug'])
             ->ogImage($author['avatar_url'])
-            ->breadcrumb([['Inicio', '/'], ['Autores', '/autores'], [$author['name'], '/autor/' . $author['slug']]]);
+            ->ogType('profile')
+            ->breadcrumb([['Inicio', '/'], ['Autores', '/autores'], [$author['name'], '/autor/' . $author['slug']]])
+            ->schemaPerson($author);
 
         $this->render('author', ['author' => $author, 'articles' => $articles]);
     }

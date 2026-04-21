@@ -20,6 +20,11 @@
     <?php if ($site->faviconUrl): ?>
     <link rel="icon" href="<?= e($site->faviconUrl) ?>">
     <?php endif; ?>
+    <?php if ($site->googleAnalyticsId || $site->googleTagManagerId): ?>
+    <!-- Performance hints: pre-conectar al CDN de Google Analytics/GTM -->
+    <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+    <link rel="dns-prefetch" href="https://www.google-analytics.com">
+    <?php endif; ?>
     <link rel="stylesheet" href="<?= e(theme_asset('css/site.css')) ?>">
     <?php
     // Preset visual seleccionado desde /admin/settings (theme_preset).

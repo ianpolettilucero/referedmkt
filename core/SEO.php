@@ -25,6 +25,7 @@ final class SEO
     private ?string $canonical = null;
     private ?string $ogImage = null;
     private string $ogType = 'website';
+    private ?string $ogLocaleValue = null;
     private ?string $robots = null;
 
     /** @var array<int, array{0:string,1:string}> */
@@ -79,9 +80,12 @@ final class SEO
         return $this;
     }
 
-    public function noindex(): self
+    public function noindex(bool $follow = false): self
     {
-        $this->robots = 'noindex, nofollow';
+        // follow=true → "noindex, follow" (no rankear esta URL pero sí seguir
+        // los links, util para listados parametrizados con filtros).
+        // Default false → "noindex, nofollow" (ej. admin, error pages).
+        $this->robots = 'noindex, ' . ($follow ? 'follow' : 'nofollow');
         return $this;
     }
 
@@ -120,6 +124,84 @@ final class SEO
             'logo'     => $this->site->logoUrl,
         ];
         return $this;
+    }
+
+    /**
+     * WebSite + SearchAction → habilita el "sitelinks search box" de Google
+     * cuando el sitio rankea con su nombre. Usar en la home.
+     */
+    public function schemaWebSite(): self
+    {
+        $this->jsonLd[] = [
+            '@context'        => 'https://schema.org',
+            '@type'           => 'WebSite',
+            'name'            => $this->site->name,
+            'url'             => site_url('/'),
+            'potentialAction' => [
+                '@type'       => 'SearchAction',
+                'target'      => [
+                    '@type'       => 'EntryPoint',
+                    'urlTemplate' => site_url('/buscar?q={search_term_string}'),
+                ],
+                'query-input' => 'required name=search_term_string',
+            ],
+        ];
+        return $this;
+    }
+
+    /**
+     * Person schema para paginas de autor. Mejora E-E-A-T.
+     * @param array<string, mixed> $author row con name, slug, bio, avatar_url, social_links, expertise
+     */
+    public function schemaPerson(array $author): self
+    {
+        $sameAs = [];
+        if (!empty($author['social_links']) && is_array($author['social_links'])) {
+            foreach ($author['social_links'] as $url) {
+                if (is_string($url) && filter_var($url, FILTER_VALIDATE_URL)) {
+                    $sameAs[] = $url;
+                }
+            }
+        }
+        $data = [
+            '@context'    => 'https://schema.org',
+            '@type'       => 'Person',
+            'name'        => $author['name'],
+            'url'         => site_url('/autor/' . ($author['slug'] ?? '')),
+            'description' => !empty($author['bio']) ? $this->oneLine($author['bio'], 300) : null,
+            'image'       => $author['avatar_url'] ?? null,
+            'jobTitle'    => $author['expertise'] ?? null,
+            'sameAs'      => $sameAs ?: null,
+            'worksFor'    => [
+                '@type' => 'Organization',
+                'name'  => $this->site->name,
+                'url'   => site_url('/'),
+            ],
+        ];
+        $this->jsonLd[] = $this->deepFilter($data);
+        return $this;
+    }
+
+    /**
+     * Setea og:locale (ej "es_AR", "es_MX"). Ayuda a la geo-relevancia
+     * en mercados especificos. Default: derivado del site (lang_country).
+     */
+    public function ogLocale(?string $locale = null): self
+    {
+        if ($locale === null) {
+            $lang = strtolower($this->site->defaultLanguage ?: 'es');
+            $country = strtoupper($this->site->defaultCountry ?: 'AR');
+            $locale = $lang . '_' . $country;
+        }
+        $this->ogLocaleValue = $locale;
+        return $this;
+    }
+
+    private function oneLine(string $s, int $max = 200): string
+    {
+        $s = trim(preg_replace('/\s+/', ' ', strip_tags($s)));
+        if (mb_strlen($s) > $max) { $s = rtrim(mb_substr($s, 0, $max - 1)) . '…'; }
+        return $s;
     }
 
     /**
@@ -251,6 +333,10 @@ final class SEO
         }
         $out[] = '<meta property="og:url" content="' . e($canonical) . '">';
         $out[] = '<meta property="og:type" content="' . e($this->ogType) . '">';
+        // og:locale: si no fue seteado explicitamente, derivar del site (lang_country).
+        $locale = $this->ogLocaleValue
+            ?? (strtolower($this->site->defaultLanguage ?: 'es') . '_' . strtoupper($this->site->defaultCountry ?: 'AR'));
+        $out[] = '<meta property="og:locale" content="' . e($locale) . '">';
         if ($this->ogImage) {
             $out[] = '<meta property="og:image" content="' . e($this->ogImage) . '">';
         }

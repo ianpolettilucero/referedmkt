@@ -34,6 +34,12 @@ final class CategoryController extends Controller
             ->canonical('/productos')
             ->breadcrumb([['Inicio', '/'], ['Productos', '/productos']]);
 
+        // Si hay filtros activos: noindex follow para evitar duplicate content
+        // (canonical sigue apuntando a /productos sin params).
+        if ($hasActiveFilters) {
+            $this->seo->noindex(true);
+        }
+
         if (!$hasActiveFilters) {
             // Vista agrupada por categoria con H2s
             $grouped = Product::groupedByCategory($this->site->id, 8);
@@ -112,6 +118,14 @@ final class CategoryController extends Controller
             ['s' => $this->site->id]
         );
 
+        // Filtros que NO sean la categoria base (que viene fija de la URL)
+        // hacen que esta variante se considere parametrizada -> noindex follow.
+        $hasExtraFilters = !empty($filters['brand'])
+            || !empty($filters['min_rating'])
+            || !empty($filters['max_price'])
+            || (($filters['sort'] ?? 'featured') !== 'featured')
+            || $page > 1;
+
         $this->seo
             ->title($cat['meta_title'] ?: $cat['name'])
             ->description($cat['meta_description'] ?: $cat['description'])
@@ -121,6 +135,10 @@ final class CategoryController extends Controller
                 ['Productos', '/productos'],
                 [$cat['name'], category_url($cat)],
             ]);
+
+        if ($hasExtraFilters) {
+            $this->seo->noindex(true);
+        }
 
         $this->render('category', [
             'category'        => $cat,

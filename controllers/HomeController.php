@@ -17,7 +17,8 @@ final class HomeController extends Controller
             ->title($this->site->name)
             ->description($this->site->metaDescriptionTemplate)
             ->canonical('/')
-            ->schemaOrganization();
+            ->schemaOrganization()
+            ->schemaWebSite();
 
         $this->render('home', [
             'featured_products' => $featured,

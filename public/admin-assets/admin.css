@@ -644,22 +644,6 @@ h2 { font-size: 1.1rem; font-weight: 700; }
 }
 
 /* ==== RESPONSIVE ==== */
-/* ==== RESPONSIVE ADMIN ==== */
-
-/* Tablas: siempre con scroll horizontal si desbordan (cualquier viewport) */
-.admin-table {
-    display: block;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    max-width: 100%;
-}
-.admin-table thead, .admin-table tbody, .admin-table tr {
-    display: table;
-    width: 100%;
-    table-layout: auto;
-}
-
-/* ---- Tablet / mobile (<= 860px): sidebar colapsable ---- */
 @media (max-width: 860px) {
     .admin-shell {
         grid-template-columns: 1fr;
@@ -689,62 +673,6 @@ h2 { font-size: 1.1rem; font-weight: 700; }
     .admin-main { padding: 1rem 1.25rem 3rem; }
     .admin-site-switcher select { min-width: 120px; }
     .admin-user-label { display: none; }
-}
-
-/* ---- Mobile (<= 640px): compactar mas ---- */
-@media (max-width: 640px) {
-    .admin-topbar { padding: 0 0.75rem; }
-    .admin-topbar-left > .admin-btn-subtle { display: none; }
-    .admin-main { padding: 0.75rem 0.75rem 3rem; }
-    .admin-page-header { margin-bottom: 1rem; }
-    .admin-page-title { font-size: 1.25rem; }
-    .admin-create-buttons .admin-btn { font-size: 0.8rem; padding: 0.45rem 0.7rem; }
-    .admin-card { padding: 1rem; }
-    .admin-table th, .admin-table td { padding: 0.55rem 0.7rem; font-size: 0.85rem; }
-
-    .admin-tabs {
-        margin-bottom: 1rem;
-    }
-    .admin-tab {
-        padding: 0.55rem 0.75rem;
-        font-size: 0.85rem;
-    }
-
-    .admin-form .admin-grid { gap: 0.75rem; }
-
-    /* Preset grid mas denso */
-    .preset-grid { grid-template-columns: 1fr 1fr; gap: 0.5rem; }
-    .preset-card { padding: 0.7rem; }
-    .preset-swatches { height: 26px; }
-
-    /* Product picker: menos columnas */
-    .product-picker-list { grid-template-columns: 1fr; max-height: 260px; }
-
-    /* Stats: 2 cols en mobile */
-    .admin-stats { grid-template-columns: 1fr 1fr; gap: 0.5rem; }
-    .admin-stat { padding: 0.85rem 1rem; }
-    .admin-stat-value { font-size: 1.5rem; }
-}
-
-/* ---- Mobile chico (<= 400px): 1 col de stats ---- */
-@media (max-width: 400px) {
-    .admin-stats { grid-template-columns: 1fr; }
-    .preset-grid { grid-template-columns: 1fr; }
-    .admin-site-switcher label { display: none; }
-    .admin-site-switcher select { min-width: 110px; }
-    .admin-topbar-right { gap: 0.4rem; }
-}
-
-/* ---- Desktop grande (>= 1400px): sidebar un poco mas ancha + main con mas aire ---- */
-@media (min-width: 1400px) {
-    :root { --a-sidebar-w: 260px; }
-    .admin-main { padding: 2rem 2.5rem 4rem; }
-}
-
-/* ---- Desktop ultra-wide (>= 1920px) ---- */
-@media (min-width: 1920px) {
-    :root { --a-sidebar-w: 280px; }
-    .admin-main { padding: 2rem 3rem 5rem; max-width: 1600px; }
 }
 
 /* ==== SCROLLBAR ==== */
