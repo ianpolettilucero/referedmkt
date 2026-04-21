@@ -23,6 +23,30 @@ final class Security
     public const LOGIN_WINDOW_MIN = 15;      // ventana para contar fails
 
     /**
+     * Enmascara una IP para display en UI (oculta octetos/grupos intermedios).
+     * Preserva el primer y ultimo octeto para identificacion gruesa pero evita
+     * exponer la IP completa en un screenshot accidental.
+     *
+     * IPv4 "190.123.45.67" -> "190.***.***.67"
+     * IPv6 "2001:db8:1:2:3:4:5:6" -> "2001:db8:****:****:****:****:5:6"
+     */
+    public static function maskIp(string $ip): string
+    {
+        if ($ip === '') { return ''; }
+        if (strpos($ip, ':') !== false) {
+            // IPv6: preservar primeros 2 y ultimos 2 grupos
+            $parts = explode(':', $ip);
+            if (count($parts) < 4) { return $ip; }
+            return $parts[0] . ':' . $parts[1] . ':****:****:'
+                . $parts[count($parts) - 2] . ':' . $parts[count($parts) - 1];
+        }
+        // IPv4
+        $parts = explode('.', $ip);
+        if (count($parts) !== 4) { return $ip; }
+        return $parts[0] . '.***.***.' . $parts[3];
+    }
+
+    /**
      * Devuelve la IP real del cliente considerando proxies comunes.
      */
     public static function getClientIp(): string
@@ -240,6 +264,15 @@ final class Security
     public static function enforceBans(): void
     {
         try {
+            // Assets estaticos: no aplicamos ban. Apache casi siempre los sirve
+            // directo sin pasar por index.php (por el .htaccess), pero por las
+            // dudas skipeamos aca tambien para no bloquear CSS/JS de la pagina
+            // de error que el user baneado igual tiene que poder ver.
+            $path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?? '/';
+            if (preg_match('#^/(theme-assets|admin-assets|uploads|favicon\.ico|robots\.txt)#', $path)) {
+                return;
+            }
+
             $ip = self::getClientIp();
             if (!self::isBanned($ip)) { return; }
 

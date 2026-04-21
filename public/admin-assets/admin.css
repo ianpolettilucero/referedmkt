@@ -643,6 +643,37 @@ h2 { font-size: 1.1rem; font-weight: 700; }
     margin-top: 0.5rem;
 }
 
+/* ==== IP masked cell ==== */
+.ip-masked {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-family: var(--a-font-mono);
+    font-size: 0.85rem;
+}
+.ip-masked-value {
+    background: var(--a-surface);
+    padding: 0.1rem 0.35rem;
+    border-radius: 3px;
+    color: var(--a-text-muted);
+    border: 1px solid var(--a-border);
+}
+.ip-masked.is-revealed .ip-masked-value {
+    color: var(--a-text);
+    border-color: var(--a-border-strong);
+}
+.ip-masked-toggle {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0.1rem 0.25rem;
+    opacity: 0.55;
+    font-size: 0.9rem;
+    transition: opacity var(--a-transition);
+    line-height: 1;
+}
+.ip-masked-toggle:hover { opacity: 1; }
+
 /* ==== RESPONSIVE ==== */
 @media (max-width: 860px) {
     .admin-shell {

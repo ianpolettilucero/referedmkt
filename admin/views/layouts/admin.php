@@ -60,6 +60,39 @@
                 }
             });
         })();
+
+        // IP masking: toggle entre mostrar IP masked vs full.
+        (function () {
+            document.addEventListener('click', function (e) {
+                var btn = e.target.closest('.ip-masked-toggle');
+                if (!btn) return;
+                var cell = btn.closest('.ip-masked');
+                var valueEl = cell.querySelector('.ip-masked-value');
+                var full = cell.getAttribute('data-ip-full');
+                var revealed = cell.classList.contains('is-revealed');
+                if (revealed) {
+                    // Re-masking: regeneramos la version masked en JS.
+                    valueEl.textContent = maskIp(full);
+                    cell.classList.remove('is-revealed');
+                    btn.textContent = '👁';
+                } else {
+                    valueEl.textContent = full;
+                    cell.classList.add('is-revealed');
+                    btn.textContent = '🙈';
+                }
+            });
+            function maskIp(ip) {
+                if (!ip) return '';
+                if (ip.indexOf(':') !== -1) {
+                    var p = ip.split(':');
+                    if (p.length < 4) return ip;
+                    return p[0] + ':' + p[1] + ':****:****:' + p[p.length-2] + ':' + p[p.length-1];
+                }
+                var q = ip.split('.');
+                if (q.length !== 4) return ip;
+                return q[0] + '.***.***.' + q[3];
+            }
+        })();
     </script>
 </body>
 </html>
