@@ -38,7 +38,10 @@ $eventBadge = function ($t) {
 ?>
 <div class="admin-page-header">
     <h1 class="admin-page-title">Seguridad</h1>
-    <span class="admin-muted" style="font-size:0.85rem">Tu IP actual: <code><?= htmlspecialchars($my_ip, ENT_QUOTES, 'UTF-8') ?></code></span>
+    <span class="admin-muted" style="font-size:0.85rem">
+        Tu IP actual:
+        <?= $view->partial('ip_cell', ['ip' => $my_ip]) ?>
+    </span>
 </div>
 
 <div class="admin-stats">
@@ -107,7 +110,7 @@ $eventBadge = function ($t) {
             <tbody>
                 <?php foreach ($bans as $b): ?>
                     <tr>
-                        <td><code><?= htmlspecialchars($b['ip_address'], ENT_QUOTES, 'UTF-8') ?></code></td>
+                        <td><?= $view->partial('ip_cell', ['ip' => $b['ip_address']]) ?></td>
                         <td><?= htmlspecialchars($b['reason'] ?? '—', ENT_QUOTES, 'UTF-8') ?></td>
                         <td>
                             <?php if ($b['auto_banned']): ?>
@@ -167,7 +170,8 @@ $eventBadge = function ($t) {
             <tbody>
                 <?php foreach ($whitelist as $w): ?>
                     <tr>
-                        <td><code><?= htmlspecialchars($w['ip_address'], ENT_QUOTES, 'UTF-8') ?></code>
+                        <td>
+                            <?= $view->partial('ip_cell', ['ip' => $w['ip_address']]) ?>
                             <?php if ($w['ip_address'] === $my_ip): ?>
                                 <span class="admin-badge admin-badge-success">tu IP</span>
                             <?php endif; ?>
@@ -198,7 +202,7 @@ $eventBadge = function ($t) {
         <tbody>
             <?php foreach ($top_attackers as $a): ?>
                 <tr>
-                    <td><code><?= htmlspecialchars($a['ip_address'], ENT_QUOTES, 'UTF-8') ?></code></td>
+                    <td><?= $view->partial('ip_cell', ['ip' => $a['ip_address']]) ?></td>
                     <td style="font-variant-numeric:tabular-nums;color:var(--a-danger);font-weight:700"><?= (int)$a['fails'] ?></td>
                     <td><?= htmlspecialchars(date('d/m/Y H:i', strtotime($a['last_seen'])), ENT_QUOTES, 'UTF-8') ?></td>
                     <td style="font-size:0.82rem"><?= htmlspecialchars(mb_substr($a['emails_tried'] ?? '', 0, 120), ENT_QUOTES, 'UTF-8') ?></td>
@@ -242,7 +246,13 @@ $eventBadge = function ($t) {
                     <tr>
                         <td style="font-size:0.82rem;white-space:nowrap"><?= htmlspecialchars(date('d/m H:i:s', strtotime($e['created_at'])), ENT_QUOTES, 'UTF-8') ?></td>
                         <td><span class="admin-badge <?= $eventBadge($e['event_type']) ?>"><?= htmlspecialchars($eventLabel($e['event_type']), ENT_QUOTES, 'UTF-8') ?></span></td>
-                        <td><code style="font-size:0.82rem"><?= htmlspecialchars($e['ip_address'] ?? '—', ENT_QUOTES, 'UTF-8') ?></code></td>
+                        <td>
+                            <?php if (!empty($e['ip_address'])): ?>
+                                <?= $view->partial('ip_cell', ['ip' => $e['ip_address']]) ?>
+                            <?php else: ?>
+                                <span class="admin-muted">—</span>
+                            <?php endif; ?>
+                        </td>
                         <td style="font-size:0.85rem">
                             <?php if (!empty($e['user_name'])): ?>
                                 <strong><?= htmlspecialchars($e['user_name'], ENT_QUOTES, 'UTF-8') ?></strong>
