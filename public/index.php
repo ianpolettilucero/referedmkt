@@ -6,6 +6,7 @@
 require dirname(__DIR__) . '/core/bootstrap.php';
 
 use Core\Router;
+use Core\Security;
 use Core\Site;
 use Controllers\ArticleController;
 use Controllers\AuthorController;
@@ -20,6 +21,10 @@ use Controllers\RedirectController;
 use Controllers\RobotsController;
 use Controllers\SearchController;
 use Controllers\SitemapController;
+
+// Security middleware: bloquear IPs baneadas ANTES de cualquier routing.
+// enforceBans() termina con 403 si hay match; sigue si la IP esta limpia.
+Security::enforceBans();
 
 // El admin es global (no requiere tenant). Se delega antes de resolver Site.
 $currentPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?? '/';

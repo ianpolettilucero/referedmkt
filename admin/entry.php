@@ -120,6 +120,14 @@ $router->group('/admin', function (Router $r) {
 
     // Analytics
     $r->get('/analytics', [A\AnalyticsController::class, 'index']);
+
+    // Security
+    $r->get('/security',                      [A\SecurityController::class, 'index']);
+    $r->post('/security/ban',                 [A\SecurityController::class, 'banIp']);
+    $r->post('/security/unban',               [A\SecurityController::class, 'unbanIp']);
+    $r->post('/security/whitelist/add',       [A\SecurityController::class, 'addWhitelist']);
+    $r->post('/security/whitelist/remove',    [A\SecurityController::class, 'removeWhitelist']);
+    $r->post('/security/gc',                  [A\SecurityController::class, 'runGc']);
 });
 
 $router->setNotFound(function ($path) {

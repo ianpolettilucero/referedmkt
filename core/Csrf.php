@@ -41,12 +41,19 @@ final class Csrf
     }
 
     /**
-     * Usar en handlers POST/PUT/DELETE; aborta con 419 si falla.
+     * Usar en handlers POST/PUT/DELETE; aborta con 419 si falla y loguea el evento.
      */
     public static function requireValid(): void
     {
         $provided = $_POST['_csrf'] ?? $_SERVER['HTTP_X_CSRF_TOKEN'] ?? null;
         if (!self::validate($provided)) {
+            // Log al security_events (util para detectar scripts maliciosos).
+            Security::logEvent('csrf_fail', [
+                'details' => json_encode([
+                    'method' => $_SERVER['REQUEST_METHOD'] ?? '',
+                    'token_provided' => $provided ? 'yes' : 'no',
+                ]),
+            ]);
             http_response_code(419);
             header('Content-Type: text/plain; charset=utf-8');
             echo '419 - CSRF token invalido. Volve atras y reintenta.';
