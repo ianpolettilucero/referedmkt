@@ -53,38 +53,50 @@ final class Security
 
     /**
      * ¿Esta IP esta baneada y el ban aun vigente? Cachea por request.
+     * Defensivo: si la tabla no existe (migracion 005 no corrida), retorna false.
      */
     public static function isBanned(string $ip): bool
     {
         if ($ip === '' || $ip === '0.0.0.0') { return false; }
-        if (self::isWhitelisted($ip)) { return false; }
+        try {
+            if (self::isWhitelisted($ip)) { return false; }
 
-        $row = Database::instance()->fetch(
-            'SELECT expires_at FROM banned_ips WHERE ip_address = :ip LIMIT 1',
-            ['ip' => $ip]
-        );
-        if (!$row) { return false; }
-        // expires_at NULL = permanente
-        if ($row['expires_at'] === null) { return true; }
-        // Si ya vencio, limpiar y retornar false
-        if (strtotime($row['expires_at']) < time()) {
-            Database::instance()->query(
-                'DELETE FROM banned_ips WHERE ip_address = :ip',
+            $row = Database::instance()->fetch(
+                'SELECT expires_at FROM banned_ips WHERE ip_address = :ip LIMIT 1',
                 ['ip' => $ip]
             );
+            if (!$row) { return false; }
+            // expires_at NULL = permanente
+            if ($row['expires_at'] === null) { return true; }
+            // Si ya vencio, limpiar y retornar false
+            if (strtotime($row['expires_at']) < time()) {
+                Database::instance()->query(
+                    'DELETE FROM banned_ips WHERE ip_address = :ip',
+                    ['ip' => $ip]
+                );
+                return false;
+            }
+            return true;
+        } catch (\Throwable $e) {
+            // Tabla no existe / DB error -> no bloquear. Logueamos al error log.
+            error_log('[referedmkt][security] isBanned falló: ' . $e->getMessage());
             return false;
         }
-        return true;
     }
 
     public static function isWhitelisted(string $ip): bool
     {
         if ($ip === '') { return false; }
-        $exists = Database::instance()->fetchColumn(
-            'SELECT 1 FROM ip_whitelist WHERE ip_address = :ip LIMIT 1',
-            ['ip' => $ip]
-        );
-        return (bool)$exists;
+        try {
+            $exists = Database::instance()->fetchColumn(
+                'SELECT 1 FROM ip_whitelist WHERE ip_address = :ip LIMIT 1',
+                ['ip' => $ip]
+            );
+            return (bool)$exists;
+        } catch (\Throwable $e) {
+            error_log('[referedmkt][security] isWhitelisted falló: ' . $e->getMessage());
+            return false;
+        }
     }
 
     /**
@@ -102,41 +114,45 @@ final class Security
         int $attemptCount = 0
     ): void {
         if (!self::isValidIp($ip)) { return; }
-        if (self::isWhitelisted($ip)) { return; } // whitelist > ban
+        try {
+            if (self::isWhitelisted($ip)) { return; }
 
-        $expiresAt = $durationHours === null
-            ? null
-            : date('Y-m-d H:i:s', time() + ($durationHours * 3600));
+            $expiresAt = $durationHours === null
+                ? null
+                : date('Y-m-d H:i:s', time() + ($durationHours * 3600));
 
-        Database::instance()->query(
-            "INSERT INTO banned_ips (ip_address, reason, banned_by, auto_banned, expires_at, attempt_count)
-             VALUES (:ip, :reason, :by, :auto, :exp, :attempts)
-             ON DUPLICATE KEY UPDATE
-                reason = VALUES(reason),
-                banned_by = VALUES(banned_by),
-                auto_banned = VALUES(auto_banned),
-                banned_at = CURRENT_TIMESTAMP,
-                expires_at = VALUES(expires_at),
-                attempt_count = VALUES(attempt_count)",
-            [
-                'ip'       => $ip,
-                'reason'   => mb_substr($reason, 0, 255),
-                'by'       => $byUserId,
-                'auto'     => $auto ? 1 : 0,
-                'exp'      => $expiresAt,
-                'attempts' => $attemptCount,
-            ]
-        );
+            Database::instance()->query(
+                "INSERT INTO banned_ips (ip_address, reason, banned_by, auto_banned, expires_at, attempt_count)
+                 VALUES (:ip, :reason, :by, :auto, :exp, :attempts)
+                 ON DUPLICATE KEY UPDATE
+                    reason = VALUES(reason),
+                    banned_by = VALUES(banned_by),
+                    auto_banned = VALUES(auto_banned),
+                    banned_at = CURRENT_TIMESTAMP,
+                    expires_at = VALUES(expires_at),
+                    attempt_count = VALUES(attempt_count)",
+                [
+                    'ip'       => $ip,
+                    'reason'   => mb_substr($reason, 0, 255),
+                    'by'       => $byUserId,
+                    'auto'     => $auto ? 1 : 0,
+                    'exp'      => $expiresAt,
+                    'attempts' => $attemptCount,
+                ]
+            );
 
-        self::logEvent($auto ? 'auto_ban' : 'manual_ban', [
-            'ip_address' => $ip,
-            'user_id'    => $byUserId,
-            'details'    => json_encode([
-                'reason' => $reason,
-                'expires_at' => $expiresAt,
-                'attempt_count' => $attemptCount,
-            ], JSON_UNESCAPED_UNICODE),
-        ]);
+            self::logEvent($auto ? 'auto_ban' : 'manual_ban', [
+                'ip_address' => $ip,
+                'user_id'    => $byUserId,
+                'details'    => json_encode([
+                    'reason' => $reason,
+                    'expires_at' => $expiresAt,
+                    'attempt_count' => $attemptCount,
+                ], JSON_UNESCAPED_UNICODE),
+            ]);
+        } catch (\Throwable $e) {
+            error_log('[referedmkt][security] ban() falló: ' . $e->getMessage());
+        }
     }
 
     public static function unban(string $ip, int $byUserId): bool
@@ -216,27 +232,36 @@ final class Security
     /**
      * Middleware: detener la ejecucion si la IP actual esta baneada.
      * Llamado desde public/index.php ANTES del router.
+     *
+     * Defensivo: cualquier error interno (DB down, tabla faltante, etc.)
+     * NO bloquea el request. Fail open — privilegia disponibilidad del
+     * sitio sobre la proteccion opcional de bans.
      */
     public static function enforceBans(): void
     {
-        $ip = self::getClientIp();
-        if (!self::isBanned($ip)) { return; }
+        try {
+            $ip = self::getClientIp();
+            if (!self::isBanned($ip)) { return; }
 
-        // Log del bloqueo (solo 1 por sesion de ban, no spamear logs)
-        self::logEvent('blocked_request', [
-            'ip_address' => $ip,
-            'details'    => json_encode([
-                'reason' => 'IP banned',
-                'uri'    => $_SERVER['REQUEST_URI'] ?? '',
-            ]),
-        ]);
+            // Log del bloqueo
+            self::logEvent('blocked_request', [
+                'ip_address' => $ip,
+                'details'    => json_encode([
+                    'reason' => 'IP banned',
+                    'uri'    => $_SERVER['REQUEST_URI'] ?? '',
+                ]),
+            ]);
 
-        http_response_code(403);
-        header('Content-Type: text/plain; charset=utf-8');
-        header('Retry-After: 3600'); // sugiere 1h al cliente (bots razonables lo respetan)
-        echo "403 Forbidden\n\nTu IP ha sido bloqueada por actividad sospechosa.\n";
-        echo "Si crees que es un error, contacta al administrador del sitio.\n";
-        exit;
+            http_response_code(403);
+            header('Content-Type: text/plain; charset=utf-8');
+            header('Retry-After: 3600');
+            echo "403 Forbidden\n\nTu IP ha sido bloqueada por actividad sospechosa.\n";
+            echo "Si crees que es un error, contacta al administrador del sitio.\n";
+            exit;
+        } catch (\Throwable $e) {
+            error_log('[referedmkt][security] enforceBans falló: ' . $e->getMessage());
+            // Fail open: continua la ejecucion normal sin bloquear.
+        }
     }
 
     /**
