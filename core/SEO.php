@@ -41,8 +41,28 @@ final class SEO
 
     public function title(string $title): self
     {
-        $template = $this->site->metaTitleTemplate ?: '{title} | ' . $this->site->name;
-        $this->title = str_replace('{title}', $title, $template);
+        $title = trim($title);
+        $siteName = trim($this->site->name);
+
+        // Si el title coincide con el nombre del sitio (caso tipico: home),
+        // no aplicamos template para evitar "Ciberseguridad | Ciberseguridad".
+        if ($title !== '' && strcasecmp($title, $siteName) === 0) {
+            $this->title = $title;
+            return $this;
+        }
+
+        $template = $this->site->metaTitleTemplate ?: '{title} | ' . $siteName;
+        $rendered = str_replace('{title}', $title, $template);
+
+        // Defensa extra: si el render contiene el title duplicado (X | X | ...),
+        // colapsar a una sola aparicion.
+        $rendered = preg_replace(
+            '/(?:^|\s\|\s)' . preg_quote($title, '/') . '(?=\s\|\s' . preg_quote($title, '/') . '(?:\s\||$))/i',
+            '',
+            $rendered
+        );
+
+        $this->title = trim($rendered, " |\t");
         return $this;
     }
 

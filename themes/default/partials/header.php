@@ -1,12 +1,11 @@
 <?php /** @var \Core\Site $site */ ?>
 <header class="site-header">
     <div class="container site-header-inner">
-        <a class="site-brand" href="/">
+        <a class="site-brand<?= $site->logoUrl ? ' site-brand--with-logo' : '' ?>" href="/">
             <?php if ($site->logoUrl): ?>
-                <img src="<?= e($site->logoUrl) ?>" alt="<?= e($site->name) ?>" height="32">
-            <?php else: ?>
-                <span><?= e($site->name) ?></span>
+                <img class="site-brand-logo" src="<?= e($site->logoUrl) ?>" alt="<?= e($site->name) ?>">
             <?php endif; ?>
+            <span class="site-brand-name"><?= e($site->name) ?></span>
         </a>
         <nav class="site-nav" aria-label="Principal">
             <a href="/productos">Productos</a>
