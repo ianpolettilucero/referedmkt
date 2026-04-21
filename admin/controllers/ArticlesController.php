@@ -233,7 +233,11 @@ final class ArticlesController extends BaseController
     private function productOptions(int $siteId): array
     {
         return Database::instance()->fetchAll(
-            'SELECT id, name FROM products WHERE site_id = :s ORDER BY name', ['s' => $siteId]
+            'SELECT p.id, p.name, p.brand, p.slug, al.tracking_slug AS affiliate_slug
+             FROM products p
+             LEFT JOIN affiliate_links al ON al.id = p.affiliate_link_id AND al.active = 1
+             WHERE p.site_id = :s ORDER BY p.name',
+            ['s' => $siteId]
         );
     }
 }
