@@ -116,3 +116,18 @@ if (!function_exists('excerpt')) {
         return rtrim(mb_substr($text, 0, $maxChars - 1)) . '…';
     }
 }
+
+if (!function_exists('reading_time')) {
+    /**
+     * Calcula el tiempo de lectura estimado en minutos.
+     * Asume ~225 palabras/minuto (promedio adulto en español).
+     * Min 1 min para textos cortos.
+     */
+    function reading_time(?string $text, int $wordsPerMin = 225): int
+    {
+        if ($text === null || $text === '') { return 1; }
+        $clean = trim(preg_replace('/\s+/', ' ', strip_tags($text)));
+        $words = $clean === '' ? 0 : str_word_count($clean, 0, 'áéíóúüñÁÉÍÓÚÜÑ');
+        return max(1, (int)round($words / $wordsPerMin));
+    }
+}

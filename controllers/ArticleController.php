@@ -104,6 +104,14 @@ final class ArticleController extends Controller
             ->canonical($this->sectionPathForType($type))
             ->breadcrumb([['Inicio', '/'], [$label, $this->sectionPathForType($type)]]);
 
+        // Filtros activos -> noindex follow (canonical apunta a la base sin params).
+        $hasFilters = !empty($filters['category_id'])
+            || (($filters['sort'] ?? 'recent') !== 'recent')
+            || $page > 1;
+        if ($hasFilters) {
+            $this->seo->noindex(true);
+        }
+
         $this->render('article_list', [
             'articles'   => $data['items'],
             'total'      => $data['total'],

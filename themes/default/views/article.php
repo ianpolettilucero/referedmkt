@@ -15,13 +15,15 @@ $view->layout('default');
         <?php endif; ?>
         <p class="article-meta">
             <?php if (!empty($article['author_name'])): ?>
-                Por <strong><?= e($article['author_name']) ?></strong>
+                Por <a rel="author" href="<?= e('/autor/' . ($article['author_slug'] ?? '')) ?>"><strong><?= e($article['author_name']) ?></strong></a>
             <?php endif; ?>
             <?php if (!empty($article['published_at'])): ?>
                 · <time datetime="<?= e(date('c', strtotime($article['published_at']))) ?>">
                     <?= e(date('d/m/Y', strtotime($article['published_at']))) ?>
                 </time>
             <?php endif; ?>
+            <?php $minutes = reading_time($article['content'] ?? ''); ?>
+            · <span class="article-reading-time" title="Tiempo estimado de lectura"><?= e($minutes) ?> min de lectura</span>
         </p>
         <?php if (!empty($article['featured_image'])): ?>
             <img class="article-hero" src="<?= e($article['featured_image']) ?>" alt="<?= e($article['title']) ?>" loading="lazy">
