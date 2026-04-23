@@ -10,7 +10,7 @@ final class DashboardController extends BaseController
     public function index(): void
     {
         $site = Context::activeSite();
-        $stats = ['products' => 0, 'articles' => 0, 'affiliate_links' => 0, 'clicks_30d' => 0];
+        $stats = ['products' => 0, 'articles' => 0, 'affiliate_links' => 0, 'clicks_30d' => 0, 'broken_links' => 0];
 
         if ($site) {
             $db = Database::instance();
@@ -23,6 +23,7 @@ final class DashboardController extends BaseController
                  WHERE l.site_id = :s AND c.clicked_at >= (NOW() - INTERVAL 30 DAY)",
                 ['s' => $site['id']]
             );
+            $stats['broken_links']    = \Core\LinkChecker::brokenCountForSite((int)$site['id']);
         }
 
         $this->render('dashboard', ['stats' => $stats, 'page_title' => 'Dashboard']);

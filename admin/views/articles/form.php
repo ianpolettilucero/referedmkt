@@ -5,6 +5,7 @@
  *  @var array  $categories
  *  @var array  $authors
  *  @var array  $products
+ *  @var array  $broken_links
  *  @var string $csrf_token
  */
 $view->layout('admin');
@@ -14,11 +15,27 @@ $publishedLocal = '';
 if (!empty($row['published_at'])) {
     $publishedLocal = date('Y-m-d\TH:i', strtotime($row['published_at']));
 }
+$broken_links = $broken_links ?? [];
 ?>
 <div class="admin-page-header">
     <h1 class="admin-page-title"><?= $is_new ? 'Nuevo artículo' : 'Editar artículo' ?></h1>
     <a class="admin-btn" href="/admin/articles">← Volver</a>
 </div>
+
+<?php if (!$is_new && !empty($broken_links)): ?>
+    <div class="admin-flash admin-flash-error" style="margin-bottom:1rem;flex-direction:column;align-items:flex-start;gap:0.5rem">
+        <strong>⚠ Este artículo tiene <?= count($broken_links) ?> link(s) con problemas:</strong>
+        <ul style="margin:0;padding-left:1.25rem;font-size:0.88rem">
+            <?php foreach ($broken_links as $bl): ?>
+                <li>
+                    <code style="font-size:0.85em;word-break:break-all"><?= htmlspecialchars($bl['url'], ENT_QUOTES, 'UTF-8') ?></code>
+                    — <?= $bl['status_code'] ? (int)$bl['status_code'] : 'no responde' ?>
+                </li>
+            <?php endforeach; ?>
+        </ul>
+        <a class="admin-btn admin-btn-primary" href="/admin/link-health">Ver panel de health check →</a>
+    </div>
+<?php endif; ?>
 
 <form method="post" action="<?= htmlspecialchars($action, ENT_QUOTES, 'UTF-8') ?>" class="admin-form admin-card" id="article-form">
     <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrf_token, ENT_QUOTES, 'UTF-8') ?>">

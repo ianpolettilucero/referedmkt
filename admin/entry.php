@@ -122,6 +122,14 @@ $router->group('/admin', function (Router $r) {
     // Analytics
     $r->get('/analytics', [A\AnalyticsController::class, 'index']);
 
+    // Link health (articulos -> URLs externas)
+    $r->get('/link-health',                         [A\LinkHealthController::class, 'index']);
+    $r->post('/link-health/check-all',              [A\LinkHealthController::class, 'checkAll']);
+    $r->post('/link-health/check-article/{id}',     [A\LinkHealthController::class, 'checkArticle']);
+    $r->post('/link-health/{id}/apply-fix',         [A\LinkHealthController::class, 'applyFix']);
+    $r->post('/link-health/{id}/ignore',            [A\LinkHealthController::class, 'ignore']);
+    $r->post('/link-health/{id}/unignore',          [A\LinkHealthController::class, 'unignore']);
+
     // Security
     $r->get('/security',                      [A\SecurityController::class, 'index']);
     $r->post('/security/ban',                 [A\SecurityController::class, 'banIp']);
