@@ -36,22 +36,24 @@ $toc_items        = $toc_items ?? [];
     </header>
 
     <?php if ($toc_items): ?>
-        <details class="article-toc no-print" open>
-            <summary>
+        <aside class="article-toc no-print" data-toc-open="false" aria-label="Índice">
+            <button class="article-toc-toggle" type="button" aria-expanded="false" aria-controls="toc-nav">
                 <span class="article-toc-icon" aria-hidden="true">☰</span>
-                <span>Índice del artículo</span>
-                <span class="article-toc-count"><?= count($toc_items) ?> secciones</span>
-            </summary>
-            <nav aria-label="Tabla de contenidos">
+                <span class="article-toc-label-mobile">Índice del artículo</span>
+                <span class="article-toc-count"><?= count($toc_items) ?></span>
+                <span class="article-toc-chevron" aria-hidden="true">▼</span>
+            </button>
+            <div class="article-toc-label-desktop" aria-hidden="true">En esta página</div>
+            <nav id="toc-nav" aria-label="Tabla de contenidos">
                 <ol>
                     <?php foreach ($toc_items as $it): ?>
                         <li class="toc-level-<?= (int)$it['level'] ?>">
-                            <a href="#<?= e($it['id']) ?>"><?= e($it['text']) ?></a>
+                            <a href="#<?= e($it['id']) ?>" data-toc-link="<?= e($it['id']) ?>"><?= e($it['text']) ?></a>
                         </li>
                     <?php endforeach; ?>
                 </ol>
             </nav>
-        </details>
+        </aside>
     <?php endif; ?>
 
     <div class="article-body">
@@ -127,3 +129,63 @@ $toc_items        = $toc_items ?? [];
 
     <?= $view->partial('newsletter_signup') ?>
 </article>
+
+<?php if ($toc_items): ?>
+<script>
+(function () {
+    var toc = document.querySelector('.article-toc');
+    if (!toc) return;
+
+    // --- Toggle mobile: abre/cierra el nav con el boton ---
+    var btn = toc.querySelector('.article-toc-toggle');
+    var nav = toc.querySelector('#toc-nav');
+    if (btn && nav) {
+        btn.addEventListener('click', function () {
+            var isOpen = toc.getAttribute('data-toc-open') === 'true';
+            toc.setAttribute('data-toc-open', isOpen ? 'false' : 'true');
+            btn.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
+        });
+        // Al clickear un link del TOC en mobile, cerrarlo (menos distraccion)
+        nav.addEventListener('click', function (e) {
+            var link = e.target.closest('a[href^="#"]');
+            if (!link) return;
+            if (window.matchMedia('(max-width: 1199px)').matches) {
+                toc.setAttribute('data-toc-open', 'false');
+                btn.setAttribute('aria-expanded', 'false');
+            }
+        });
+    }
+
+    // --- Scrollspy: marca la seccion activa en el TOC ---
+    if (!('IntersectionObserver' in window)) return;
+    var headings = document.querySelectorAll('.article-body h2[id], .article-body h3[id]');
+    if (!headings.length) return;
+    var links = {};
+    toc.querySelectorAll('a[data-toc-link]').forEach(function (a) {
+        links[a.getAttribute('data-toc-link')] = a;
+    });
+
+    var currentActive = null;
+    var setActive = function (id) {
+        if (currentActive === id) return;
+        if (currentActive && links[currentActive]) links[currentActive].classList.remove('is-active');
+        if (id && links[id]) links[id].classList.add('is-active');
+        currentActive = id;
+    };
+
+    var observer = new IntersectionObserver(function (entries) {
+        // Buscamos la primera heading visible en el viewport "activo"
+        var visible = entries.filter(function (e) { return e.isIntersecting; });
+        if (visible.length === 0) return;
+        visible.sort(function (a, b) { return a.boundingClientRect.top - b.boundingClientRect.top; });
+        setActive(visible[0].target.id);
+    }, {
+        // "Activo" = heading entre el 12% superior y el 65% del viewport.
+        // Evita que al pasar rapido saltemos a la siguiente demasiado pronto.
+        rootMargin: '-12% 0px -65% 0px',
+        threshold: 0
+    });
+    headings.forEach(function (h) { observer.observe(h); });
+})();
+</script>
+<?php endif; ?>
