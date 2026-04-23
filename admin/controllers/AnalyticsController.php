@@ -111,19 +111,92 @@ final class AnalyticsController extends BaseController
             ['s' => $site['id']]
         );
 
+        // "Usuarios únicos" (proxy): IPs hasheadas distintas con al menos un click.
+        // NO es pageviews (no trackeamos IP en pageviews, solo en clicks de afiliado).
+        // Util como señal de conversion, no de trafico total.
+        $uniqueClickers = (int)$db->fetchColumn(
+            "SELECT COUNT(DISTINCT c.user_ip_hash) FROM affiliate_clicks c
+             JOIN affiliate_links l ON l.id = c.affiliate_link_id
+             WHERE l.site_id = :s AND c.clicked_at >= (NOW() - INTERVAL $days DAY)
+               AND c.user_ip_hash IS NOT NULL",
+            ['s' => $site['id']]
+        );
+
+        // "Usuarios que volvieron": IPs que clickearon en este período Y en el anterior.
+        $returningClickers = (int)$db->fetchColumn(
+            "SELECT COUNT(DISTINCT c.user_ip_hash) FROM affiliate_clicks c
+             JOIN affiliate_links l ON l.id = c.affiliate_link_id
+             WHERE l.site_id = :s
+               AND c.clicked_at >= (NOW() - INTERVAL $days DAY)
+               AND c.user_ip_hash IS NOT NULL
+               AND c.user_ip_hash IN (
+                   SELECT DISTINCT c2.user_ip_hash FROM affiliate_clicks c2
+                   JOIN affiliate_links l2 ON l2.id = c2.affiliate_link_id
+                   WHERE l2.site_id = :s2
+                     AND c2.clicked_at >= (NOW() - INTERVAL $prevDays DAY)
+                     AND c2.clicked_at <  (NOW() - INTERVAL $days DAY)
+                     AND c2.user_ip_hash IS NOT NULL
+               )",
+            ['s' => $site['id'], 's2' => $site['id']]
+        );
+
+        // Top referrers de los clicks (de donde venian los usuarios cuando clickearon afiliado)
+        $byReferer = $db->fetchAll(
+            "SELECT
+                CASE
+                    WHEN c.referer IS NULL OR c.referer = '' THEN '(directo)'
+                    ELSE SUBSTRING_INDEX(SUBSTRING_INDEX(c.referer, '/', 3), '://', -1)
+                END AS source,
+                COUNT(*) AS clicks
+             FROM affiliate_clicks c
+             JOIN affiliate_links l ON l.id = c.affiliate_link_id
+             WHERE l.site_id = :s AND c.clicked_at >= (NOW() - INTERVAL $days DAY)
+             GROUP BY source
+             ORDER BY clicks DESC
+             LIMIT 15",
+            ['s' => $site['id']]
+        );
+
+        // Pageviews por día (sumados desde article_views_daily si existe la tabla)
+        $pageviewsByDay = [];
+        $totalPageviewsPeriod = 0;
+        try {
+            $pageviewsByDay = $db->fetchAll(
+                "SELECT avd.day AS d, SUM(avd.views) AS views
+                 FROM article_views_daily avd
+                 JOIN articles a ON a.id = avd.article_id
+                 WHERE a.site_id = :s AND avd.day >= (CURDATE() - INTERVAL $days DAY)
+                 GROUP BY avd.day
+                 ORDER BY avd.day ASC",
+                ['s' => $site['id']]
+            );
+            foreach ($pageviewsByDay as $pv) {
+                $totalPageviewsPeriod += (int)$pv['views'];
+            }
+        } catch (\Throwable $e) {
+            // Tabla no existe todavia (migracion 006 no aplicada). Silencioso.
+        }
+
         $this->render('analytics', [
-            'days'                => $days,
-            'total_clicks'        => $totalClicks,
-            'prev_clicks'         => $prevClicks,
-            'delta'               => $delta,
-            'total_views_alltime' => $totalViewsAllTime,
-            'active_links'        => $activeLinks,
-            'by_link'             => $byLink,
-            'by_article'          => $byArticle,
-            'by_product'          => $byProduct,
-            'by_day'              => $byDay,
-            'by_country'          => $byCountry,
-            'page_title'          => 'Analytics',
+            'days'                   => $days,
+            'total_clicks'           => $totalClicks,
+            'prev_clicks'            => $prevClicks,
+            'delta'                  => $delta,
+            'total_views_alltime'    => $totalViewsAllTime,
+            'total_pageviews_period' => $totalPageviewsPeriod,
+            'active_links'           => $activeLinks,
+            'unique_clickers'        => $uniqueClickers,
+            'returning_clickers'     => $returningClickers,
+            'by_link'                => $byLink,
+            'by_article'             => $byArticle,
+            'by_product'             => $byProduct,
+            'by_day'                 => $byDay,
+            'by_country'             => $byCountry,
+            'by_referer'             => $byReferer,
+            'pageviews_by_day'       => $pageviewsByDay,
+            'site_name'              => $site['name'],
+            'site_domain'            => $site['domain'],
+            'page_title'             => 'Analytics',
         ]);
     }
 }
