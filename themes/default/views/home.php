@@ -5,8 +5,10 @@
  * @var array      $featured_products
  * @var array      $recent_articles
  * @var array      $top_categories
+ * @var array      $trending_articles
  */
 $view->layout('default');
+$trending_articles = $trending_articles ?? [];
 ?>
 <section class="hero">
     <h1><?= e($site->name) ?></h1>
@@ -33,6 +35,20 @@ $view->layout('default');
     <div class="grid grid-cards">
         <?php foreach ($featured_products as $p): ?>
             <?= $view->partial('product_card', ['product' => $p]) ?>
+        <?php endforeach; ?>
+    </div>
+</section>
+<?php endif; ?>
+
+<?php if (count($trending_articles) >= 3): ?>
+<section class="section section-trending">
+    <h2>
+        <span class="trending-flame" aria-hidden="true">🔥</span>
+        Más leídos esta semana
+    </h2>
+    <div class="grid grid-cards">
+        <?php foreach ($trending_articles as $a): ?>
+            <?= $view->partial('article_card', ['article' => $a]) ?>
         <?php endforeach; ?>
     </div>
 </section>

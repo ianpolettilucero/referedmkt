@@ -38,6 +38,54 @@ final class Article extends Model
     public static function incrementViews(int $id): void
     {
         self::db()->query('UPDATE articles SET views_count = views_count + 1 WHERE id = :id', ['id' => $id]);
+
+        // Aggregado diario para "trending de la semana". Defensivo: si la
+        // migracion 006 no esta aplicada todavia, skipeamos sin romper la
+        // carga del articulo.
+        try {
+            self::db()->query(
+                "INSERT INTO article_views_daily (article_id, day, views)
+                 VALUES (:id, CURDATE(), 1)
+                 ON DUPLICATE KEY UPDATE views = views + 1",
+                ['id' => $id]
+            );
+        } catch (\Throwable $e) {
+            error_log('[referedmkt] article_views_daily insert failed: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Articulos mas leidos en los ultimos N dias (default 7).
+     *
+     * Requiere tabla article_views_daily (migracion 006). Si no existe o
+     * no hay suficientes datos, devuelve array vacio — el caller decide
+     * si mostrar o no el widget.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public static function trendingWeek(int $siteId, int $limit = 4, int $days = 7): array
+    {
+        $limit = max(1, min(20, $limit));
+        $days  = max(1, min(30, $days));
+        try {
+            $rows = self::db()->fetchAll(
+                "SELECT a.*, SUM(avd.views) AS weekly_views
+                 FROM article_views_daily avd
+                 JOIN articles a ON a.id = avd.article_id
+                 WHERE a.site_id = :site
+                   AND a.status = 'published'
+                   AND a.published_at <= NOW()
+                   AND avd.day >= (CURDATE() - INTERVAL $days DAY)
+                 GROUP BY a.id
+                 ORDER BY weekly_views DESC, a.published_at DESC
+                 LIMIT $limit",
+                ['site' => $siteId]
+            );
+            return self::hydrateAll($rows);
+        } catch (\Throwable $e) {
+            error_log('[referedmkt] trendingWeek failed: ' . $e->getMessage());
+            return [];
+        }
     }
 
     public const SORTS = [

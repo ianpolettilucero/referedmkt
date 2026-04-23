@@ -12,6 +12,7 @@ final class HomeController extends Controller
         $featured = Product::featured($this->site->id, 6);
         $recent   = Article::recent($this->site->id, 6);
         $cats     = Category::topLevel($this->site->id);
+        $trending = Article::trendingWeek($this->site->id, 4);
 
         $this->seo
             ->title($this->site->name)
@@ -24,6 +25,7 @@ final class HomeController extends Controller
             'featured_products' => $featured,
             'recent_articles'   => $recent,
             'top_categories'    => $cats,
+            'trending_articles' => $trending,
         ]);
     }
 }
