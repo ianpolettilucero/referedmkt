@@ -1346,3 +1346,203 @@ code, pre { font-family: var(--font-mono); font-size: 0.92em; }
     outline-offset: 2px;
     border-radius: 2px;
 }
+
+/* =============================================================================
+   ARTICLE SHARE (LinkedIn, WhatsApp, X, Email)
+   ============================================================================= */
+.article-share {
+    margin: var(--s-5) 0 var(--s-4);
+    padding: var(--s-3);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--s-2);
+}
+.article-share-label {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+.article-share-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    flex: 1;
+}
+.article-share-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.45rem 0.85rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--bg-elevated);
+    color: var(--text);
+    text-decoration: none;
+    font-size: 0.88rem;
+    font-weight: 500;
+    transition: transform var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast);
+    line-height: 1;
+}
+.article-share-btn:hover {
+    text-decoration: none;
+    transform: translateY(-1px);
+    background: var(--surface-hover);
+}
+.article-share-btn svg { flex-shrink: 0; }
+.article-share-linkedin:hover { border-color: #0a66c2; color: #0a66c2; }
+.article-share-whatsapp:hover { border-color: #25d366; color: #25d366; }
+.article-share-x:hover         { border-color: var(--text); color: var(--text); }
+.article-share-email:hover     { border-color: var(--primary); color: var(--primary); }
+
+/* Mobile: mantener fila pero ocultar labels cuando queda muy ajustado */
+@media (max-width: 479px) {
+    .article-share {
+        padding: var(--s-2);
+        gap: 0.6rem;
+    }
+    .article-share-label {
+        flex-basis: 100%;
+        font-size: 0.85rem;
+    }
+    .article-share-buttons {
+        gap: 0.4rem;
+        width: 100%;
+    }
+    .article-share-btn {
+        flex: 1;
+        justify-content: center;
+        padding: 0.55rem 0.5rem;
+    }
+    .article-share-btn span {
+        /* Solo icono en pantallas muy chicas */
+        position: absolute;
+        left: -9999px;
+    }
+}
+
+/* =============================================================================
+   TRENDING SECTION (widget "Mas leidos esta semana" en home)
+   ============================================================================= */
+.section-trending .trending-flame {
+    font-size: 1.1em;
+    margin-right: 0.2rem;
+    filter: drop-shadow(0 0 6px rgba(251, 146, 60, 0.45));
+}
+
+/* =============================================================================
+   PRINT CSS
+   B2B LATAM: las guias se imprimen / exportan a PDF y se comparten internamente.
+   Objetivo: layout limpio, alto contraste, URLs visibles, un color de tinta.
+   ============================================================================= */
+@media print {
+    /* Forzar colores claros independientemente del theme activo, para no gastar
+       toner y para que el texto sea legible en B/N. */
+    :root, [data-theme="dark"], [data-theme="light"] {
+        --bg: #ffffff !important;
+        --bg-elevated: #ffffff !important;
+        --surface: #ffffff !important;
+        --surface-hover: #ffffff !important;
+        --border: #cccccc !important;
+        --border-strong: #999999 !important;
+        --text: #000000 !important;
+        --text-muted: #333333 !important;
+        --text-subtle: #555555 !important;
+        --primary: #000000 !important;
+        --primary-hover: #000000 !important;
+        --primary-soft: transparent !important;
+        --accent: #000000 !important;
+        --gradient-primary: none !important;
+        --gradient-card: none !important;
+        --gradient-hero: none !important;
+        --gradient-text: none !important;
+        --shadow-sm: none !important;
+        --shadow-md: none !important;
+        --shadow-lg: none !important;
+        --glow-primary: none !important;
+        --glow-accent: none !important;
+    }
+
+    @page { margin: 1.8cm 1.5cm; }
+
+    html, body {
+        background: #ffffff !important;
+        color: #000000 !important;
+        font-size: 11pt;
+        line-height: 1.45;
+    }
+
+    /* Esconder chrome del sitio */
+    .site-header,
+    .site-footer,
+    .breadcrumb,
+    .newsletter-block,
+    .affiliate-disclosure,
+    .article-share,
+    .related-products,
+    .no-print,
+    nav, aside, form,
+    .btn, button,
+    video, iframe, embed, object {
+        display: none !important;
+    }
+
+    main.container, .container {
+        max-width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    /* Articulo */
+    .article { max-width: 100% !important; }
+    .article-header { margin: 0 0 1rem; }
+    .article-header h1 { font-size: 22pt; color: #000 !important; }
+    .article-subtitle { font-size: 13pt; color: #333 !important; }
+    .article-meta { font-size: 9pt; color: #555 !important; border-bottom: 1px solid #999; padding-bottom: 0.4rem; }
+    .article-hero {
+        max-width: 100% !important;
+        max-height: 10cm;
+        object-fit: contain;
+        break-inside: avoid;
+        margin: 0.5rem 0;
+    }
+
+    .article-body, body { color: #000 !important; }
+    .article-body h2 { font-size: 15pt; margin-top: 1rem; break-after: avoid; }
+    .article-body h3 { font-size: 12.5pt; break-after: avoid; }
+    .article-body p, .article-body li { orphans: 3; widows: 3; }
+    .article-body img { max-width: 100% !important; break-inside: avoid; }
+    .article-body pre, .article-body blockquote { break-inside: avoid; border: 1px solid #999 !important; background: #f4f4f4 !important; }
+    .article-body code { background: #f4f4f4 !important; color: #000 !important; }
+
+    /* Links: mostrar la URL al lado en parentesis, pero solo para externos
+       (los internos llenarian la hoja). */
+    .article-body a[href^="http"]::after {
+        content: " (" attr(href) ")";
+        font-size: 9pt;
+        color: #555;
+        word-break: break-all;
+    }
+    a { color: #000 !important; text-decoration: underline; }
+
+    /* Tablas: fuerza borde visible, evita romper filas */
+    .article-body table {
+        border: 1px solid #999 !important;
+        break-inside: auto;
+    }
+    .article-body table th,
+    .article-body table td {
+        border: 1px solid #ccc !important;
+        background: #fff !important;
+        color: #000 !important;
+    }
+    .article-body table tr { break-inside: avoid; }
+    .article-body table thead { display: table-header-group; }
+
+    /* Evitar saltos feos */
+    h1, h2, h3, h4 { page-break-after: avoid; break-after: avoid; }
+    img, figure, pre, blockquote { page-break-inside: avoid; break-inside: avoid; }
+}
