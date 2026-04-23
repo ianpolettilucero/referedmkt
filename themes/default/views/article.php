@@ -5,8 +5,12 @@
  * @var array      $article
  * @var string     $content_html
  * @var array      $related_products
+ * @var array      $related_articles
+ * @var array      $toc_items
  */
 $view->layout('default');
+$related_articles = $related_articles ?? [];
+$toc_items        = $toc_items ?? [];
 ?>
 <article class="article">
     <header class="article-header">
@@ -31,6 +35,25 @@ $view->layout('default');
         <?php endif; ?>
     </header>
 
+    <?php if ($toc_items): ?>
+        <details class="article-toc no-print" open>
+            <summary>
+                <span class="article-toc-icon" aria-hidden="true">☰</span>
+                <span>Índice del artículo</span>
+                <span class="article-toc-count"><?= count($toc_items) ?> secciones</span>
+            </summary>
+            <nav aria-label="Tabla de contenidos">
+                <ol>
+                    <?php foreach ($toc_items as $it): ?>
+                        <li class="toc-level-<?= (int)$it['level'] ?>">
+                            <a href="#<?= e($it['id']) ?>"><?= e($it['text']) ?></a>
+                        </li>
+                    <?php endforeach; ?>
+                </ol>
+            </nav>
+        </details>
+    <?php endif; ?>
+
     <div class="article-body">
         <?= $content_html /* HTML generado por Markdown::toHtml (input escapado) */ ?>
     </div>
@@ -41,6 +64,17 @@ $view->layout('default');
             <div class="grid grid-cards">
                 <?php foreach ($related_products as $p): ?>
                     <?= $view->partial('product_card', ['product' => $p]) ?>
+                <?php endforeach; ?>
+            </div>
+        </section>
+    <?php endif; ?>
+
+    <?php if ($related_articles): ?>
+        <section class="related-articles no-print">
+            <h2>Seguí leyendo</h2>
+            <div class="grid grid-cards">
+                <?php foreach ($related_articles as $ra): ?>
+                    <?= $view->partial('article_card', ['article' => $ra]) ?>
                 <?php endforeach; ?>
             </div>
         </section>

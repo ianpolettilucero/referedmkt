@@ -55,6 +55,47 @@ final class Article extends Model
     }
 
     /**
+     * Articulos relacionados para mostrar al final de una nota.
+     *
+     * Prioriza (en orden): misma categoria, mismo tipo, mas recientes.
+     * Excluye el articulo actual para evitar auto-link.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public static function related(
+        int $siteId,
+        int $excludeId,
+        ?int $categoryId,
+        string $articleType,
+        int $limit = 3
+    ): array {
+        $limit = max(1, min(12, $limit));
+
+        // ORDER BY que ranquea por afinidad: categoria igual (2 puntos) vs
+        // tipo igual (1 punto), fallback por recencia. Una sola query.
+        $params = [
+            'site'    => $siteId,
+            'exclude' => $excludeId,
+            'cat'     => $categoryId ?: 0,
+            'type'    => $articleType,
+        ];
+        $rows = self::db()->fetchAll(
+            "SELECT * FROM articles
+             WHERE site_id = :site
+               AND status = 'published'
+               AND published_at <= NOW()
+               AND id <> :exclude
+             ORDER BY
+                (category_id IS NOT NULL AND category_id = :cat) DESC,
+                (article_type = :type) DESC,
+                published_at DESC
+             LIMIT $limit",
+            $params
+        );
+        return self::hydrateAll($rows);
+    }
+
+    /**
      * Articulos mas leidos en los ultimos N dias (default 7).
      *
      * Requiere tabla article_views_daily (migracion 006). Si no existe o
