@@ -28,14 +28,36 @@ $timeAgo = static function (?string $ts): string {
     return 'hace ' . (int)floor($diff/86400) . 'd';
 };
 
-$renderRow = static function (array $r, bool $showFix, bool $showIgnore, bool $showUnignore) use ($csrf_token, $statusBadge, $timeAgo, $articleEditUrl) {
+// Heuristica: es interno si arranca con '/' o si el host coincide con el dominio actual.
+// Evito pasar el dominio del sitio explicito para simplificar; el '/' cubre el 99% de casos.
+$isInternalLink = static function (string $url): bool {
+    if ($url === '') return false;
+    if ($url[0] === '/') return true;
+    if (preg_match('#^https?://#i', $url)) {
+        $host = parse_url($url, PHP_URL_HOST);
+        if ($host && isset($_SERVER['HTTP_HOST']) && stripos($host, (string)$_SERVER['HTTP_HOST']) !== false) {
+            return true;
+        }
+    }
+    return false;
+};
+
+$renderRow = static function (array $r, bool $showFix, bool $showIgnore, bool $showUnignore) use ($csrf_token, $statusBadge, $timeAgo, $articleEditUrl, $isInternalLink) {
     [$label, $cls] = $statusBadge($r['status_code']);
     $err = $r['error_message'] ?? null;
+    $internal = $isInternalLink((string)$r['url']);
     ?>
     <tr>
         <td style="max-width:440px">
             <div style="display:flex;flex-direction:column;gap:0.2rem">
-                <code style="font-size:0.78rem;word-break:break-all"><?= htmlspecialchars($r['url'], ENT_QUOTES, 'UTF-8') ?></code>
+                <div style="display:flex;gap:0.4rem;align-items:center;flex-wrap:wrap">
+                    <?php if ($internal): ?>
+                        <span class="admin-badge" style="background:var(--a-primary-soft);color:var(--a-primary);border-color:rgba(99,102,241,0.3);font-size:0.7rem" title="Link interno (dentro de tu sitio)">interno</span>
+                    <?php else: ?>
+                        <span class="admin-badge" style="font-size:0.7rem" title="Link externo">externo</span>
+                    <?php endif; ?>
+                    <code style="font-size:0.78rem;word-break:break-all"><?= htmlspecialchars($r['url'], ENT_QUOTES, 'UTF-8') ?></code>
+                </div>
                 <?php if (!empty($r['final_url'])): ?>
                     <div class="admin-muted" style="font-size:0.78rem">
                         ↳ <code style="word-break:break-all"><?= htmlspecialchars($r['final_url'], ENT_QUOTES, 'UTF-8') ?></code>
@@ -98,13 +120,16 @@ $renderRow = static function (array $r, bool $showFix, bool $showIgnore, bool $s
 
 <div class="admin-card" style="margin-bottom:1rem">
     <p style="margin:0 0 0.5rem 0">
-        Monitoriamos los links <strong>externos</strong> dentro del contenido de tus articulos.
-        Los links <code>/go/</code> (afiliados) se chequean en
+        Monitoriamos <strong>todos los links</strong> dentro del contenido de tus artículos:
+        <strong>externos</strong> (via HEAD/GET con timeout) e <strong>internos</strong>
+        (chequeados contra la DB para detectar slugs rotos).
+        Los links <code>/go/</code> (afiliados) se chequean aparte en
         <a href="/admin/affiliate-links/health">Afiliados → Health check</a>.
     </p>
     <p class="admin-muted" style="margin:0;font-size:0.88rem">
-        Cada URL se chequea con HEAD y fallback a GET si el servidor bloquea HEAD. Cache de 6h por URL —
-        correr "Re-chequear todo" no sobrecarga destinos ya chequeados recientemente.
+        Internos: detectamos cuando linkeaste a un slug inexistente, a un artículo despublicado,
+        o con el prefix incorrecto (ej. <code>/guia/x</code> cuando en realidad es <code>/resena/x</code>).
+        Externos: cache de 6h por URL para no sobrecargar destinos.
     </p>
 </div>
 

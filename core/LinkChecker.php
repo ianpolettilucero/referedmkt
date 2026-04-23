@@ -86,6 +86,54 @@ final class LinkChecker
     }
 
     /**
+     * Extrae links INTERNOS (mismo dominio o relativos) del HTML renderizado.
+     * Filtra anchors (#...), mailto:, tel:, javascript:, y /go/ (afiliados).
+     * Retorna el href tal cual aparece en HTML + el path parseado (para DB lookup).
+     *
+     * @return array<int, array{href:string, path:string}>
+     */
+    public static function extractInternalPaths(string $html, string $siteDomain): array
+    {
+        if ($html === '') { return []; }
+        $siteDomain = strtolower(trim($siteDomain));
+
+        libxml_use_internal_errors(true);
+        $dom = new \DOMDocument();
+        $wrapped = '<?xml encoding="UTF-8"><div>' . $html . '</div>';
+        $dom->loadHTML($wrapped, LIBXML_NOWARNING | LIBXML_NOERROR | LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+        libxml_clear_errors();
+
+        $normalize = static fn(string $h): string => preg_replace('/^www\./i', '', strtolower($h)) ?? $h;
+        $siteDomainN = $normalize($siteDomain);
+
+        $out = [];
+        foreach ($dom->getElementsByTagName('a') as $a) {
+            /** @var \DOMElement $a */
+            $href = trim($a->getAttribute('href'));
+            if ($href === '') { continue; }
+
+            // Skip anchors puros, mailto, tel, javascript
+            if ($href[0] === '#') { continue; }
+            if (preg_match('#^(mailto|tel|javascript|data):#i', $href)) { continue; }
+
+            // Si tiene host y no es el nuestro → externo, skip (lo toma extractExternalUrls)
+            $host = parse_url($href, PHP_URL_HOST);
+            if ($host !== null && $host !== '' && $normalize($host) !== $siteDomainN) {
+                continue;
+            }
+
+            $path = parse_url($href, PHP_URL_PATH);
+            if ($path === null || $path === false || $path === '') { continue; }
+
+            // Skip /go/ (afiliados — ya chequeados en su propio health)
+            if (strpos($path, '/go/') === 0) { continue; }
+
+            $out[$href] = ['href' => $href, 'path' => $path];
+        }
+        return array_values($out);
+    }
+
+    /**
      * Chequea todos los links externos de un articulo, upserts en article_links.
      * Si $force es false, URLs chequeadas hace menos de RECHECK_MIN_HOURS se
      * skipean (reusamos status guardado).
@@ -109,18 +157,26 @@ final class LinkChecker
         $domain = $site['domain'] ?? '';
 
         $html = Markdown::toHtml((string)$article['content']);
-        $urls = self::extractExternalUrls($html, $domain);
 
-        // Borrar de article_links las URLs que ya no estan en el articulo
-        // (link eliminado/editado). Evita basura acumulandose.
-        self::pruneRemovedLinks($articleId, $urls);
+        // Externos (HTTP probe) + internos (DB lookup). El "url" en article_links
+        // guarda el href TAL CUAL aparece en el HTML (relativo o absoluto), asi
+        // el str_replace del auto-fix matchea exacto.
+        $externalUrls  = self::extractExternalUrls($html, $domain);
+        $internalLinks = self::extractInternalPaths($html, $domain);
 
-        if (!$urls) {
+        $allHrefs = array_merge(
+            $externalUrls,
+            array_column($internalLinks, 'href')
+        );
+        self::pruneRemovedLinks($articleId, $allHrefs);
+
+        if (!$allHrefs) {
             return ['checked' => 0, 'ok' => 0, 'broken' => 0, 'suspicious' => 0, 'total' => 0];
         }
 
-        // Separar URLs que ya tienen un check reciente (skip) de las que hay que chequear
-        $toCheck = $urls;
+        // URLs recientes (skip si no force). Solo aplica a EXTERNOS — los
+        // internos son casi gratis (una query DB), no vale la pena cachear.
+        $recentExternal = [];
         if (!$force) {
             $existing = Database::instance()->fetchAll(
                 "SELECT url FROM article_links
@@ -128,15 +184,25 @@ final class LinkChecker
                    AND last_checked_at >= (NOW() - INTERVAL " . self::RECHECK_MIN_HOURS . " HOUR)",
                 ['a' => $articleId]
             );
-            $recent = array_column($existing, 'url');
-            $toCheck = array_values(array_diff($urls, $recent));
+            $recentExternal = array_flip(array_column($existing, 'url'));
         }
+        $externalToCheck = array_values(array_filter(
+            $externalUrls,
+            static fn(string $u): bool => !isset($recentExternal[$u])
+        ));
 
-        foreach (array_chunk($toCheck, self::BATCH_SIZE) as $batch) {
+        // Externos en paralelo
+        foreach (array_chunk($externalToCheck, self::BATCH_SIZE) as $batch) {
             $results = self::probeBatch($batch);
             foreach ($results as $url => $r) {
                 self::upsertResult($articleId, $url, $r);
             }
+        }
+
+        // Internos uno por uno (son solo DB queries, ultra rapidos)
+        foreach ($internalLinks as $link) {
+            $r = self::probeInternal($link['path'], (int)$article['site_id']);
+            self::upsertResult($articleId, $link['href'], $r);
         }
 
         // Resumen devuelto refleja el estado ACTUAL de todos los links del articulo
@@ -154,7 +220,7 @@ final class LinkChecker
             else { $broken++; }
         }
         return [
-            'checked'    => count($toCheck),
+            'checked'    => count($externalToCheck) + count($internalLinks),
             'ok'         => $ok,
             'broken'     => $broken,
             'suspicious' => $suspicious,
@@ -298,6 +364,133 @@ final class LinkChecker
             'UPDATE article_links SET ignored_at = NULL WHERE id = :id',
             ['id' => $linkId]
         );
+    }
+
+    /**
+     * Chequea un path interno contra la DB. Rapidisimo (una o dos queries),
+     * sin HTTP, sin timeouts. Retorna el mismo formato que probeBatch() para
+     * que upsertResult() funcione sin cambios.
+     *
+     * Auto-fix hints:
+     *   - Si el slug existe pero con otro article_type → status=301 + final_url a la URL correcta.
+     *   - Si hay un redirect manual definido en admin → status=301 + final_url al destino.
+     *
+     * @return array{status:int|null, final_url:string|null, error:string|null}
+     */
+    public static function probeInternal(string $path, int $siteId): array
+    {
+        // Normalizar
+        $path = parse_url($path, PHP_URL_PATH) ?: $path;
+        if (!is_string($path) || $path === '') {
+            return ['status' => null, 'final_url' => null, 'error' => 'path invalido'];
+        }
+        if ($path !== '/' && substr($path, -1) === '/') {
+            $path = rtrim($path, '/');
+        }
+
+        // Rutas estaticas / de listado que siempre responden 200
+        static $staticOk = [
+            '/', '/productos',
+            '/guias', '/resenas', '/comparativas', '/noticias',
+            '/buscar', '/comparar',
+            '/sitemap.xml', '/robots.txt', '/feed.xml',
+            '/llms.txt', '/llms-full.txt', '/healthz',
+        ];
+        if (in_array($path, $staticOk, true)) {
+            return ['status' => 200, 'final_url' => null, 'error' => null];
+        }
+
+        $db = Database::instance();
+
+        // 1) Redirects manuales definidos en /admin/redirects (preserva SEO ante renames)
+        try {
+            $redirect = $db->fetch(
+                'SELECT to_path, status_code FROM redirects
+                 WHERE site_id = :s AND from_path = :p AND active = 1 LIMIT 1',
+                ['s' => $siteId, 'p' => $path]
+            );
+            if ($redirect) {
+                return [
+                    'status'    => (int)($redirect['status_code'] ?? 301),
+                    'final_url' => (string)$redirect['to_path'],
+                    'error'     => null,
+                ];
+            }
+        } catch (\Throwable $e) {
+            // redirects table puede no existir en setups viejos; continuamos
+        }
+
+        // 2) Articulos: /guia|resena|comparativa|noticia/{slug}
+        if (preg_match('#^/(guia|resena|comparativa|noticia)/([^/]+)$#', $path, $m)) {
+            $typeMap = [
+                'guia'        => 'guide',
+                'resena'      => 'review',
+                'comparativa' => 'comparison',
+                'noticia'     => 'news',
+            ];
+            $prefixMap = array_flip($typeMap);
+            $expectedType = $typeMap[$m[1]];
+            $slug = $m[2];
+
+            $row = $db->fetch(
+                'SELECT article_type, status FROM articles
+                 WHERE site_id = :s AND slug = :slug LIMIT 1',
+                ['s' => $siteId, 'slug' => $slug]
+            );
+            if (!$row) {
+                return ['status' => 404, 'final_url' => null, 'error' => "Slug '$slug' no existe en articulos"];
+            }
+            if ($row['status'] !== 'published') {
+                return ['status' => 404, 'final_url' => null, 'error' => "Articulo '$slug' esta en estado '" . $row['status'] . "'"];
+            }
+            if ($row['article_type'] !== $expectedType) {
+                $correctPath = '/' . $prefixMap[$row['article_type']] . '/' . $slug;
+                return [
+                    'status'    => 301,
+                    'final_url' => $correctPath,
+                    'error'     => "URL usa prefix incorrecto (articulo es tipo '" . $row['article_type'] . "')",
+                ];
+            }
+            return ['status' => 200, 'final_url' => null, 'error' => null];
+        }
+
+        // 3) Producto
+        if (preg_match('#^/producto/([^/]+)$#', $path, $m)) {
+            $slug = $m[1];
+            $exists = $db->fetchColumn(
+                'SELECT 1 FROM products WHERE site_id = :s AND slug = :slug LIMIT 1',
+                ['s' => $siteId, 'slug' => $slug]
+            );
+            if ($exists) { return ['status' => 200, 'final_url' => null, 'error' => null]; }
+            return ['status' => 404, 'final_url' => null, 'error' => "Producto '$slug' no existe"];
+        }
+
+        // 4) Categoria: /productos/{slug}
+        if (preg_match('#^/productos/([^/]+)$#', $path, $m)) {
+            $slug = $m[1];
+            $exists = $db->fetchColumn(
+                'SELECT 1 FROM categories WHERE site_id = :s AND slug = :slug LIMIT 1',
+                ['s' => $siteId, 'slug' => $slug]
+            );
+            if ($exists) { return ['status' => 200, 'final_url' => null, 'error' => null]; }
+            return ['status' => 404, 'final_url' => null, 'error' => "Categoria '$slug' no existe"];
+        }
+
+        // 5) Autor
+        if (preg_match('#^/autor/([^/]+)$#', $path, $m)) {
+            $slug = $m[1];
+            $exists = $db->fetchColumn(
+                'SELECT 1 FROM authors WHERE site_id = :s AND slug = :slug LIMIT 1',
+                ['s' => $siteId, 'slug' => $slug]
+            );
+            if ($exists) { return ['status' => 200, 'final_url' => null, 'error' => null]; }
+            return ['status' => 404, 'final_url' => null, 'error' => "Autor '$slug' no existe"];
+        }
+
+        // 6) Ruta desconocida: para un sitio estaticamente configurado, esto es 404.
+        //    (Si el usuario agrega rutas custom via .htaccess daria falso positivo;
+        //    lo aceptamos — es raro y pueden "Marcar OK" el link.)
+        return ['status' => 404, 'final_url' => null, 'error' => "Ruta no mapeada: $path"];
     }
 
     // -----------------------------------------------------------------------
