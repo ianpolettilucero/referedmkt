@@ -2,6 +2,7 @@
 namespace Controllers;
 
 use Core\Markdown;
+use Core\Toc;
 use Models\Article;
 use Models\Product;
 
@@ -43,6 +44,20 @@ final class ArticleController extends Controller
                 . '</pre>';
         }
 
+        // TOC: agrega ids a h2/h3 y extrae la estructura para el nav lateral.
+        $toc = Toc::process($contentHtml);
+        $contentHtml = $toc['html'];
+        $tocItems    = Toc::shouldShow($toc['items']) ? $toc['items'] : [];
+
+        // Articulos relacionados (misma categoria > mismo tipo > recientes).
+        $relatedArticles = Article::related(
+            $this->site->id,
+            (int)$a['id'],
+            isset($a['category_id']) ? (int)$a['category_id'] : null,
+            (string)($a['article_type'] ?? 'guide'),
+            3
+        );
+
         $breadcrumb = [
             ['Inicio', '/'],
             [$this->breadcrumbLabelForType($a['article_type']), $this->sectionPathForType($a['article_type'])],
@@ -62,6 +77,8 @@ final class ArticleController extends Controller
             'article'          => $a,
             'content_html'     => $contentHtml,
             'related_products' => $relatedProducts,
+            'related_articles' => $relatedArticles,
+            'toc_items'        => $tocItems,
         ]);
     }
 
