@@ -5,12 +5,19 @@
  *  @var int   $prev_clicks
  *  @var int|null $delta
  *  @var int   $total_views_alltime
+ *  @var int   $total_pageviews_period
  *  @var int   $active_links
+ *  @var int   $unique_clickers
+ *  @var int   $returning_clickers
  *  @var array $by_link
  *  @var array $by_article
  *  @var array $by_product
  *  @var array $by_day
  *  @var array $by_country
+ *  @var array $by_referer
+ *  @var array $pageviews_by_day
+ *  @var string $site_name
+ *  @var string $site_domain
  */
 $view->layout('admin');
 
@@ -40,14 +47,19 @@ $countryNames = [
 ?>
 <div class="admin-page-header">
     <h1 class="admin-page-title">Analytics</h1>
-    <form method="get" action="/admin/analytics" class="admin-inline-form">
-        <label class="admin-muted">Rango:</label>
-        <select name="days" onchange="this.form.submit()">
-            <?php foreach ([7,14,30,60,90,180,365] as $opt): ?>
-                <option value="<?= $opt ?>" <?= $days === $opt ? 'selected' : '' ?>><?= $opt ?> días</option>
-            <?php endforeach; ?>
-        </select>
-    </form>
+    <div style="display:flex;gap:0.5rem;align-items:center">
+        <button type="button" class="admin-btn admin-btn-subtle" onclick="copyAnalyticsReport(this)" title="Copia un reporte completo en texto plano al clipboard para pegar en Claude u otro asistente">
+            📋 Copiar reporte
+        </button>
+        <form method="get" action="/admin/analytics" class="admin-inline-form">
+            <label class="admin-muted">Rango:</label>
+            <select name="days" onchange="this.form.submit()">
+                <?php foreach ([7,14,30,60,90,180,365] as $opt): ?>
+                    <option value="<?= $opt ?>" <?= $days === $opt ? 'selected' : '' ?>><?= $opt ?> días</option>
+                <?php endforeach; ?>
+            </select>
+        </form>
+    </div>
 </div>
 
 <div class="admin-stats">
@@ -67,12 +79,22 @@ $countryNames = [
         <?php endif; ?>
     </div>
     <div class="admin-stat">
-        <div class="admin-stat-value"><?= count($by_day) ?></div>
-        <div class="admin-stat-label">Días con actividad (de <?= (int)$days ?>)</div>
+        <div class="admin-stat-value"><?= (int)$unique_clickers ?></div>
+        <div class="admin-stat-label" title="IPs distintas que clickearon al menos un afiliado. Proxy de conversión, no de tráfico total.">Usuarios únicos (clickers)</div>
+        <?php if ($returning_clickers > 0): ?>
+            <div class="admin-muted" style="font-size:0.78rem;margin-top:0.35rem">
+                <?= (int)$returning_clickers ?> volvieron del período anterior
+            </div>
+        <?php endif; ?>
     </div>
     <div class="admin-stat">
-        <div class="admin-stat-value"><?= (int)$total_views_alltime ?></div>
-        <div class="admin-stat-label">Vistas totales de artículos (all-time)</div>
+        <div class="admin-stat-value"><?= (int)$total_pageviews_period ?></div>
+        <div class="admin-stat-label">Pageviews (<?= htmlspecialchars($rangeLabel, ENT_QUOTES, 'UTF-8') ?>)</div>
+        <?php if ($total_views_alltime > 0): ?>
+            <div class="admin-muted" style="font-size:0.78rem;margin-top:0.35rem">
+                <?= (int)$total_views_alltime ?> all-time
+            </div>
+        <?php endif; ?>
     </div>
     <div class="admin-stat">
         <div class="admin-stat-value"><?= (int)$active_links ?></div>
@@ -229,13 +251,168 @@ $countryNames = [
 </div>
 <?php endif; ?>
 
+<?php if ($by_referer): ?>
+<div class="admin-card" style="margin-top:1rem">
+    <h2 style="margin:0 0 0.5rem;font-size:1.1rem">Fuentes (referrers de los clicks)</h2>
+    <p class="admin-muted" style="margin:0 0 0.5rem;font-size:0.85rem">
+        De qué dominio venía el usuario cuando clickeó un afiliado. "(directo)" = acceso sin referer
+        (typed URL, marcadores, apps que strippean referer, etc.).
+    </p>
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>Fuente</th>
+                <th style="text-align:right">Clicks</th>
+                <th style="text-align:right">% del total</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($by_referer as $r): ?>
+                <?php $pct = $total_clicks > 0 ? round(((int)$r['clicks']) * 100 / $total_clicks, 1) : 0; ?>
+                <tr>
+                    <td><code><?= htmlspecialchars($r['source'], ENT_QUOTES, 'UTF-8') ?></code></td>
+                    <td style="text-align:right;font-variant-numeric:tabular-nums"><?= (int)$r['clicks'] ?></td>
+                    <td style="text-align:right;font-variant-numeric:tabular-nums" class="admin-muted"><?= $pct ?>%</td>
+                </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+</div>
+<?php endif; ?>
+
 <div class="admin-card" style="margin-top:1rem">
     <h2 style="margin:0 0 0.5rem;font-size:1.1rem">¿Qué métricas NO ves acá?</h2>
     <p class="admin-muted" style="font-size:0.9rem">
-        Este panel trackea <strong>clicks a afiliados</strong> (nuestra propia infraestructura, no bloqueable por ad blockers).
-        Para tráfico general, fuentes, device/browser, bounce rate, tiempo en sitio, etc., usá
+        Este panel trackea <strong>clicks a afiliados + pageviews propios</strong> (nuestra propia infraestructura,
+        no bloqueable por ad blockers). No tenemos tiempo-en-sitio, bounce rate, device/browser, ni usuarios
+        únicos de pageviews (solo de clicks). Para eso usá
         <a href="https://analytics.google.com" target="_blank" rel="noopener">Google Analytics 4</a>
-        (ya configurado en tu sitio). Para queries de búsqueda y posiciones en Google SERP,
+        (ya configurado). Para queries de búsqueda y posiciones en Google SERP,
         <a href="https://search.google.com/search-console" target="_blank" rel="noopener">Google Search Console</a>.
     </p>
 </div>
+
+<?php
+// Generamos el reporte completo en texto plano para copiar al clipboard.
+// Formato markdown-ish para que Claude lo parsee bien.
+$fmt = static function (string $s): string { return str_replace(["\r\n", "\r"], "\n", $s); };
+$report  = "# Reporte Analytics — " . $site_name . " (" . $site_domain . ")\n";
+$report .= "Generado: " . date('Y-m-d H:i:s') . " | Rango: " . $rangeLabel . " (" . $days . " días)\n\n";
+
+$report .= "## Resumen\n";
+$report .= "- Clicks totales a afiliados: " . (int)$total_clicks . "\n";
+$report .= "- Clicks período anterior: " . (int)$prev_clicks;
+if ($delta !== null) {
+    $report .= " (delta: " . ($delta > 0 ? '+' : '') . $delta . "%)";
+}
+$report .= "\n";
+$report .= "- Pageviews en el período: " . (int)$total_pageviews_period . "\n";
+$report .= "- Pageviews all-time: " . (int)$total_views_alltime . "\n";
+$report .= "- Usuarios únicos (IPs distintas que clickearon): " . (int)$unique_clickers . "\n";
+$report .= "- Usuarios recurrentes (clickearon en este período Y en el anterior): " . (int)$returning_clickers . "\n";
+$report .= "- Afiliados activos: " . (int)$active_links . "\n";
+$report .= "- Días con actividad: " . count($by_day) . " de " . (int)$days . "\n";
+
+$report .= "\n## Clicks por día\n";
+if (!$by_day) {
+    $report .= "(sin datos)\n";
+} else {
+    foreach ($by_day as $d) {
+        $report .= "- " . $d['d'] . ": " . (int)$d['clicks'] . " clicks\n";
+    }
+}
+
+$report .= "\n## Pageviews por día\n";
+if (!$pageviews_by_day) {
+    $report .= "(sin datos o migración 006 no aplicada)\n";
+} else {
+    foreach ($pageviews_by_day as $pv) {
+        $report .= "- " . $pv['d'] . ": " . (int)$pv['views'] . " pageviews\n";
+    }
+}
+
+$report .= "\n## Afiliados más clickeados (últimos " . $days . "d)\n";
+if (!$by_link) {
+    $report .= "(sin datos)\n";
+} else {
+    foreach ($by_link as $r) {
+        $report .= "- [" . (int)$r['clicks'] . " clicks] " . $r['name']
+                . " (red: " . ($r['network_name'] ?: '—')
+                . ", slug: /go/" . $r['tracking_slug'] . ")\n";
+    }
+}
+
+$report .= "\n## Top artículos (con CTR)\n";
+if (!$by_article) {
+    $report .= "(sin datos)\n";
+} else {
+    foreach ($by_article as $r) {
+        $v = (int)$r['views_count']; $c = (int)$r['clicks'];
+        $ctr = $v > 0 ? round($c * 100 / $v, 1) . '%' : 'n/a';
+        $report .= "- [" . $v . " views / " . $c . " clicks / CTR " . $ctr . "] "
+                . $r['title'] . " (tipo: " . $r['article_type']
+                . ", slug: " . $r['slug'] . ")\n";
+    }
+}
+
+$report .= "\n## Top productos (clicks desde /producto/)\n";
+if (!$by_product) {
+    $report .= "(sin datos)\n";
+} else {
+    foreach ($by_product as $r) {
+        $report .= "- [" . (int)$r['clicks'] . " clicks] " . $r['name'] . " (slug: " . $r['slug'] . ")\n";
+    }
+}
+
+$report .= "\n## Referrers (de dónde vienen los que clickean afiliados)\n";
+if (!$by_referer) {
+    $report .= "(sin datos)\n";
+} else {
+    foreach ($by_referer as $r) {
+        $pct = $total_clicks > 0 ? round(((int)$r['clicks']) * 100 / $total_clicks, 1) : 0;
+        $report .= "- [" . (int)$r['clicks'] . " clicks, " . $pct . "%] " . $r['source'] . "\n";
+    }
+}
+
+$report .= "\n## Países\n";
+if (!$by_country) {
+    $report .= "(sin datos — requiere Cloudflare proxy para header CF-IPCOUNTRY)\n";
+} else {
+    foreach ($by_country as $r) {
+        $name = $countryNames[$r['country']] ?? $r['country'];
+        $report .= "- [" . (int)$r['clicks'] . " clicks] " . $name . " (" . $r['country'] . ")\n";
+    }
+}
+
+$report .= "\n## Notas sobre las métricas\n";
+$report .= "- Los usuarios únicos y recurrentes se miden solo sobre usuarios que clickearon un afiliado (no sobre pageviews totales).\n";
+$report .= "- IPs están hasheadas con SHA256+salt por GDPR. No se pueden desanonimizar.\n";
+$report .= "- Tiempo en sitio, bounce rate y device/browser no están en este panel — ver Google Analytics 4.\n";
+$report .= "- Posiciones y queries de búsqueda — ver Google Search Console.\n";
+?>
+<script id="analytics-report-data" type="application/json"><?= json_encode($fmt($report), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) ?></script>
+<script>
+function copyAnalyticsReport(btn) {
+    var raw = document.getElementById('analytics-report-data').textContent;
+    var text = JSON.parse(raw);
+    var orig = btn.textContent;
+    var done = function () {
+        btn.textContent = '✓ Copiado al portapapeles';
+        setTimeout(function () { btn.textContent = orig; }, 1800);
+    };
+    (navigator.clipboard && navigator.clipboard.writeText
+        ? navigator.clipboard.writeText(text)
+        : Promise.reject()
+    ).then(done).catch(function () {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); done(); }
+        catch (e) { alert('No pude copiar automáticamente. Mirá la consola.'); console.log(text); }
+        finally { ta.remove(); }
+    });
+}
+</script>
