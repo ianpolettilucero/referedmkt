@@ -36,7 +36,7 @@ $toc_items        = $toc_items ?? [];
     </header>
 
     <?php if ($toc_items): ?>
-        <details class="article-toc no-print" open>
+        <details class="article-toc no-print">
             <summary>
                 <span class="article-toc-icon" aria-hidden="true">☰</span>
                 <span>Índice del artículo</span>
