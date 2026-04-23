@@ -100,13 +100,15 @@ final class ArticlesController extends BaseController
         $row['related_product_ids'] = is_string($row['related_product_ids'] ?? null)
             ? (json_decode($row['related_product_ids'], true) ?: [])
             : ($row['related_product_ids'] ?? []);
+        $brokenLinks = \Core\LinkChecker::brokenForArticle((int)$row['id']);
         $this->render('articles/form', [
-            'row'        => $row,
-            'is_new'     => false,
-            'categories' => $this->categoryOptions($site['id']),
-            'authors'    => $this->authorOptions($site['id']),
-            'products'   => $this->productOptions($site['id']),
-            'page_title' => 'Editar: ' . $row['title'],
+            'row'          => $row,
+            'is_new'       => false,
+            'categories'   => $this->categoryOptions($site['id']),
+            'authors'      => $this->authorOptions($site['id']),
+            'products'     => $this->productOptions($site['id']),
+            'broken_links' => $brokenLinks,
+            'page_title'   => 'Editar: ' . $row['title'],
         ]);
     }
 

@@ -18,6 +18,15 @@ $view->layout('admin');
         <p>No hay sitio seleccionado. <a href="/admin/sites">Crear uno</a> o elegir uno existente en el selector de arriba.</p>
     </div>
 <?php else: ?>
+    <?php if (!empty($stats['broken_links'])): ?>
+        <div class="admin-flash admin-flash-error" style="margin-bottom:1rem">
+            <span>
+                ⚠ Hay <strong><?= (int)$stats['broken_links'] ?></strong> link(s) roto(s) en tus artículos.
+            </span>
+            <a class="admin-btn admin-btn-primary" href="/admin/link-health">Revisar</a>
+        </div>
+    <?php endif; ?>
+
     <div class="admin-stats">
         <div class="admin-stat">
             <div class="admin-stat-value"><?= (int)$stats['products'] ?></div>
