@@ -79,8 +79,10 @@ final class ArticlesController extends BaseController
         $this->requireCsrf();
         $site = $this->requireSite();
         try {
-            $id = Database::instance()->insert('articles', $this->collect($site['id']));
+            $data = $this->collect($site['id']);
+            $id = Database::instance()->insert('articles', $data);
             Flash::success("Articulo #$id creado.");
+            $this->pingIndexNowForArticle((int)$site['id'], $id, $data);
             $this->redirect('/admin/articles/' . $id . '/edit');
             return;
         } catch (\Throwable $e) {
@@ -129,10 +131,35 @@ final class ArticlesController extends BaseController
                 $data
             );
             Flash::success('Articulo actualizado.');
+            $this->pingIndexNowForArticle((int)$site['id'], $id, $data);
         } catch (\Throwable $e) {
             Flash::error('Error al guardar: ' . $e->getMessage());
         }
         $this->redirect('/admin/articles/' . $id . '/edit');
+    }
+
+    /**
+     * Si el articulo esta publicado, pingeamos IndexNow con su URL.
+     * Fire-and-forget, no bloquea el flujo si falla.
+     *
+     * @param array<string, mixed> $data
+     */
+    private function pingIndexNowForArticle(int $siteId, int $articleId, array $data): void
+    {
+        if (($data['status'] ?? '') !== 'published') { return; }
+        $site = Database::instance()->fetch('SELECT domain FROM sites WHERE id = :id LIMIT 1', ['id' => $siteId]);
+        if (!$site) { return; }
+        $type = (string)($data['article_type'] ?? 'guide');
+        $slug = (string)($data['slug'] ?? '');
+        if ($slug === '') { return; }
+        $path = match ($type) {
+            'review'     => '/resena/' . $slug,
+            'comparison' => '/comparativa/' . $slug,
+            'news'       => '/noticia/' . $slug,
+            default      => '/guia/' . $slug,
+        };
+        $url = 'https://' . $site['domain'] . $path;
+        \Core\IndexNow::ping($siteId, [$url]);
     }
 
     public function destroy(array $params): void

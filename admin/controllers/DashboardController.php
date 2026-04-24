@@ -10,7 +10,7 @@ final class DashboardController extends BaseController
     public function index(): void
     {
         $site = Context::activeSite();
-        $stats = ['products' => 0, 'articles' => 0, 'affiliate_links' => 0, 'clicks_30d' => 0, 'broken_links' => 0];
+        $stats = ['products' => 0, 'articles' => 0, 'affiliate_links' => 0, 'clicks_30d' => 0, 'broken_links' => 0, 'not_indexed' => 0];
 
         if ($site) {
             $db = Database::instance();
@@ -24,6 +24,7 @@ final class DashboardController extends BaseController
                 ['s' => $site['id']]
             );
             $stats['broken_links']    = \Core\LinkChecker::brokenCountForSite((int)$site['id']);
+            $stats['not_indexed']     = \Models\IndexStatus::notIndexedCount((int)$site['id']);
         }
 
         $this->render('dashboard', ['stats' => $stats, 'page_title' => 'Dashboard']);

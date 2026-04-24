@@ -37,8 +37,10 @@ final class ProductsController extends BaseController
         $this->requireCsrf();
         $site = $this->requireSite();
         try {
-            $id = Database::instance()->insert('products', $this->collect($site['id']));
+            $data = $this->collect($site['id']);
+            $id = Database::instance()->insert('products', $data);
             Flash::success("Producto #$id creado.");
+            $this->pingIndexNowForProduct((int)$site['id'], $data);
             $this->redirect('/admin/products/' . $id . '/edit');
             return;
         } catch (\Throwable $e) {
@@ -84,6 +86,7 @@ final class ProductsController extends BaseController
                 $data
             );
             Flash::success('Producto actualizado.');
+            $this->pingIndexNowForProduct((int)$site['id'], $data);
         } catch (\Throwable $e) {
             Flash::error('Error al guardar: ' . $e->getMessage());
         }
@@ -100,6 +103,21 @@ final class ProductsController extends BaseController
         );
         Flash::success('Producto eliminado.');
         $this->redirect('/admin/products');
+    }
+
+    /**
+     * Pinguea IndexNow con la URL del producto. Fire-and-forget.
+     *
+     * @param array<string, mixed> $data
+     */
+    private function pingIndexNowForProduct(int $siteId, array $data): void
+    {
+        $site = Database::instance()->fetch('SELECT domain FROM sites WHERE id = :id LIMIT 1', ['id' => $siteId]);
+        if (!$site) { return; }
+        $slug = (string)($data['slug'] ?? '');
+        if ($slug === '') { return; }
+        $url = 'https://' . $site['domain'] . '/producto/' . $slug;
+        \Core\IndexNow::ping($siteId, [$url]);
     }
 
     private function emptyRow(): array

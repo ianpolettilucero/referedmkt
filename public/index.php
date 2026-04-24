@@ -52,6 +52,13 @@ if ($site === null) {
 // antes de cualquier routing (preserva SEO ante cambios de URL).
 \Core\Redirects::maybeHandle($site->id, $currentPath);
 
+// IndexNow key verification file (Bing/Yandex lo piden en https://{domain}/{key}.txt).
+// Se intercepta antes del router porque el path es dinamico y no queremos
+// declararlo como ruta formal.
+if (\Core\IndexNow::serveKeyFileIfMatch($site->id, $currentPath)) {
+    exit;
+}
+
 $router = new Router();
 
 // Home
