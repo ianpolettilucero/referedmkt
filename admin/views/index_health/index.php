@@ -78,14 +78,14 @@ $renderRow = static function (array $r) use ($csrf_token, $verdictBadge, $timeAg
 <div class="admin-page-header">
     <h1 class="admin-page-title">Health de indexación</h1>
     <div style="display:flex;gap:0.5rem;align-items:center">
+        <form method="post" action="/admin/index-health/ping-indexnow" style="margin:0">
+            <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrf_token, ENT_QUOTES, 'UTF-8') ?>">
+            <button class="admin-btn admin-btn-subtle" title="Notificar a Bing/Yandex de todas las URLs del sitio">Pingear IndexNow</button>
+        </form>
         <?php if ($configured): ?>
-            <form method="post" action="/admin/index-health/ping-indexnow" style="margin:0">
-                <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrf_token, ENT_QUOTES, 'UTF-8') ?>">
-                <button class="admin-btn admin-btn-subtle" title="Notificar a Bing/Yandex de todas las URLs">Pingear IndexNow</button>
-            </form>
             <form method="post" action="/admin/index-health/check-all" style="margin:0" onsubmit="return confirm('Chequear todas las URLs contra GSC? Puede tardar 1-5 minutos.')">
                 <input type="hidden" name="_csrf" value="<?= htmlspecialchars($csrf_token, ENT_QUOTES, 'UTF-8') ?>">
-                <button class="admin-btn admin-btn-primary">Chequear todas</button>
+                <button class="admin-btn admin-btn-primary">Chequear todas (GSC)</button>
             </form>
         <?php endif; ?>
     </div>
@@ -95,11 +95,12 @@ $renderRow = static function (array $r) use ($csrf_token, $verdictBadge, $timeAg
     <div class="admin-card" style="border-left:4px solid var(--a-warning);margin-bottom:1rem">
         <h2 style="margin-top:0">⚠ GSC no está configurado</h2>
         <p style="margin:0 0 0.8rem 0">
-            Para chequear estado de indexación necesitás un service account de Google con acceso a tu property en
+            Para chequear automáticamente qué URLs están indexadas en Google necesitás un service account con acceso a tu property en
             Google Search Console. Andá a <a href="/admin/settings"><strong>Settings → Indexación</strong></a> y seguí los pasos.
         </p>
         <p class="admin-muted" style="margin:0;font-size:0.88rem">
-            IndexNow (Bing/Yandex) funciona sin configuración adicional — solo pinguearlo cuando publicás contenido nuevo.
+            <strong>Mientras tanto podés usar IndexNow:</strong> el botón arriba a la derecha notifica a Bing/Yandex
+            de todas las URLs del sitio (no requiere GSC). Al publicar nuevos artículos/productos se pingea automático.
         </p>
     </div>
 <?php else: ?>
