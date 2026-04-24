@@ -130,6 +130,12 @@ $router->group('/admin', function (Router $r) {
     $r->post('/link-health/{id}/ignore',            [A\LinkHealthController::class, 'ignore']);
     $r->post('/link-health/{id}/unignore',          [A\LinkHealthController::class, 'unignore']);
 
+    // Index health (GSC URL Inspection + IndexNow)
+    $r->get('/index-health',                  [A\IndexHealthController::class, 'index']);
+    $r->post('/index-health/check-all',       [A\IndexHealthController::class, 'checkAll']);
+    $r->post('/index-health/check-one',       [A\IndexHealthController::class, 'checkOne']);
+    $r->post('/index-health/ping-indexnow',   [A\IndexHealthController::class, 'pingIndexNow']);
+
     // Security
     $r->get('/security',                      [A\SecurityController::class, 'index']);
     $r->post('/security/ban',                 [A\SecurityController::class, 'banIp']);

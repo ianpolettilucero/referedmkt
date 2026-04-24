@@ -27,6 +27,15 @@ $view->layout('admin');
         </div>
     <?php endif; ?>
 
+    <?php if (!empty($stats['not_indexed'])): ?>
+        <div class="admin-flash admin-flash-error" style="margin-bottom:1rem">
+            <span>
+                ⚠ Hay <strong><?= (int)$stats['not_indexed'] ?></strong> página(s) no indexada(s) en Google.
+            </span>
+            <a class="admin-btn admin-btn-primary" href="/admin/index-health">Revisar</a>
+        </div>
+    <?php endif; ?>
+
     <div class="admin-stats">
         <div class="admin-stat">
             <div class="admin-stat-value"><?= (int)$stats['products'] ?></div>

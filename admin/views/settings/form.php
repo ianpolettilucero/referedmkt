@@ -113,5 +113,44 @@ $view->layout('admin');
         <textarea name="custom_css" style="min-height:220px;font-family:ui-monospace,Menlo,monospace;font-size:13px"><?= htmlspecialchars($values['custom_css'] ?? '', ENT_QUOTES, 'UTF-8') ?></textarea>
     </div>
 
+    <h2 style="margin-top:2rem;font-size:1.1rem">Indexación</h2>
+
+    <div class="admin-field">
+        <label>IndexNow key</label>
+        <input name="indexnow_key" value="<?= htmlspecialchars($values['indexnow_key'] ?? '', ENT_QUOTES, 'UTF-8') ?>" pattern="[a-f0-9]{8,128}">
+        <small class="admin-hint">
+            Hex string (8-128 chars). Dejalo vacío y se auto-genera al primer ping a Bing/Yandex. Se sirve en
+            <code>/{key}.txt</code> para que los motores verifiquen que sos dueño del dominio.
+            Google no soporta IndexNow; esto acelera indexación solo en Bing/Yandex/Seznam/Naver.
+        </small>
+    </div>
+
+    <div class="admin-field">
+        <label>GSC Property URL</label>
+        <input name="gsc_property_url" value="<?= htmlspecialchars($values['gsc_property_url'] ?? '', ENT_QUOTES, 'UTF-8') ?>" placeholder="https://capacero.online/ o sc-domain:capacero.online">
+        <small class="admin-hint">
+            El identificador exacto de tu property en Google Search Console. Si tenés URL-prefix property,
+            usá la URL con slash final. Si tenés Domain property, usá <code>sc-domain:tudominio.com</code>.
+        </small>
+    </div>
+
+    <div class="admin-field">
+        <label>GSC Service Account JSON</label>
+        <textarea name="gsc_service_account_json" style="min-height:160px;font-family:ui-monospace,Menlo,monospace;font-size:12px" placeholder='{"type":"service_account","project_id":"...","private_key":"...","client_email":"..."}'><?= htmlspecialchars($values['gsc_service_account_json'] ?? '', ENT_QUOTES, 'UTF-8') ?></textarea>
+        <small class="admin-hint">
+            JSON completo del service account. Pasos para obtenerlo:
+            <ol style="margin:0.4rem 0 0 1.2rem;padding:0">
+                <li>Entrá a <a href="https://console.cloud.google.com/" target="_blank" rel="noopener">console.cloud.google.com</a> y creá (o seleccioná) un proyecto.</li>
+                <li>Buscá "Search Console API" en la barra → Enable.</li>
+                <li>IAM &amp; Admin → Service Accounts → Create → dale un nombre (ej. "gsc-inspector").</li>
+                <li>Abrí el service account creado → Keys → Add key → Create new key → JSON. Se descarga el archivo.</li>
+                <li>Copiá el <strong>email del service account</strong> (termina en <code>@xxx.iam.gserviceaccount.com</code>).</li>
+                <li>Entrá a <a href="https://search.google.com/search-console" target="_blank" rel="noopener">Google Search Console</a> → Settings → Users and permissions → Add user → pegá el email, permiso "Full".</li>
+                <li>Pegá acá el contenido completo del JSON descargado.</li>
+            </ol>
+            <strong>Seguridad:</strong> este JSON da acceso de lectura a tus datos de GSC. Si lo perdés, revocá la key desde Google Cloud Console.
+        </small>
+    </div>
+
     <button type="submit" class="admin-btn admin-btn-primary">Guardar</button>
 </form>

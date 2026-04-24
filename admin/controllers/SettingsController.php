@@ -20,6 +20,10 @@ final class SettingsController extends BaseController
         'newsletter_hidden_fields_json'=> '',
         'newsletter_success_message'   => 'Listo. Revisá tu email para confirmar.',
         'custom_css'                   => '',
+        // Indexacion
+        'indexnow_key'                 => '', // auto-generado si esta vacio al primer uso
+        'gsc_property_url'             => '', // ej: https://capacero.online/ o sc-domain:capacero.online
+        'gsc_service_account_json'     => '', // JSON completo del service account de Google Cloud
     ];
 
     public function index(): void
@@ -62,6 +66,19 @@ final class SettingsController extends BaseController
             }
             if ($k === 'newsletter_action_url' && $v !== '' && !filter_var($v, FILTER_VALIDATE_URL)) {
                 Flash::error('newsletter_action_url debe ser una URL valida.');
+                $this->redirect('/admin/settings');
+                return;
+            }
+            if ($k === 'gsc_service_account_json' && $v !== '') {
+                $sa = json_decode($v, true);
+                if (!is_array($sa) || empty($sa['client_email']) || empty($sa['private_key'])) {
+                    Flash::error('gsc_service_account_json debe ser el JSON de service account (con client_email y private_key).');
+                    $this->redirect('/admin/settings');
+                    return;
+                }
+            }
+            if ($k === 'indexnow_key' && $v !== '' && !preg_match('/^[a-f0-9]{8,128}$/i', $v)) {
+                Flash::error('indexnow_key debe ser hex (8-128 chars). Dejalo vacio para auto-generar.');
                 $this->redirect('/admin/settings');
                 return;
             }
