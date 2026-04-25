@@ -20,10 +20,16 @@
     <?php if ($site->faviconUrl): ?>
     <link rel="icon" href="<?= e($site->faviconUrl) ?>">
     <?php endif; ?>
-    <?php if ($site->googleAnalyticsId || $site->googleTagManagerId): ?>
-    <!-- Performance hints: pre-conectar al CDN de Google Analytics/GTM -->
+    <?php if ($site->googleAnalyticsId || $site->googleTagManagerId || $site->googleAdsId): ?>
+    <!-- Performance hints: pre-conectar al CDN de Google Analytics/GTM/Ads -->
     <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
     <link rel="dns-prefetch" href="https://www.google-analytics.com">
+    <?php endif; ?>
+    <?php if ($site->microsoftClarityId): ?>
+    <link rel="dns-prefetch" href="https://www.clarity.ms">
+    <?php endif; ?>
+    <?php if ($site->metaPixelId): ?>
+    <link rel="dns-prefetch" href="https://connect.facebook.net">
     <?php endif; ?>
     <link rel="stylesheet" href="<?= e(theme_asset('css/site.css')) ?>">
     <?php
@@ -54,15 +60,22 @@
             } catch (e) {}
         })();
     </script>
-    <?php if ($site->googleAnalyticsId): ?>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=<?= e($site->googleAnalyticsId) ?>"
-            onerror="console.warn('[GA4] gtag.js no cargo para ID ' + <?= json_encode($site->googleAnalyticsId) ?> + '. Verificar en analytics.google.com que el Data Stream este activo y reciba datos, o esperar hasta 24h si el stream es nuevo.');"></script>
+    <?php
+    // gtag.js: cargar UNA sola vez si hay GA4 o Google Ads, despues config
+    // multiples IDs. Cargar dos <script src=gtag.js> distintos rompe el dataLayer.
+    $gtagIds = array_values(array_filter([$site->googleAnalyticsId, $site->googleAdsId]));
+    if (!empty($gtagIds)):
+        $primaryGtagId = $gtagIds[0];
+    ?>
+    <!-- Google tag (gtag.js) — GA4 + Google Ads -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=<?= e($primaryGtagId) ?>"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-      gtag('config', <?= json_encode($site->googleAnalyticsId) ?>);
+      <?php foreach ($gtagIds as $tid): ?>
+      gtag('config', <?= json_encode($tid) ?>);
+      <?php endforeach; ?>
     </script>
     <?php endif; ?>
     <?php if ($site->googleTagManagerId): ?>
@@ -73,6 +86,33 @@
     'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
     })(window,document,'script','dataLayer',<?= json_encode($site->googleTagManagerId) ?>);</script>
     <!-- End Google Tag Manager -->
+    <?php endif; ?>
+    <?php if ($site->microsoftClarityId): ?>
+    <!-- Microsoft Clarity -->
+    <script type="text/javascript">
+      (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", <?= json_encode($site->microsoftClarityId) ?>);
+    </script>
+    <?php endif; ?>
+    <?php if ($site->metaPixelId): ?>
+    <!-- Meta Pixel (Facebook/Instagram) -->
+    <script>
+      !function(f,b,e,v,n,t,s)
+      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+      n.queue=[];t=b.createElement(e);t.async=!0;
+      t.src=v;s=b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t,s)}(window, document,'script',
+      'https://connect.facebook.net/en_US/fbevents.js');
+      fbq('init', <?= json_encode($site->metaPixelId) ?>);
+      fbq('track', 'PageView');
+    </script>
+    <noscript><img height="1" width="1" style="display:none"
+      src="https://www.facebook.com/tr?id=<?= e($site->metaPixelId) ?>&ev=PageView&noscript=1" alt=""></noscript>
     <?php endif; ?>
 </head>
 <body>
