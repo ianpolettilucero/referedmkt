@@ -103,6 +103,9 @@ final class SitesController extends BaseController
             'affiliate_disclosure_text' => '', 'google_analytics_id' => '',
             'google_search_console_verification' => '',
             'google_tag_manager_id' => '',
+            'google_ads_id' => '',
+            'microsoft_clarity_id' => '',
+            'meta_pixel_id' => '',
             'default_language' => 'es', 'default_country' => 'AR',
             'meta_title_template' => '', 'meta_description_template' => '',
             'active' => 1,
@@ -125,6 +128,21 @@ final class SitesController extends BaseController
         if ($gtm !== '' && !preg_match('/^GTM-[A-Z0-9]{4,20}$/', $gtm)) {
             $gtm = ''; // formato GTM esperado: GTM-XXXXXXX
         }
+        // Google Ads: AW-XXXXXXXXX (9-12 digitos tipicamente)
+        $gads = trim((string)$this->input('google_ads_id', ''));
+        if ($gads !== '' && !preg_match('/^AW-[0-9]{6,15}$/', $gads)) {
+            $gads = '';
+        }
+        // Microsoft Clarity: ID alfanumerico corto (~10 chars lowercase)
+        $clarity = trim((string)$this->input('microsoft_clarity_id', ''));
+        if ($clarity !== '' && !preg_match('/^[a-z0-9]{6,30}$/i', $clarity)) {
+            $clarity = '';
+        }
+        // Meta Pixel: ID numerico (~15 digitos)
+        $metaPx = trim((string)$this->input('meta_pixel_id', ''));
+        if ($metaPx !== '' && !preg_match('/^[0-9]{8,20}$/', $metaPx)) {
+            $metaPx = '';
+        }
 
         return [
             'domain'                             => strtolower(trim((string)$this->input('domain', ''))),
@@ -138,6 +156,9 @@ final class SitesController extends BaseController
             'google_analytics_id'                => $ga ?: null,
             'google_search_console_verification' => trim((string)$this->input('google_search_console_verification', '')) ?: null,
             'google_tag_manager_id'              => $gtm ?: null,
+            'google_ads_id'                      => $gads ?: null,
+            'microsoft_clarity_id'               => $clarity ?: null,
+            'meta_pixel_id'                      => $metaPx ?: null,
             'default_language'                   => substr(trim((string)$this->input('default_language', 'es')), 0, 5) ?: 'es',
             'default_country'                    => strtoupper(substr(trim((string)$this->input('default_country', 'AR')), 0, 2)) ?: 'AR',
             'meta_title_template'                => trim((string)$this->input('meta_title_template', '')) ?: null,

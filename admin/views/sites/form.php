@@ -76,12 +76,36 @@ $action = $is_new ? '/admin/sites' : '/admin/sites/' . (int)$row['id'];
 
     <div class="admin-grid admin-grid-2">
         <div class="admin-field">
+            <label>Google Ads ID (opcional)</label>
+            <input name="google_ads_id" value="<?= htmlspecialchars($row['google_ads_id'] ?? '', ENT_QUOTES, 'UTF-8') ?>" placeholder="AW-XXXXXXXXX">
+            <small class="admin-hint">Para conversiones / remarketing. Formato <code>AW-XXXXXXXXX</code>. Comparte el script gtag.js con GA4, no se duplica.</small>
+        </div>
+        <div class="admin-field">
+            <label>Microsoft Clarity ID (opcional)</label>
+            <input name="microsoft_clarity_id" value="<?= htmlspecialchars($row['microsoft_clarity_id'] ?? '', ENT_QUOTES, 'UTF-8') ?>" placeholder="wgytkj3a9g">
+            <small class="admin-hint">Heatmaps + session recordings gratis. De clarity.microsoft.com → tu proyecto → Settings → Tracking code (es el ID corto, no el script entero).</small>
+        </div>
+    </div>
+
+    <div class="admin-grid admin-grid-2">
+        <div class="admin-field">
+            <label>Meta Pixel ID (opcional)</label>
+            <input name="meta_pixel_id" value="<?= htmlspecialchars($row['meta_pixel_id'] ?? '', ENT_QUOTES, 'UTF-8') ?>" placeholder="123456789012345">
+            <small class="admin-hint">Solo si vas a correr ads de Facebook/Instagram. ID numérico de Meta Business → Events Manager → Pixel.</small>
+        </div>
+        <div class="admin-field">
             <label>Idioma</label>
             <input name="default_language" value="<?= htmlspecialchars($row['default_language'] ?? 'es', ENT_QUOTES, 'UTF-8') ?>" maxlength="5">
         </div>
+    </div>
+
+    <div class="admin-grid admin-grid-2">
         <div class="admin-field">
             <label>País (ISO 2)</label>
             <input name="default_country" value="<?= htmlspecialchars($row['default_country'] ?? 'AR', ENT_QUOTES, 'UTF-8') ?>" maxlength="2">
+        </div>
+        <div class="admin-field">
+            <!-- placeholder para mantener simetría del grid -->
         </div>
     </div>
 

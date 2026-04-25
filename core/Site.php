@@ -29,6 +29,9 @@ final class Site
     public ?string $googleAnalyticsId;
     public ?string $googleSearchConsoleVerification;
     public ?string $googleTagManagerId;
+    public ?string $googleAdsId;
+    public ?string $microsoftClarityId;
+    public ?string $metaPixelId;
     public string $defaultLanguage;
     public string $defaultCountry;
     public ?string $metaTitleTemplate;
@@ -49,6 +52,9 @@ final class Site
         $this->googleAnalyticsId               = $row['google_analytics_id'];
         $this->googleSearchConsoleVerification = $row['google_search_console_verification'];
         $this->googleTagManagerId              = $row['google_tag_manager_id'] ?? null;
+        $this->googleAdsId                     = $row['google_ads_id'] ?? null;
+        $this->microsoftClarityId              = $row['microsoft_clarity_id'] ?? null;
+        $this->metaPixelId                     = $row['meta_pixel_id'] ?? null;
         $this->defaultLanguage                 = $row['default_language'] ?: 'es';
         $this->defaultCountry                  = $row['default_country'] ?: 'AR';
         $this->metaTitleTemplate               = $row['meta_title_template'];
