@@ -64,7 +64,7 @@
     --radius-lg: 12px;
     --radius-xl: 16px;
 
-    --container: 1180px;
+    --container: min(95vw, 1720px);
     --measure: 74ch;
     --transition: 200ms cubic-bezier(0.4, 0, 0.2, 1);
     --transition-fast: 130ms cubic-bezier(0.4, 0, 0.2, 1);
@@ -715,11 +715,16 @@ code, pre { font-family: var(--font-mono); font-size: 0.92em; }
 .cta-band p { font-size: 1.1rem; color: var(--text-muted); margin-bottom: var(--s-2); }
 
 /* ==== ARTICLE ==== */
+/* Lectura larga: una sola columna, del ancho de la prosa. La cabecera, el
+   indice y el cuerpo comparten borde izquierdo; solo los bloques que ganan con
+   ancho (tablas, veredicto, grillas de relacionados) se escapan del margen.
+   Estirar el texto a 1720px seria ilegible; dejarlo suelto en un contenedor
+   ancho se veia desbalanceado. */
 .article {
-    max-width: 820px;
+    max-width: min(92vw, 720px);
     margin: 0 auto;
 }
-.article-header { margin: var(--s-4) 0 var(--s-5); }
+.article-header { margin: var(--s-4) 0; }
 .article-header h1 {
     color: var(--text);
     max-width: 22ch;
@@ -730,6 +735,8 @@ code, pre { font-family: var(--font-mono); font-size: 0.92em; }
     max-width: 60ch;
 }
 .article-meta {
+    flex-wrap: wrap;
+    max-width: 100%;
     color: var(--text-muted);
     font-size: 0.92rem;
     display: inline-flex;
@@ -751,10 +758,38 @@ code, pre { font-family: var(--font-mono); font-size: 0.92em; }
     border: 1px solid var(--border);
 }
 .article-body {
-    max-width: 72ch;
-    margin: 0 auto;
-    font-size: 1.08rem;
-    line-height: 1.8;
+    /* Medida fija a proposito: no escala con el viewport. ~70 caracteres
+       reales por linea, el centro del rango legible (45-75). */
+    max-width: 100%;
+    margin: 0;
+    font-size: 1.09rem;
+    line-height: 1.75;
+}
+
+/* Bloques que respiran mejor anchos: se escapan de la columna de texto sin
+   tocar la medida de la prosa. Solo desde 1100px, que es donde sobra margen a
+   los costados; abajo de eso no hay a donde escaparse y romperia el layout. */
+@media (min-width: 1100px) {
+    .article-body > table,
+    .article-body > pre,
+    .article-body > figure,
+    .article-verdict,
+    .related-products,
+    .related-articles {
+        width: min(92vw, 1180px);
+        max-width: min(92vw, 1180px);
+        margin-left: 50%;
+        transform: translateX(-50%);
+    }
+}
+
+/* Las tablas scrollean dentro de su caja en cualquier ancho: una tabla mide
+   por su contenido y sin esto empuja la pagina entera. */
+.article-body table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
 }
 .article-body h2 {
     margin-top: var(--s-5);
@@ -1394,7 +1429,6 @@ code, pre { font-family: var(--font-mono); font-size: 0.92em; }
 /* ---- Tablet portrait (640-899px) ---- */
 @media (min-width: 640px) and (max-width: 899px) {
     .hero h1 { font-size: clamp(2rem, 4.5vw, 2.8rem); }
-    .article-body { font-size: 1.02rem; }
     .product-header { gap: var(--s-3); }
     .filter-group { min-width: calc(33% - var(--s-1)); }
     .filter-group-sort { min-width: 220px; }
@@ -1402,24 +1436,21 @@ code, pre { font-family: var(--font-mono); font-size: 0.92em; }
 
 /* ---- Desktop chico / tablet landscape (900-1199px) ---- */
 @media (min-width: 900px) and (max-width: 1199px) {
-    .article-body { font-size: 1.05rem; }
 }
 
 /* ---- Desktop grande (>= 1600px): aire extra, container mas ancho ---- */
 @media (min-width: 1600px) {
-    :root { --container: 1320px; }
-    .hero { padding: var(--s-6) 0 var(--s-5); }
+    .hero { padding: var(--s-5) 0 var(--s-4); }
     .hero h1 { font-size: clamp(3rem, 4vw, 4rem); }
-    .article-body { font-size: 1.1rem; }
     .section { margin: var(--s-4) 0; }
 }
 
 /* ---- Desktop ultra-wide / 4K (>= 1920px) ---- */
 @media (min-width: 1920px) {
-    :root { --container: 1480px; }
-    body { font-size: 17px; }
-    .article-body { font-size: 1.12rem; max-width: 74ch; }
-    .article { max-width: 900px; }
+    /* El contenedor ya escala via min(95vw, 1720px) en :root. La pagina del
+       articulo tambien: la prosa mantiene su medida y los bloques anchos
+       (tablas, veredicto, grillas) usan el espacio extra. */
+    .grid-cards { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
 }
 
 /* ---- Tablas de articulos: scroll horizontal en mobile ---- */

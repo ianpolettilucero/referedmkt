@@ -3,7 +3,7 @@ name: Microsoft Defender for Endpoint P2
 brand: Microsoft
 category: antivirus-y-edr
 description_short: Plataforma empresarial de protección de endpoints de Microsoft, integrada nativamente al ecosistema Windows, Microsoft 365 y Azure. Combina antivirus de nueva generación, EDR, gestión de vulnerabilidades, reducción de superficie de ataque e investigación automatizada en una sola solución. El Plan 2 agrega capacidades avanzadas de detección, respuesta y threat hunting, con integración directa a Microsoft Sentinel y al resto del stack XDR de Defender.
-logo_url: https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg
+logo_url: /uploads/ciberseguridad/2026/04/microsoft-logo-wikimedia.svg
 rating: 4.7
 price_from: 5.2
 price_currency: USD
