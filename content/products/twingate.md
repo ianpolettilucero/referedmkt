@@ -71,8 +71,6 @@ specs:
   Clientes notables: Shopify, Blend, Productboard, Instacart, Chegg
 ---
 
-# Twingate
-
 **Twingate** es una plataforma moderna de **Zero Trust Network Access (ZTNA)** desarrollada por **Twingate Inc.**, compañía fundada en 2019 en Redwood City, California, por ex-ingenieros de **Dropbox**, **Uber** y **Google**. Desde su lanzamiento público en 2020, Twingate se consolidó como una de las **alternativas favoritas de equipos técnicos** para reemplazar la VPN corporativa tradicional, con una propuesta muy enfocada: **hacer Zero Trust tan simple como instalar una app**.
 
 En pocos años Twingate captó clientes como **Shopify**, **Blend**, **Productboard**, **Instacart** y **Chegg**, y levantó rondas de inversión significativas de *Insight Partners*, *WndrCo* y *8VC*. Su posicionamiento no es competir en enterprise puro contra Zscaler o Palo Alto — es competir en el segmento **mid-market y startups técnicas** donde la facilidad de adopción y la DX (*developer experience*) pesan más que features enterprise pesados.

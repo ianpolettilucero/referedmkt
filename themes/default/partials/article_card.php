@@ -4,7 +4,7 @@
         <?php if (!empty($article['featured_image'])): ?>
             <img class="article-card-img" src="<?= e($article['featured_image']) ?>" alt="<?= e($article['title']) ?>" loading="lazy">
         <?php endif; ?>
-        <h3 class="article-card-title"><?= e($article['title']) ?></h3>
+        <h2 class="article-card-title"><?= e($article['title']) ?></h2>
         <?php if (!empty($article['excerpt'])): ?>
             <p class="article-card-excerpt"><?= e(excerpt($article['excerpt'], 180)) ?></p>
         <?php endif; ?>

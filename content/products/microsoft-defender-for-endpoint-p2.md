@@ -59,7 +59,7 @@ specs:
   Sede: Redmond, Washington, EE.UU.
 ---
 
-# Microsoft Defender for Endpoint Plan 2
+## Microsoft Defender for Endpoint Plan 2
 
 **Microsoft Defender for Endpoint (MDE)** es la plataforma empresarial de protección, detección y respuesta de endpoints desarrollada por Microsoft. Nació como una evolución del antivirus Windows Defender y, tras años de inversión masiva, se ha consolidado como una de las soluciones **líderes del mercado**, reconocida por *Gartner* y *Forrester* junto a CrowdStrike y SentinelOne.
 

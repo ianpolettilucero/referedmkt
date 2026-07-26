@@ -66,8 +66,6 @@ specs:
   Empresa: Bitwarden Inc., fundada en 2015, Santa Barbara, California
 ---
 
-# Bitwarden Business
-
 **Bitwarden Business** es la oferta empresarial de **Bitwarden Inc.**, compañía fundada en 2015 por Kyle Spearrin como un proyecto open source que rápidamente se convirtió en una de las **alternativas más populares** a los gestores de contraseñas propietarios tradicionales. Hoy es usado por empresas como *Mozilla*, *Esri*, *Tesco* y miles de PyMEs y startups en todo el mundo.
 
 Su propuesta combina tres elementos poco habituales juntos: **código abierto auditable**, **precios extremadamente competitivos** y **opción real de autohospedaje empresarial**. Esa tríada lo convierte en el favorito de **equipos técnicos**, **MSPs**, **organizaciones reguladas** y empresas con requisitos estrictos de soberanía de datos.

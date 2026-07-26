@@ -64,8 +64,6 @@ specs:
   Usuarios empresariales: Más de 150.000 organizaciones
 ---
 
-# 1Password Business
-
 **1Password Business** es la oferta empresarial de **AgileBits**, compañía canadiense-estadounidense fundada en 2005 que creó uno de los primeros gestores de contraseñas modernos del mercado. Hoy es considerado el **estándar de facto** en experiencia de usuario empresarial para *password management*, con más de **150.000 organizaciones** como clientes, incluyendo nombres como *IBM*, *Slack*, *GitLab*, *Shopify*, *Under Armour* y *PagerDuty*.
 
 Su propuesta se centra en un principio difícil de lograr: **hacer que la seguridad sea la opción más fácil**. Todo el producto está diseñado para que los empleados, desde el CEO hasta el pasante, usen un *password manager* sin notarlo — y que los administradores tengan control granular sin convertirse en ingenieros de seguridad.

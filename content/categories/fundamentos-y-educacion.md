@@ -5,7 +5,7 @@ meta_title: Fundamentos y Educación en Ciberseguridad | Guías LATAM 2026
 meta_description: "Guías educativas sobre ciberseguridad: ROI, roles, certificaciones (CISSP, OSCP), compliance LATAM y frameworks. Para dueños, gerentes y profesionales que necesitan pensar antes de comprar."
 ---
 
-# Fundamentos y Educación en Ciberseguridad
+## Fundamentos y Educación en Ciberseguridad
 
 No toda la ciberseguridad se trata de elegir el mejor producto EDR o comparar password managers. Hay una capa previa igual de crítica: **entender por qué la ciberseguridad importa, cómo se estructura como disciplina, qué roles existen, qué regulaciones aplican y qué invertir tiene sentido en cada etapa de una organización**.
 

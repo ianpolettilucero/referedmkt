@@ -69,7 +69,7 @@ specs:
   Cuota de mercado: Uno de los principales jugadores globales en SSE según Gartner
 ---
 
-# Cloudflare Access (Zero Trust)
+## Cloudflare Access (Zero Trust)
 
 **Cloudflare Access** es el módulo de **Zero Trust Network Access (ZTNA)** de la plataforma **Cloudflare Zero Trust** (anteriormente conocida como *Cloudflare for Teams*), desarrollada por **Cloudflare Inc.**, compañía fundada en 2009 en San Francisco y cotizada en la Bolsa de Nueva York desde 2019 (*NYSE: NET*). Cloudflare es conocida globalmente por su CDN, protección DDoS y servicios de infraestructura web, y en los últimos años expandió agresivamente su portafolio hacia **SASE/SSE empresarial** con una propuesta que aprovecha su red global como ventaja competitiva.
 

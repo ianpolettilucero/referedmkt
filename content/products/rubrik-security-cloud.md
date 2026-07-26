@@ -70,8 +70,6 @@ specs:
   Clientes globales: Más de 6.000 incluyendo Home Depot, Adobe, Allina Health, US Air Force
 ---
 
-# Rubrik Security Cloud
-
 **Rubrik Security Cloud** es la plataforma empresarial de protección y resiliencia de datos desarrollada por **Rubrik**, compañía fundada en 2014 en Palo Alto, California, y cotizada en la Bolsa de Nueva York desde **abril de 2024** (*NYSE: RBRK*). En una década, Rubrik pasó de ser una *startup* disruptiva a consolidarse como **challenger principal** de Veeam y Cohesity en el mercado empresarial de backup, con un posicionamiento claro: no es un producto de backup tradicional sino una **plataforma de seguridad de datos**.
 
 Esa diferencia no es marketing. Rubrik fue de los primeros fabricantes en declarar que **el backup es un problema de ciberseguridad, no de almacenamiento**, y diseñó toda la arquitectura del producto alrededor de esa tesis. La empresa cuenta con más de **6.000 clientes** incluyendo *Home Depot*, *US Air Force*, *Adobe* y *Allina Health*, y en los últimos años fue reconocida por *Gartner* como **Visionario** y **Challenger** en el *Magic Quadrant for Enterprise Backup and Recovery*.

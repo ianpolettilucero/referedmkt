@@ -69,8 +69,6 @@ specs:
   Clientes globales: Más de 550.000 incluyendo 82% del Fortune 500
 ---
 
-# Veeam Data Platform
-
 **Veeam Data Platform** es la plataforma empresarial de backup, recuperación y protección de datos desarrollada por **Veeam Software**, compañía fundada en 2006 en Suiza y hoy con sede en Seattle. Es el **referente indiscutido** del mercado de protección de datos empresariales con más de **550.000 clientes globales**, incluyendo el **82% del Fortune 500**, y reconocimiento consistente como Líder en el *Gartner Magic Quadrant for Enterprise Backup and Recovery* durante más de **ocho años consecutivos**.
 
 Veeam Data Platform es la evolución moderna de lo que históricamente se conoció como **Veeam Backup & Replication**, expandida en los últimos años para cubrir **todo el espectro de cargas empresariales**: máquinas virtuales, servidores físicos, aplicaciones SaaS, entornos cloud nativos, Kubernetes, bases de datos y endpoints. Su propuesta se centra en tres principios: **cobertura universal**, **recuperación garantizada** y **resiliencia ante ransomware** como capacidad nativa, no como *add-on*.

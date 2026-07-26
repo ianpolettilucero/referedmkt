@@ -14,8 +14,6 @@ meta_title: "Reseña de 1Password Business: 12 meses de uso real en PyME"
 meta_description: Reseña honesta de 1Password Business tras 12 meses usándolo. Rollout, SSO con Azure AD, Developer Tools, incidentes reales, ROI medido y comparación con Bitwarden y Dashlane.
 ---
 
-# Reseña de 1Password Business: 12 meses usándolo
-
 Hace exactamente un año empezamos el *rollout* de **1Password Business** en una empresa de **~45 empleados** con una mezcla típica de perfiles: equipo técnico (devs, sysadmin, DevOps), equipo comercial, marketing, administración y gerencia. Antes teníamos el desastre habitual — un Excel compartido en el Drive con "contraseñas importantes", passwords reutilizadas entre servicios personales y laborales, y al menos tres gerentes que guardaban todo en una libreta física.
 
 Esta reseña no es un resumen de la web del producto. Es lo que **aprendimos usándolo todos los días durante 12 meses**, los problemas reales que aparecieron, las decisiones de configuración que tomamos y lo que haría distinto si tuviera que empezar de nuevo.

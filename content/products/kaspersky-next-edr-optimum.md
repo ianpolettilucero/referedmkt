@@ -70,8 +70,6 @@ specs:
   Restricciones: Prohibido para clientes en EE.UU. desde junio de 2024
 ---
 
-# Kaspersky Next EDR Optimum
-
 **Kaspersky Next EDR Optimum** es la plataforma de protección de endpoints empresarial desarrollada por **Kaspersky**, compañía fundada en 1997 por Eugene Kaspersky y considerada una de las **tres empresas de ciberseguridad más reconocidas del mundo** por la calidad de su investigación en amenazas y la profundidad de sus motores de detección. Su equipo **GReAT (Global Research and Analysis Team)** es históricamente responsable del descubrimiento de varias de las operaciones APT más sofisticadas de la última década, incluidas *Stuxnet*, *Duqu*, *Flame*, *Equation Group*, *Carbanak* y *Lazarus*.
 
 Kaspersky Next es la línea de productos empresariales lanzada a mediados de 2024 como evolución y reemplazo de la antigua familia *Kaspersky Endpoint Security for Business*. Dentro de esa línea, el tier **EDR Optimum** es el punto de equilibrio del portafolio: suma capacidades EDR simplificadas al motor antimalware de clase mundial, manteniéndose accesible en precio y complejidad para PyMEs y empresas medianas sin un SOC dedicado.

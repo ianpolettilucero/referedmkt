@@ -231,6 +231,9 @@ final class ContentBuilder
             $cat = self::resolveRef($d['category'] ?? null, $categories, $where, 'category');
             $aff = self::resolveRef($d['affiliate'] ?? null, $affiliateLinks, $where, 'affiliate');
 
+            $descriptionHtml = $doc['body'] !== '' ? Markdown::toHtml($doc['body']) : '';
+            self::assertNoH1($descriptionHtml, $where);
+
             $pricing = (string)($d['pricing_model'] ?? 'custom');
             if (!in_array($pricing, self::PRICING_MODELS, true)) {
                 throw new \InvalidArgumentException(
@@ -246,7 +249,7 @@ final class ContentBuilder
                 'brand'             => $d['brand'] ?? null,
                 'description_short' => $d['description_short'] ?? null,
                 'description_long'  => $doc['body'],
-                'description_html'  => $doc['body'] !== '' ? Markdown::toHtml($doc['body']) : '',
+                'description_html'  => $descriptionHtml,
                 'logo_url'          => $d['logo_url'] ?? null,
                 'rating'            => self::rating($d['rating'] ?? null, $where),
                 'price_from'        => isset($d['price_from']) ? (float)$d['price_from'] : null,
@@ -312,6 +315,9 @@ final class ContentBuilder
                 $relatedIds[] = $products[$pslug]['id'];
             }
 
+            $contentHtml = $doc['body'] !== '' ? Markdown::toHtml($doc['body']) : '';
+            self::assertNoH1($contentHtml, $where);
+
             $publishedAt = self::stamp($d['published'] ?? null, null);
             if ($status === 'published' && $publishedAt === null) {
                 throw new \InvalidArgumentException("$where: status published requiere 'published: YYYY-MM-DD'");
@@ -325,7 +331,7 @@ final class ContentBuilder
                 'subtitle'            => $d['subtitle'] ?? null,
                 'excerpt'             => $d['excerpt'] ?? null,
                 'content'             => $doc['body'],
-                'content_html'        => $doc['body'] !== '' ? Markdown::toHtml($doc['body']) : '',
+                'content_html'        => $contentHtml,
                 'featured_image'      => $d['featured_image'] ?? null,
                 'article_type'        => $type,
                 'related_product_ids' => $relatedIds,
@@ -404,6 +410,7 @@ final class ContentBuilder
         }
         $files = glob($dir . '/*.md') ?: [];
         sort($files);
+        // content/_plantillas/ queda fuera: no es contenido publicable.
 
         $out = [];
         foreach ($files as $file) {
@@ -427,6 +434,24 @@ final class ContentBuilder
             ];
         }
         return $out;
+    }
+
+    /**
+     * El cuerpo no puede traer un H1: el H1 de la pagina es el titulo, y dos
+     * H1 en el mismo documento es un error de SEO.
+     *
+     * Se chequea sobre el HTML ya renderizado, no sobre el markdown: asi un
+     * "# comentario" dentro de un bloque de codigo no cuenta, porque el parser
+     * ya lo resolvio como codigo.
+     */
+    private static function assertNoH1(string $html, string $where): void
+    {
+        if (preg_match('~<h1[\s>]~i', $html)) {
+            throw new \InvalidArgumentException(
+                "$where: el cuerpo tiene un encabezado H1 (# Titulo). El H1 de la "
+                . "pagina ya es el titulo del front-matter — usa ## para las secciones."
+            );
+        }
     }
 
     /**
