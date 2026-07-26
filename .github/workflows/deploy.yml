@@ -101,7 +101,13 @@ jobs:
         env:
           HOOK: ${{ secrets.HOSTINGER_DEPLOY_WEBHOOK }}
         run: |
-          code=$(curl -sS -o /tmp/resp.txt -w '%{http_code}' --max-time 60 --retry 3 --retry-delay 5 "$HOOK")
+          # POST, no GET: el webhook de Hostinger espera el push event de
+          # GitHub y responde 405 a cualquier otro metodo.
+          code=$(curl -sS -X POST \
+                      -H 'Content-Type: application/json' \
+                      -d '{"ref":"refs/heads/main"}' \
+                      -o /tmp/resp.txt -w '%{http_code}' \
+                      --max-time 60 --retry 3 --retry-delay 5 "$HOOK")
           echo "HTTP $code"
           head -c 400 /tmp/resp.txt || true
           echo
@@ -111,21 +117,30 @@ jobs:
           esac
 
       # --- Verificacion -------------------------------------------------------
-      # El primer request despues del deploy recompila content/. Esperamos a que
-      # /healthz reporte la version nueva (la vieja no traia la clave "content").
-      - name: Verificar que el sitio quedo sano
+      # Verificacion real: /healthz reporta el commit desplegado, asi que
+      # comparamos contra el SHA que acaba de pasar el CI. Chequear solo que el
+      # sitio responda 200 no probaria nada: ya respondia 200 antes del deploy.
+      - name: Verificar que el commit correcto quedo en produccion
         if: steps.pick.outputs.mode != 'none'
+        env:
+          EXPECTED_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
         run: |
           DOMAIN=$(grep -oP "(?<='domain' => ')[^']+" content/site.php | head -1)
-          EXPECTED=$(git rev-list --count HEAD)
-          echo "Dominio: $DOMAIN"
-          for i in $(seq 1 12); do
+          SHORT=$(echo "$EXPECTED_SHA" | cut -c1-8)
+          echo "Dominio: $DOMAIN — esperando commit $SHORT"
+          for i in $(seq 1 18); do
             sleep 10
             body=$(curl -sS --max-time 20 "https://$DOMAIN/healthz" || true)
-            echo "  intento $i: $body"
-            case "$body" in
-              *'"status":"ok"'*'"content"'*) echo "Sitio sano."; exit 0 ;;
-            esac
+            live=$(echo "$body" | grep -oP '(?<="commit":")[0-9a-f]+' || true)
+            echo "  intento $i: commit=${live:-?} status=$(echo "$body" | grep -oP '(?<="status":")[a-z]+' || echo '?')"
+            if [ "$live" = "$SHORT" ]; then
+              case "$body" in
+                *'"status":"ok"'*) echo "Deploy confirmado en $SHORT."; exit 0 ;;
+              esac
+              echo "::error::El commit llego pero el sitio reporta unhealthy: $body"
+              exit 1
+            fi
           done
-          echo "::error::El sitio no reporto healthy despues del deploy."
+          echo "::error::Produccion no llego al commit $SHORT despues de 3 minutos."
+          echo "Ultimo /healthz: $body"
           exit 1
