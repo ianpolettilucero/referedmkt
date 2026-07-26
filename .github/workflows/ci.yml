@@ -58,17 +58,16 @@ jobs:
       # Levanta el sitio de verdad y verifica que cada ruta publica responda lo
       # que tiene que responder. Un 500 por una vista rota no lo agarran ni el
       # lint ni los unit tests.
-      - name: Levantar servidor
+      - name: Levantar servidor y chequear rutas
         run: |
           DOMAIN=$(php -r 'echo (require "content/site.php")["domain"];')
-          DEV_SITE_DOMAIN=$DOMAIN php -S 127.0.0.1:8080 -t public > /tmp/server.log 2>&1 &
+          # bin/dev-server.php replica el rewrite de Apache. Sin el, PHP <= 8.3
+          # devuelve 404 en /sitemap.xml y demas rutas con extension.
+          DEV_SITE_DOMAIN=$DOMAIN php -S 127.0.0.1:8080 -t public bin/dev-server.php > /tmp/server.log 2>&1 &
           for i in $(seq 1 20); do
             curl -sf -o /dev/null http://127.0.0.1:8080/healthz && break
             sleep 0.5
           done
-
-      - name: Chequear rutas
-        run: |
           fail=0
           check() {
             code=$(curl -s -o /dev/null -w '%{http_code}' "http://127.0.0.1:8080$1")
