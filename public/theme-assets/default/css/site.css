@@ -1502,6 +1502,52 @@ html { scroll-behavior: smooth; }
 }
 
 /* =============================================================================
+   ARTICLE VERDICT (resenas: nota editorial + a favor / en contra)
+   ============================================================================= */
+.article-verdict {
+    margin: var(--s-5) 0 var(--s-4);
+    padding: var(--s-3);
+    background: var(--gradient-card);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+}
+.article-verdict-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s-2);
+    flex-wrap: wrap;
+    margin-bottom: var(--s-2);
+}
+.article-verdict-head h2 {
+    margin: 0;
+    font-size: 1.35rem;
+}
+.article-verdict-score {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.1rem;
+    padding: 0.3rem 0.8rem;
+    border-radius: var(--radius-sm);
+    background: var(--accent-soft);
+    color: var(--accent);
+    line-height: 1;
+    white-space: nowrap;
+}
+.article-verdict-score strong { font-size: 1.6rem; font-weight: 700; }
+.article-verdict-score span   { font-size: 0.9rem; opacity: 0.75; }
+
+.article-verdict-body { color: var(--text); }
+.article-verdict-body p:first-child { margin-top: 0; }
+.article-verdict-body p:last-child  { margin-bottom: 0; }
+
+.article-verdict .pros-cons { margin-top: var(--s-3); }
+.article-verdict .pros-cons h3 { font-size: 1rem; margin: 0 0 0.5rem; }
+
+.article-updated { color: var(--text-muted); }
+
+/* =============================================================================
    RELATED ARTICLES (al final del articulo)
    ============================================================================= */
 .related-articles {

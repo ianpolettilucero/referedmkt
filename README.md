@@ -57,7 +57,7 @@ php -S localhost:8080 -t public
 php tests/run.php
 ```
 
-50 tests smoke sin necesidad de DB (runner minimal ~50 lineas en `tests/TestRunner.php`).
+82 tests smoke sin necesidad de DB (runner minimal ~50 lineas en `tests/TestRunner.php`).
 
 ## Estructura
 
@@ -83,9 +83,15 @@ config/        config.php + .env (no commiteado)
   affiliate_links/products/articles/redirects) + biblioteca de imagenes con
   picker reusable + settings por sitio + analytics + migraciones y backup
   on-demand.
-- SEO first-class: JSON-LD (Product + AggregateRating, Article/Review,
-  BreadcrumbList, FAQPage, Organization), Open Graph, Twitter Cards,
-  meta templates por sitio, hreflang ready.
+- SEO first-class: JSON-LD (Product + Review editorial, Article/NewsArticle,
+  Review con `itemReviewed` + `reviewRating`, BreadcrumbList, FAQPage,
+  Organization, WebSite, Person), Open Graph, Twitter Cards, meta templates
+  por sitio, hreflang ready.
+- Veredicto editorial por artículo: nota 0-5, párrafo de veredicto y
+  a favor / en contra propios, independientes del producto. Es lo que
+  alimenta el `reviewRating` del schema `Review`.
+- FAQ automático: un `## Preguntas frecuentes` con las preguntas como `###`
+  se convierte en `FAQPage` sin cargar nada aparte (`core/Faq.php`).
 - Uploads: MIME-check real con finfo, SVG sanitization, whitelist de formatos,
   storage bajo `public/uploads/{site-slug}/YYYY/MM/`.
 - Newsletter: form embebido configurable por sitio (ConvertKit, Buttondown,

@@ -225,7 +225,13 @@ final class SEO
     }
 
     /**
-     * Product + Review + AggregateRating.
+     * Product + Offer + Review editorial.
+     *
+     * Nota sobre el rating: nuestra nota es UNA opinion editorial, no el
+     * promedio de reviews de usuarios. Por eso se emite como `review` (un
+     * Review con author = la publicacion) y no como `aggregateRating` con
+     * ratingCount 1, que le declara a Google un agregado que no existe.
+     *
      * @param array<string, mixed> $p producto (con features/pros/cons ya decodificados)
      */
     public function schemaProduct(array $p): self
@@ -254,12 +260,14 @@ final class SEO
             $data['offers'] = $offers;
         }
         if (!empty($p['rating'])) {
-            $data['aggregateRating'] = [
-                '@type'       => 'AggregateRating',
-                'ratingValue' => (string)$p['rating'],
-                'bestRating'  => '5',
-                'worstRating' => '0',
-                'ratingCount' => 1,
+            $data['review'] = [
+                '@type'        => 'Review',
+                'reviewRating' => self::ratingNode($p['rating']),
+                'author'       => [
+                    '@type' => 'Organization',
+                    'name'  => $this->site->name,
+                    'url'   => site_url('/'),
+                ],
             ];
         }
 
@@ -268,14 +276,104 @@ final class SEO
     }
 
     /**
-     * Article schema.
+     * Nodo Rating reutilizable. Escala 0-5, igual que products.rating y
+     * articles.rating.
+     *
+     * @param mixed $value
+     * @return array<string, string>
+     */
+    private static function ratingNode($value): array
+    {
+        return [
+            '@type'       => 'Rating',
+            'ratingValue' => number_format((float)$value, 1, '.', ''),
+            'bestRating'  => '5',
+            'worstRating' => '0',
+        ];
+    }
+
+    /**
+     * Review completo para articulos de tipo `review`.
+     *
+     * Google exige `itemReviewed` + `reviewRating` para tomar un Review como
+     * valido. Si falta cualquiera de los dos (resena sin producto asociado, o
+     * sin nota cargada) degradamos a Article, que siempre es correcto — es
+     * preferible un Article valido a un Review que el validador descarta.
+     *
+     * @param array<string, mixed>      $a       articulo
+     * @param array<string, mixed>|null $product producto reseñado
+     */
+    public function schemaReview(array $a, ?array $product = null): self
+    {
+        $rating = $a['rating'] ?? null;
+        if (($rating === null || $rating === '') && $product !== null) {
+            $rating = $product['rating'] ?? null;
+        }
+
+        if ($product === null || $rating === null || $rating === '') {
+            return $this->schemaArticle($a);
+        }
+
+        $itemReviewed = [
+            '@type' => 'Product',
+            'name'  => $product['name'],
+            'brand' => !empty($product['brand'])
+                ? ['@type' => 'Brand', 'name' => $product['brand']]
+                : null,
+            'image' => $product['logo_url'] ?? null,
+            'url'   => site_url(product_url($product)),
+        ];
+
+        $body = $a['verdict'] ?? null;
+        if ($body === null || trim((string)$body) === '') {
+            $body = $a['excerpt'] ?? null;
+        }
+
+        $data = [
+            '@context'      => 'https://schema.org',
+            '@type'         => 'Review',
+            'name'          => $a['title'],
+            'headline'      => $a['title'],
+            'reviewBody'    => $body ? $this->oneLine((string)$body, 500) : null,
+            'itemReviewed'  => $itemReviewed,
+            'reviewRating'  => self::ratingNode($rating),
+            'datePublished' => !empty($a['published_at']) ? date('c', strtotime($a['published_at'])) : null,
+            'dateModified'  => !empty($a['updated_at'])   ? date('c', strtotime($a['updated_at']))   : null,
+            'author'        => !empty($a['author_name']) ? [
+                '@type' => 'Person',
+                'name'  => $a['author_name'],
+                'url'   => !empty($a['author_slug']) ? site_url('/autor/' . $a['author_slug']) : null,
+            ] : [
+                '@type' => 'Organization',
+                'name'  => $this->site->name,
+                'url'   => site_url('/'),
+            ],
+            'publisher'     => [
+                '@type' => 'Organization',
+                'name'  => $this->site->name,
+                'logo'  => $this->site->logoUrl ? [
+                    '@type' => 'ImageObject',
+                    'url'   => $this->site->logoUrl,
+                ] : null,
+            ],
+            'url' => site_url(article_url($a)),
+        ];
+
+        $this->jsonLd[] = $this->deepFilter($data);
+        return $this;
+    }
+
+    /**
+     * Article schema. Para resenas usar schemaReview(), que emite el
+     * `Review` con itemReviewed + reviewRating que Google requiere.
+     *
      * @param array<string, mixed> $a
      */
     public function schemaArticle(array $a): self
     {
         $data = [
             '@context'      => 'https://schema.org',
-            '@type'         => ($a['article_type'] ?? '') === 'review' ? 'Review' : 'Article',
+            '@type'         => ($a['article_type'] ?? '') === 'news' ? 'NewsArticle' : 'Article',
             'headline'      => $a['title'],
             'description'   => $a['excerpt'] ?? null,
             'image'         => $a['featured_image'] ?? null,
@@ -301,6 +399,11 @@ final class SEO
     }
 
     /**
+     * FAQPage. Desde agosto 2023 Google restringio el rich result de FAQ a
+     * sitios de gobierno y salud, asi que esto NO produce el acordeon
+     * expandido en Google. Sigue siendo util para Bing, para los crawlers de
+     * LLMs y como estructura semantica de la pagina.
+     *
      * @param array<int, array{question:string, answer:string}> $faqs
      */
     public function schemaFaq(array $faqs): self
