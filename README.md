@@ -88,7 +88,7 @@ php tests/run.php                  # 117 tests, sin dependencias
 Desarrollo local:
 
 ```bash
-DEV_SITE_DOMAIN=capacero.online php -S localhost:8080 -t public
+DEV_SITE_DOMAIN=capacero.online php -S localhost:8080 -t public bin/dev-server.php
 ```
 
 ## Qué valida el build
