@@ -56,14 +56,14 @@ Antes del fin de semana, dedicale **2 horas** a hacer un inventario simple. Una 
 
 ## Los métodos de MFA y cuándo usar cada uno
 
-No todos los segundos factores son iguales. Ordenados de mejor a peor:
+No todos los segundos factores son iguales. Ordenados de mejor a peor, con el directorio de plataformas en [MFA y autenticación](/productos/mfa-y-autenticacion):
 
 ### 1. Llaves físicas FIDO2 (YubiKey, Feitian, Google Titan)
 
 **Lo mejor para proteger contra phishing.** Una llave física no puede ser engañada por un sitio clon porque valida el dominio criptográficamente.
 
 - **Usá para** — administradores, C-level, cuentas con acceso privilegiado
-- **Costo** — USD 50-80 por llave, pero es *una sola vez*
+- **Costo** — USD 50-80 por llave de lista, pero es *una sola vez*. Puesta en Argentina sale bastante más: el costo total por usuario está modelado en el [análisis de costo total de las YubiKey 5 en Argentina](/resena/analisis-yubikey-5-series-costo-total-argentina)
 - **Contra** — se pueden perder, hay que tener al menos dos por usuario
 
 ### 2. Passkeys
@@ -158,7 +158,7 @@ Una vez enviado el email:
 
 ### Sábado 14:00 a 18:00 — SaaS críticos
 
-Aplicaciones que **no pasan por el IdP** y tienen login propio. Van una por una. Las más comunes:
+Aplicaciones que **no pasan por el IdP** y tienen login propio. Van una por una — es acá donde queda la mayoría de [los accesos que el MFA no llega a cubrir](/guia/ya-tenes-mfa-y-no-alcanza) en una PyME típica. Las más comunes:
 
 - **Banco online** — casi todos los bancos argentinos ya lo requieren, pero confirmá token físico o app
 - **AFIP** — clave fiscal con nivel 3 y autenticador móvil obligatorios
@@ -187,7 +187,7 @@ Dejar corriendo los logs del IdP. Si empieza a haber logins fallidos masivos ant
 
 - **OpenVPN / WireGuard custom** — integrar con el IdP vía RADIUS o SAML
 - **Fortinet / Palo Alto / Cisco AnyConnect** — activar *FortiToken*, *MFA via Duo* o similar
-- **Cloudflare Access / Zscaler / Twingate (ZTNA)** — ya vienen con MFA integrado al IdP, solo confirmá que está *enforced*
+- **Cloudflare Access / Zscaler / Twingate (ZTNA)** — ya vienen con MFA integrado al IdP, solo confirmá que está *enforced*. Si todavía usás VPN tradicional, la guía de [acceso remoto seguro sin VPN](/guia/acceso-remoto-seguro-sin-vpn) compara estas opciones con precio por usuario
 
 #### Admin panels de infraestructura
 

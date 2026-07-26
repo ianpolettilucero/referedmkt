@@ -1,0 +1,21 @@
+# El contenido migro desde la base de datos del panel viejo, y los textarea de
+# HTML mandan CRLF por especificacion — asi que la mitad de content/ quedo con
+# saltos de linea de Windows y la otra mitad no. Mezclado, cualquier editor que
+# reescriba un archivo entero produce un diff de "todas las lineas cambiaron"
+# que tapa el cambio real.
+#
+# Con esto git normaliza a LF al guardar y todo el repo queda parejo.
+* text=auto eol=lf
+
+# Binarios: que git no los toque.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.gif binary
+*.ico binary
+*.svg text eol=lf
+*.woff  binary
+*.woff2 binary
+*.gz  binary
+*.zip binary

@@ -88,7 +88,7 @@ Las aplicaciones web son uno de los objetivos más comunes, y tienen un ecosiste
 
 Burp funciona como proxy entre el navegador y la aplicación — intercepta cada request y response, permitiendo ver, modificar, repetir y automatizar interacciones. Eso parece simple pero habilita todo el trabajo ofensivo serio en web: manipulación de parámetros, bypass de controles del lado del cliente, fuzzing automatizado, testing de vulnerabilidades de autenticación y autorización, explotación de inyecciones, y análisis de APIs.
 
-La versión **Community** es gratuita con limitaciones. La versión **Professional** (USD 449/año aproximadamente) incluye el escáner automatizado, el *Intruder* sin rate limits, y extensiones avanzadas. Es una de las pocas herramientas comerciales que los pentesters profesionales compran individualmente — el retorno justifica el costo.
+La versión **Community** es gratuita con limitaciones. La versión **Professional** (USD 449/año aproximadamente) incluye el escáner automatizado, el *Intruder* sin rate limits, y extensiones avanzadas. Es una de las pocas herramientas comerciales que los pentesters profesionales compran individualmente — el retorno justifica el costo. En un equipo interno, estas licencias son una línea fija del [presupuesto de seguridad ofensiva](/guia/costos-pentesting-red-team-presupuesto-empresarial).
 
 El ecosistema alrededor de Burp incluye la [PortSwigger Web Security Academy](https://portswigger.net/web-security), plataforma gratuita con el curso más completo de web hacking disponible, y una comunidad activa de extensiones (*BApp Store*) que añaden funcionalidades específicas.
 
@@ -114,7 +114,7 @@ Una vez identificadas vulnerabilidades, viene la fase de explotación. El rubro 
 
 La importancia histórica de Metasploit es profunda: cuando se lanzó en 2003, democratizó la explotación de vulnerabilidades. Antes, explotar una vulnerabilidad conocida requería encontrar o escribir el exploit correcto, compilarlo, adaptar el payload, ejecutarlo cuidadosamente. Metasploit estandarizó todo eso en una interfaz unificada: seleccionás el exploit, configurás el objetivo, elegís el payload, ejecutás.
 
-En 2026, los pentesters profesionales usan Metasploit menos que antes por una razón específica: los EDR modernos detectan las firmas típicas de sus payloads. Para entornos sin defensas avanzadas sigue siendo enormemente útil y eficiente. Para entornos con EDR serio, los pentesters recurren a técnicas más custom y menos detectables.
+En 2026, los pentesters profesionales usan Metasploit menos que antes por una razón específica: los productos de [antivirus y EDR](/productos/antivirus-y-edr) modernos detectan las firmas típicas de sus payloads. Para entornos sin defensas avanzadas sigue siendo enormemente útil y eficiente. Para entornos con EDR serio, los pentesters recurren a técnicas más custom y menos detectables.
 
 ### Impacket
 
@@ -133,6 +133,8 @@ Su fork más reciente [NetExec](https://github.com/Pennyw0rth/NetExec) está man
 [Responder](https://github.com/lgandx/Responder) es una herramienta icónica de ataques a redes Windows internas. Captura y responde a consultas de protocolos como LLMNR, NBT-NS, y mDNS que Windows usa por default, frecuentemente logrando capturar hashes de credenciales de la red sin intervención del usuario.
 
 Es una de esas herramientas que ilustran por qué el pentesting interno es valioso: en muchas redes corporativas, ejecutar Responder durante una hora resulta en captura de credenciales aprovechables sin haber "atacado" nada explícitamente — los protocolos mismos filtran información.
+
+Lo que corta esa cadena del lado defensivo no es otra herramienta: es tener segundo factor en los accesos internos, que es justo donde aparecen [los huecos que deja el MFA](/guia/ya-tenes-mfa-y-no-alcanza) en la mayoría de las PyMEs.
 
 ---
 
@@ -246,7 +248,7 @@ En un **pentest interno de Active Directory**, el arranque es distinto. Con acce
 
 En un **pentest de aplicación web**, Burp Suite domina el trabajo. Reconocimiento manual de la aplicación, mapeo de endpoints con el *Site Map*, testeo de funcionalidades con el *Repeater*, fuzzing con *Intruder*, escaneo automatizado con el *Scanner*. sqlmap se activa si se detectan indicios de SQL injection. ffuf para descubrimiento de recursos ocultos. Wireshark ocasional si hay que analizar tráfico API específico.
 
-En **red teaming**, el setup es más sofisticado. Infraestructura C2 propia con Cobalt Strike (o Sliver/Mythic), redirectores, dominios comprados para el engagement, certificados SSL válidos. El acceso inicial frecuentemente vía phishing o explotación de algún servicio expuesto. Una vez adentro, el trabajo combina BloodHound, Impacket y técnicas de evasión avanzadas que no son herramientas *per se* sino métodos que se ejecutan con scripting custom.
+En **red teaming**, el setup es más sofisticado. Infraestructura C2 propia con Cobalt Strike (o Sliver/Mythic), redirectores, dominios comprados para el engagement, certificados SSL válidos. El acceso inicial frecuentemente vía phishing —el lado defensivo de eso es lo que mide la [comparativa de seguridad de email para PyMEs](/comparativa/comparativa-seguridad-email-pymes)— o explotación de algún servicio expuesto. Una vez adentro, el trabajo combina BloodHound, Impacket y técnicas de evasión avanzadas que no son herramientas *per se* sino métodos que se ejecutan con scripting custom.
 
 ---
 

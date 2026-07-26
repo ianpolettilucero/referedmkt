@@ -128,11 +128,11 @@ Pensar la seguridad como **capas**. Cada capa independiente, ninguna depende de 
 
 Esta es la primera línea de defensa. Si un atacante no puede autenticarse como un empleado, el **80% de los ataques se cortan acá**.
 
-- **MFA obligatorio** en email, admin panels, VPN, acceso al password manager. **Sin excepciones**. Si alguien dice "es incómodo", la respuesta es: un rescate de ransomware es más incómodo.
+- **MFA obligatorio** en email, admin panels, VPN, acceso al password manager. **Sin excepciones** — y revisá el inventario una vez activado, porque [los accesos que el MFA deja afuera](/guia/ya-tenes-mfa-y-no-alcanza) son los que terminan usando los atacantes. Si alguien dice "es incómodo", la respuesta es: un rescate de ransomware es más incómodo.
 - **Password manager empresarial** con SSO, bóvedas compartidas y auditoría. Esto reemplaza al Excel con contraseñas y al "se las mando por WhatsApp".
 - **SSO (Single Sign-On)** si ya tenés más de 20 empleados y usás Google Workspace, Microsoft 365 u Okta.
 
-Nuestra recomendación por defecto para PyMEs es **1Password Business** o **Bitwarden Business** — el primero tiene mejor UX, el segundo es más económico y open source. Para MFA, priorizá **apps de autenticación (Authy, Microsoft Authenticator, 1Password)** o **llaves físicas FIDO2 (YubiKey)** por sobre SMS, que es vulnerable a *SIM swapping*.
+Nuestra recomendación por defecto para PyMEs es **1Password Business** o **Bitwarden Business** — el primero tiene mejor UX, el segundo es más económico y open source. Para MFA, priorizá **apps de autenticación (Authy, Microsoft Authenticator, 1Password)** o **llaves físicas FIDO2 (YubiKey)** por sobre SMS, que es vulnerable a *SIM swapping*. Si vas por las llaves, en el [análisis de costo total de las YubiKey 5 en Argentina](/resena/analisis-yubikey-5-series-costo-total-argentina) está el costo puesto acá modelado con precios de lista y el régimen de importación vigente, que no es el de la etiqueta.
 
 ### Capa 2 — Endpoints (los dispositivos)
 
@@ -148,15 +148,17 @@ Opciones empresariales sólidas: [CrowdStrike Falcon](/producto/crowdstrike-falc
 ### Capa 3 — Red
 
 - **Firewall moderno (NGFW)** o **SASE cloud**. Ya no alcanza con un firewall que solo filtre puertos — se necesita inspección de aplicaciones, IDS/IPS y filtrado DNS.
-- **VPN empresarial o ZTNA** para el acceso remoto. No uses VPN *consumer* (tipo NordVPN personal) en contexto corporativo — **son productos distintos**.
+- **VPN empresarial o ZTNA** para el acceso remoto. No uses VPN *consumer* (tipo NordVPN personal) en contexto corporativo — **son productos distintos**. Si estás por renovar la VPN vieja, mirá antes cómo dar [acceso remoto seguro sin VPN](/guia/acceso-remoto-seguro-sin-vpn), que para menos de 50 usuarios suele salir cero.
 - **Segmentación**: red de invitados ≠ red de empleados ≠ red de servidores.
 
 ### Capa 4 — Email
 
-- **Filtro anti-phishing** más allá del built-in de Gmail/Microsoft 365. Productos dedicados como *Proofpoint*, *Mimecast* o *Abnormal* detectan *campaigns* coordinadas que el filtro base no ve.
-- **DMARC + SPF + DKIM** para que tu dominio no pueda ser *spoofeado*. Los 3 son records DNS. Toma **1 hora** configurarlos bien y previene el 80% de los ataques de suplantación.
+- **Filtro anti-phishing** más allá del built-in de Gmail/Microsoft 365. Productos dedicados como *Proofpoint*, *Mimecast* o *Abnormal* detectan *campaigns* coordinadas que el filtro base no ve; la [comparativa de seguridad de email para PyMEs](/comparativa/comparativa-seguridad-email-pymes) los pone lado a lado con precio por buzón y mínimo de licencias.
+- **DMARC + SPF + DKIM** para que tu dominio no pueda ser *spoofeado*. Los 3 son records DNS. Toma **1 hora** configurarlos bien y previene el 80% de los ataques de suplantación: el paso a paso, con los comandos para verificar cada registro, está en [configurar SPF, DKIM y DMARC](/guia/configurar-spf-dkim-dmarc-paso-a-paso).
 
 ### Capa 5 — Backup y recuperación
+
+Y no vale asumir que lo que está en la nube ya viene respaldado: si tu empresa trabaja sobre Microsoft 365, mirá primero por qué [el backup de Microsoft 365 hace falta](/guia/backup-microsoft-365-hace-falta) y cuántos días de retención real tenés antes de dar esta capa por cubierta.
 
 La regla **3-2-1**:
 

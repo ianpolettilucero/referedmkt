@@ -26,9 +26,9 @@ Esta reseña no es un resumen de la web del producto. Es lo que **aprendimos us�
 
 Antes del rollout evaluamos tres productos durante 6 semanas:
 
-- **Bitwarden Business** — el candidato más barato y con autohospedaje
-- **Dashlane Business** — el que más les gustó visualmente al equipo no técnico
-- **1Password Business** — el que recomendaba casi todo el mundo en foros de seguridad
+- **[Bitwarden Business](/producto/bitwarden-business)** — el candidato más barato y con autohospedaje
+- **[Dashlane Business](/producto/dashlane-business)** — el que más les gustó visualmente al equipo no técnico
+- **[1Password Business](/producto/1password-business)** — el que recomendaba casi todo el mundo en foros de seguridad
 
 Las razones concretas por las que terminamos con 1Password:
 
@@ -68,7 +68,7 @@ Pasos concretos que seguimos:
 1. Configurar la **app empresarial** de 1Password en Azure AD
 2. Habilitar **SCIM provisioning** con el token generado desde 1Password
 3. Mapear **grupos de Azure AD** a grupos de 1Password (Devs, Marketing, Comercial, Admin)
-4. Activar **Conditional Access** para requerir MFA de Azure AD al desbloquear 1Password
+4. Activar **Conditional Access** de [Microsoft Entra ID](/producto/microsoft-entra-id) para requerir MFA al desbloquear 1Password
 5. Migrar usuarios existentes al flujo de SSO (uno por uno para evitar lock-outs)
 
 El beneficio más tangible: los empleados pasaron de **recordar una Master Password compleja** a **desbloquear 1Password con su MFA de Microsoft** que ya usaban para email. Las llamadas al helpdesk por "no me acuerdo la master password" cayeron a cero.
@@ -183,17 +183,19 @@ Un desarrollador reportó que la app no sincronizaba nuevas credenciales. Diagn�
 
 Un cambio en políticas de Conditional Access en Azure AD rompió el login de 1Password para un grupo de usuarios durante 2 horas. **No fue culpa de 1Password**, pero mostró que el SSO introduce dependencia: si tu IdP está caído, tu password manager también lo está.
 
-Solución: configuramos una **cuenta de administración de respaldo** sin SSO (solo Master Password + Secret Key + YubiKey) para poder acceder en emergencias.
+Solución: configuramos una **cuenta de administración de respaldo** sin SSO (solo Master Password + Secret Key + YubiKey) para poder acceder en emergencias. Qué implica sostener llaves físicas en una PyME —repuestos, importación, horas de soporte— está desarmado en el [análisis de costo total de las YubiKey 5 en Argentina](/resena/analisis-yubikey-5-series-costo-total-argentina).
 
 ### Incidente 3 — Empleado comprometido (mes 9)
 
-Un empleado cayó en un phishing sofisticado dirigido a credenciales corporativas. El atacante obtuvo el email y password de Azure AD, pero **no pudo acceder a 1Password** porque:
+Un empleado cayó en un phishing sofisticado dirigido a credenciales corporativas — el tipo de campaña dirigida que los filtros nativos suelen dejar pasar, y que es justo lo que separa a los productos de la [comparativa de seguridad de email para PyMEs](/comparativa/comparativa-seguridad-email-pymes). El atacante obtuvo el email y password de Azure AD, pero **no pudo acceder a 1Password** porque:
 
 1. Azure AD requería MFA (app Authenticator)
 2. 1Password requería la Secret Key del dispositivo original
 3. El intento de login generó una alerta en la consola de 1Password desde una IP sospechosa
 
 Detectamos el intento en menos de 10 minutos, rotamos credenciales de Azure, revisamos auditorías y no hubo compromiso real. Este incidente **pagó solo 1Password para todo el año**.
+
+Lo que frenó el ataque no fue "tener MFA": fue tenerlo puesto en los dos accesos que importaban. Esa distinción es la que conviene revisar antes de necesitarla, y el inventario de [los accesos que el MFA suele dejar sin cubrir](/guia/ya-tenes-mfa-y-no-alcanza) es por dónde empezar.
 
 ---
 
