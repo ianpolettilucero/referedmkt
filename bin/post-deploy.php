@@ -20,10 +20,21 @@ if (PHP_SAPI !== 'cli') {
 
 $started = date('c');
 $rc = 0;
-$out = shell_exec('php ' . escapeshellarg(dirname(__DIR__) . '/migrate.php') . ' 2>&1');
+$bin = dirname(__DIR__);
+
+// 1) Migraciones pendientes.
+$out = shell_exec('php ' . escapeshellarg($bin . '/migrate.php') . ' 2>&1');
 
 // Solo loggeamos si hubo trabajo real.
 if ($out !== null && strpos($out, 'Nothing to migrate') === false) {
-    echo "[$started] post-deploy:\n" . $out . "\n";
+    echo "[$started] post-deploy migraciones:\n" . $out . "\n";
 }
+
+// 2) Sincronizar contenido de content/*.md hacia la tabla articles.
+//    Idempotente: si ningun .md cambio, no toca nada (ver content_files).
+$imp = shell_exec('php ' . escapeshellarg($bin . '/bin/import-content.php') . ' 2>&1');
+if ($imp !== null && !preg_match('/^Import: 0 nuevo\(s\), 0 actualizado\(s\)/m', $imp)) {
+    echo "[$started] post-deploy contenido:\n" . $imp . "\n";
+}
+
 exit($rc);
