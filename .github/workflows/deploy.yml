@@ -1,18 +1,28 @@
 name: Deploy
 
-# Dispara el pull de Hostinger, pero SOLO si el CI de main quedo verde.
+# Dispara el deploy en Hostinger, pero SOLO si el CI de main quedo verde.
 #
 # Por que no el webhook de GitHub directo a Hostinger: ese pega en cuanto hay
 # push, sin mirar si los tests pasan ni si content/ compila. Un front-matter
 # roto tiraria el sitio entero. Asi el deploy espera al CI.
 #
-# Setup (una vez):
-#   1. hPanel -> Avanzado -> GIT -> activar "Auto Deployment" y copiar la URL
-#      del webhook que te da.
-#   2. GitHub -> Settings -> Secrets and variables -> Actions -> New repository
-#      secret, nombre HOSTINGER_DEPLOY_WEBHOOK, valor esa URL.
+# Soporta dos mecanismos; usa el que tengas configurado, en este orden:
 #
-# Sin el secret cargado el job no falla: avisa y termina.
+#   A) SSH  (recomendado — el plan Business lo incluye)
+#      hPanel -> Avanzado -> Acceso SSH: ahi estan host, puerto y usuario.
+#      Generá el par de claves en tu maquina:
+#          ssh-keygen -t ed25519 -f ~/.ssh/capacero_deploy -N ""
+#      La PUBLICA (~/.ssh/capacero_deploy.pub) va en hPanel -> Acceso SSH ->
+#      Claves SSH. La PRIVADA (~/.ssh/capacero_deploy, el archivo sin .pub)
+#      va como secret SSH_KEY en GitHub.
+#      Secrets: SSH_HOST, SSH_USER, SSH_KEY. Opcionales: SSH_PORT (default 22),
+#      DEPLOY_PATH (si no, se prueban las rutas tipicas de Hostinger).
+#
+#   B) Webhook
+#      Si en hPanel -> Avanzado -> GIT te aparece una URL de auto-deployment,
+#      cargala como secret HOSTINGER_DEPLOY_WEBHOOK y listo.
+#
+# Sin ninguno de los dos el job no falla: avisa y termina.
 
 on:
   workflow_run:
@@ -23,27 +33,71 @@ on:
 
 jobs:
   deploy:
-    name: Disparar deploy en Hostinger
+    name: Desplegar en Hostinger
     runs-on: ubuntu-latest
     # En workflow_dispatch no hay conclusion previa; en workflow_run exigimos exito.
     if: >-
       github.event_name == 'workflow_dispatch' ||
       github.event.workflow_run.conclusion == 'success'
     steps:
-      - name: Comprobar que el webhook este configurado
-        id: check
+      - uses: actions/checkout@v4
+
+      - name: Elegir mecanismo
+        id: pick
         env:
           HOOK: ${{ secrets.HOSTINGER_DEPLOY_WEBHOOK }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_KEY: ${{ secrets.SSH_KEY }}
         run: |
-          if [ -z "$HOOK" ]; then
-            echo "configured=false" >> "$GITHUB_OUTPUT"
-            echo "::warning::Falta el secret HOSTINGER_DEPLOY_WEBHOOK. El deploy sigue siendo manual."
+          if [ -n "$SSH_HOST" ] && [ -n "$SSH_KEY" ]; then
+            echo "mode=ssh" >> "$GITHUB_OUTPUT"
+          elif [ -n "$HOOK" ]; then
+            echo "mode=webhook" >> "$GITHUB_OUTPUT"
           else
-            echo "configured=true" >> "$GITHUB_OUTPUT"
+            echo "mode=none" >> "$GITHUB_OUTPUT"
+            echo "::warning::No hay secrets de deploy cargados (SSH_HOST+SSH_KEY o HOSTINGER_DEPLOY_WEBHOOK). El deploy sigue siendo manual."
           fi
 
-      - name: Pingear el webhook
-        if: steps.check.outputs.configured == 'true'
+      # --- A) SSH -------------------------------------------------------------
+      - name: Deploy por SSH
+        if: steps.pick.outputs.mode == 'ssh'
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_PORT: ${{ secrets.SSH_PORT }}
+          SSH_KEY: ${{ secrets.SSH_KEY }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+          DOMAIN: capacero.online
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
+          PORT="${SSH_PORT:-22}"
+          ssh-keyscan -p "$PORT" -H "$SSH_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+
+          # Hostinger monta el sitio en ~/domains/<dominio>/public_html o en
+          # ~/public_html segun como se creo. Probamos las dos si no nos dan ruta.
+          ssh -i ~/.ssh/id_deploy -p "$PORT" -o BatchMode=yes "$SSH_USER@$SSH_HOST" bash -s <<EOF
+            set -e
+            for d in "${DEPLOY_PATH:-}" "\$HOME/domains/$DOMAIN/public_html" "\$HOME/public_html"; do
+              if [ -n "\$d" ] && [ -d "\$d/.git" ]; then TARGET="\$d"; break; fi
+            done
+            if [ -z "\${TARGET:-}" ]; then
+              echo "No encontre un repo git en las rutas probadas." >&2
+              exit 1
+            fi
+            echo "Desplegando en \$TARGET"
+            cd "\$TARGET"
+            git fetch origin main
+            git reset --hard origin/main
+            git rev-parse --short HEAD
+          EOF
+          rm -f ~/.ssh/id_deploy
+
+      # --- B) Webhook ---------------------------------------------------------
+      - name: Deploy por webhook
+        if: steps.pick.outputs.mode == 'webhook'
         env:
           HOOK: ${{ secrets.HOSTINGER_DEPLOY_WEBHOOK }}
         run: |
@@ -56,13 +110,14 @@ jobs:
             *)  echo "::error::Hostinger respondio $code"; exit 1 ;;
           esac
 
-      # El pull tarda unos segundos; el primer request recompila content/.
-      # Verificamos contra el sitio real que quedo servido lo que esperamos.
+      # --- Verificacion -------------------------------------------------------
+      # El primer request despues del deploy recompila content/. Esperamos a que
+      # /healthz reporte la version nueva (la vieja no traia la clave "content").
       - name: Verificar que el sitio quedo sano
-        if: steps.check.outputs.configured == 'true'
+        if: steps.pick.outputs.mode != 'none'
         run: |
-          DOMAIN=$(curl -sS https://raw.githubusercontent.com/${{ github.repository }}/main/content/site.php \
-                   | grep -oP "(?<='domain' => ')[^']+" | head -1)
+          DOMAIN=$(grep -oP "(?<='domain' => ')[^']+" content/site.php | head -1)
+          EXPECTED=$(git rev-list --count HEAD)
           echo "Dominio: $DOMAIN"
           for i in $(seq 1 12); do
             sleep 10
