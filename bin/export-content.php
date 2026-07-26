@@ -118,11 +118,11 @@ $put($outDir . '/site.php', renderSitePhp($site, $kv));
 foreach ($categories as $c) {
     $fm = [
         'name'             => $c['name'],
-        'sort_order'       => (int)($c['sort_order'] ?? 0),
+        'sort_order'       => (int)col($c, 'sort_order', 0),
         'parent'           => !empty($c['parent_id']) ? ($categories[$c['parent_id']]['slug'] ?? null) : null,
-        'meta_title'       => $c['meta_title']       ?? null,
-        'meta_description' => $c['meta_description'] ?? null,
-        'featured_image'   => $c['featured_image']   ?? null,
+        'meta_title'       => col($c, 'meta_title'),
+        'meta_description' => col($c, 'meta_description'),
+        'featured_image'   => col($c, 'featured_image'),
     ];
     $put($outDir . '/categories/' . $c['slug'] . '.md', renderMd($fm, (string)($c['description'] ?? '')));
 }
@@ -131,9 +131,9 @@ foreach ($categories as $c) {
 foreach ($authors as $a) {
     $fm = [
         'name'         => $a['name'],
-        'expertise'    => $a['expertise']  ?? null,
-        'avatar_url'   => $a['avatar_url'] ?? null,
-        'social_links' => jsonList($a['social_links'] ?? null),
+        'expertise'    => col($a, 'expertise'),
+        'avatar_url'   => col($a, 'avatar_url'),
+        'social_links' => jsonList(col($a, 'social_links')),
     ];
     $put($outDir . '/authors/' . $a['slug'] . '.md', renderMd($fm, (string)($a['bio'] ?? '')));
 }
@@ -152,11 +152,11 @@ foreach ($products as $p) {
         'affiliate'         => !empty($p['affiliate_link_id']) ? ($affiliates[$p['affiliate_link_id']]['tracking_slug'] ?? null) : null,
         'description_short' => $p['description_short'] ?? null,
         'logo_url'          => $p['logo_url']       ?? null,
-        'rating'            => $p['rating']         !== null ? (float)$p['rating'] : null,
-        'price_from'        => $p['price_from']     !== null ? (float)$p['price_from'] : null,
+        'rating'            => col($p, 'rating')     !== null ? (float)col($p, 'rating') : null,
+        'price_from'        => col($p, 'price_from') !== null ? (float)col($p, 'price_from') : null,
         'price_currency'    => $p['price_currency'] ?? null,
         'pricing_model'     => $p['pricing_model']  ?? 'custom',
-        'featured'          => !empty($p['featured']),
+        'featured'          => !empty(col($p, 'featured')),
         'meta_title'        => $p['meta_title']       ?? null,
         'meta_description'  => $p['meta_description'] ?? null,
         'updated'           => dateOnly($p['updated_at'] ?? null),
@@ -186,10 +186,10 @@ foreach ($articles as $a) {
         'updated'          => dateOnly($a['updated_at'] ?? null),
         'featured_image'   => $a['featured_image'] ?? null,
         'products'         => $productSlugs ?: null,
-        'rating'           => isset($a['rating']) && $a['rating'] !== null ? (float)$a['rating'] : null,
-        'verdict'          => $a['verdict'] ?? null,
-        'pros'             => jsonList($a['pros'] ?? null),
-        'cons'             => jsonList($a['cons'] ?? null),
+        'rating'           => col($a, 'rating') !== null ? (float)col($a, 'rating') : null,
+        'verdict'          => col($a, 'verdict'),
+        'pros'             => jsonList(col($a, 'pros')),
+        'cons'             => jsonList(col($a, 'cons')),
         'meta_title'       => $a['meta_title']       ?? null,
         'meta_description' => $a['meta_description'] ?? null,
     ];
@@ -417,21 +417,21 @@ function renderSitePhp(array $site, array $settings): string
         'domain' => $site['domain'],
         'name'   => $site['name'],
         'slug'   => $site['slug'],
-        'theme_name'    => $site['theme_name'] ?: 'default',
-        'primary_color' => $site['primary_color'] ?: null,
-        'logo_url'      => $site['logo_url'] ?: null,
-        'favicon_url'   => $site['favicon_url'] ?: null,
-        'default_language' => $site['default_language'] ?: 'es',
-        'default_country'  => $site['default_country'] ?: 'AR',
-        'meta_title_template'       => $site['meta_title_template'] ?: null,
-        'meta_description_template' => $site['meta_description_template'] ?: null,
-        'affiliate_disclosure_text' => $site['affiliate_disclosure_text'] ?: null,
-        'google_analytics_id'                => $site['google_analytics_id'] ?: null,
-        'google_tag_manager_id'              => $site['google_tag_manager_id'] ?? null ?: null,
-        'google_ads_id'                      => $site['google_ads_id'] ?? null ?: null,
-        'microsoft_clarity_id'               => $site['microsoft_clarity_id'] ?? null ?: null,
-        'meta_pixel_id'                      => $site['meta_pixel_id'] ?? null ?: null,
-        'google_search_console_verification' => $site['google_search_console_verification'] ?: null,
+        'theme_name'    => col($site, 'theme_name', 'default'),
+        'primary_color' => col($site, 'primary_color'),
+        'logo_url'      => col($site, 'logo_url'),
+        'favicon_url'   => col($site, 'favicon_url'),
+        'default_language' => col($site, 'default_language', 'es'),
+        'default_country'  => col($site, 'default_country', 'AR'),
+        'meta_title_template'       => col($site, 'meta_title_template'),
+        'meta_description_template' => col($site, 'meta_description_template'),
+        'affiliate_disclosure_text' => col($site, 'affiliate_disclosure_text'),
+        'google_analytics_id'                => col($site, 'google_analytics_id'),
+        'google_tag_manager_id'              => col($site, 'google_tag_manager_id'),
+        'google_ads_id'                      => col($site, 'google_ads_id'),
+        'microsoft_clarity_id'               => col($site, 'microsoft_clarity_id'),
+        'meta_pixel_id'                      => col($site, 'meta_pixel_id'),
+        'google_search_console_verification' => col($site, 'google_search_console_verification'),
         'settings' => $clean,
     ];
 
@@ -450,8 +450,8 @@ function renderAffiliatesPhp(array $affiliates): string
         $out[$a['tracking_slug']] = [
             'name'            => $a['name'],
             'destination_url' => $a['destination_url'],
-            'network'         => $a['network_name'] ?: null,
-            'active'          => !empty($a['active']),
+            'network'         => col($a, 'network_name'),
+            'active'          => !isset($a['active']) || !empty($a['active']),
         ];
     }
     return "<?php\n/**\n * Links de afiliado. La clave es el tracking_slug: lo que va en /go/{slug}.\n"
@@ -501,6 +501,22 @@ function varExport($v, int $depth): string
 // =============================================================================
 // Helpers
 // =============================================================================
+
+/**
+ * Lee una columna que puede no existir en el dump.
+ *
+ * Un backup tomado antes de una migracion no trae las columnas nuevas: sin
+ * esto el export se llenaria de warnings a mitad de camino.
+ *
+ * @param array<string, mixed> $row
+ * @param mixed $default
+ * @return mixed
+ */
+function col(array $row, string $key, $default = null)
+{
+    $v = $row[$key] ?? null;
+    return ($v === null || $v === '') ? $default : $v;
+}
 
 /**
  * @param array<int, array<string, mixed>> $rows
