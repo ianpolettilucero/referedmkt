@@ -1,112 +1,175 @@
 # referedmkt
 
-Plataforma multi-tenant de sitios de afiliados. Un solo codebase PHP/MySQL,
-multiples dominios, admin panel unificado, deploy por `git push` a Hostinger.
+Sitio de guías y reseñas de productos de ciberseguridad. PHP sin frameworks ni
+dependencias, **sin base de datos**: el contenido son archivos Markdown en el
+repo y el deploy es un `git push`.
 
-## Deploy en Hostinger (3 pasos, sin SSH)
+## Cómo funciona
 
-**1. Crear la base de datos** en hPanel → Bases de Datos → Crear.
-Anotá: host (normalmente `localhost`), nombre de DB (incluye prefijo
-`u123456789_`), usuario, password.
-
-**2. Conectar GitHub** en hPanel → Avanzado → Git → Create Repository.
-Install path: `public_html`. Activá "Auto Deployment". Hostinger clona el
-repo y hace `git pull` automáticamente con cada push a la branch elegida.
-
-**3. Abrir el instalador** en tu navegador:
-`https://tudominio.com/install.php`
-
-El wizard te guía por 4 pasos con formularios: credenciales DB → migraciones
-→ usuario admin → primer sitio. Al terminar se auto-bloquea creando
-`.installed` en el root del repo.
-
-Ya está. No se necesita SSH, ni crear `.env` a mano, ni correr comandos CLI.
-
-> 📝 Recomendado (hPanel → Avanzado → PHP Configuration): PHP 8.1+, activar
-> extensiones `pdo_mysql`, `mbstring`, `fileinfo`, `gd`. SSL Let's Encrypt
-> gratis en Seguridad → SSL.
-
-## Día a día
-
-- **Publicar contenido**: todo desde el admin en `/admin/login`.
-- **Deploy de código nuevo**: `git push` y listo.
-- **Cambios de schema (migraciones)**: si una actualización trajo migraciones
-  nuevas, en el admin aparece un banner con un botón "Aplicar migraciones".
-  Un click, hecho.
-- **Backup de DB**: en `/admin/dashboard` hay botón "Descargar backup de DB"
-  que genera un `.sql.gz` on-demand. Recomendado antes de cambios grandes.
-
-Opcional, si querés backups programados: hPanel → Avanzado → Cron Jobs →
-agregar `0 3 * * *` con command `/usr/bin/php /home/USER/public_html/bin/backup-db.php`.
-
-## Setup local (desarrollo)
-
-```bash
-cp .env.example .env
-# editar credenciales de DB
-php migrate.php
-php bin/create-admin.php admin@ejemplo.com "Tu Nombre" superadmin
-php -S localhost:8080 -t public
-# visitar http://localhost:8080 con DEV_SITE_DOMAIN apuntando a un dominio registrado en sites
-# admin en http://localhost:8080/admin/login
+```
+content/          Markdown con front-matter — la fuente de verdad
+   ↓  ContentBuilder compila (valida + renderiza Markdown + resuelve referencias)
+var/content.php   Un array PHP con todo resuelto, que opcache mantiene en RAM
+   ↓  require
+El sitio          Cero I/O por request
 ```
 
-## Tests
+El cache se regenera solo: en cada request se compara la huella de `content/`
+(mtime y tamaño de cada archivo) contra la del cache. Si cambió, recompila y
+reescribe de forma atómica. No hay build step, ni cron, ni comando que
+acordarse de correr después de un deploy.
 
-```bash
-php tests/run.php
+Escribir es: crear un `.md`, `git push`. Hostinger hace `git pull` solo y el
+primer visitante dispara la recompilación.
+
+## Escribir contenido
+
+```
+content/
+  site.php                    dominio, nombre, tracking IDs, tema, newsletter
+  affiliate-links.php         tracking_slug => URL real del programa
+  redirects.php               URL vieja => URL nueva
+  authors/{slug}.md
+  categories/{slug}.md
+  products/{slug}.md
+  articles/{slug}.md
 ```
 
-82 tests smoke sin necesidad de DB (runner minimal ~50 lineas en `tests/TestRunner.php`).
+**El nombre del archivo es la URL.** `articles/mi-guia.md` de tipo `guide`
+queda en `/guia/mi-guia`.
+
+Un artículo mínimo:
+
+```markdown
+---
+title: "Guía de EDR para PyMEs"
+excerpt: Qué mirar antes de comprar.
+type: guide           # guide | review | comparison | news
+status: published     # draft | published | archived
+category: antivirus-empresas
+author: equipo-editorial
+published: 2026-01-15
+products: [bitdefender-gravityzone]
+---
+
+## Cuerpo en Markdown
+```
+
+Una reseña además puede llevar veredicto propio, que es lo que alimenta el
+schema `Review`:
+
+```yaml
+rating: 4.6           # 0 a 5
+verdict: |
+  Para quién sí y para quién no.
+pros:
+  - Detección muy alta
+cons:
+  - Consola densa
+```
+
+Y si el artículo tiene un `## Preguntas frecuentes` con las preguntas como
+`###`, se emite `FAQPage` automáticamente, sin cargar nada aparte.
+
+El front-matter es un subconjunto acotado de YAML: escalares, listas inline
+(`[a, b]`), listas en bloque (`- item`), mapas de un nivel (para `specs`) y
+texto multilínea (`|` y `>`). Cualquier línea que no matchee rompe el build con
+el número de línea, en vez de perder el dato en silencio.
+
+## Comandos
+
+```bash
+php bin/build-content.php          # compila y muestra el resumen
+php bin/build-content.php --check  # solo valida, no escribe (lo corre el CI)
+php bin/list-urls.php              # todas las URLs públicas
+php tests/run.php                  # 117 tests, sin dependencias
+```
+
+Desarrollo local:
+
+```bash
+DEV_SITE_DOMAIN=capacero.online php -S localhost:8080 -t public
+```
+
+## Qué valida el build
+
+Rompe con un mensaje concreto (`articles/x.md: el producto 'y' no existe`) si:
+
+- El front-matter está mal formado o sin cerrar
+- Falta un campo obligatorio, o `status: published` sin fecha
+- `type`, `status` o `pricing_model` traen un valor fuera del enum
+- Un `rating` cae fuera de 0-5
+- El nombre de archivo no es un slug limpio
+- Una referencia a categoría, autor, producto o afiliado apunta a algo que no existe
+
+El CI corre esto en cada PR, más un smoke test que levanta el sitio y verifica
+que cada artículo, producto, categoría y autor renderice con 200.
+
+## Migrar desde la versión con MySQL
+
+```bash
+php bin/export-content.php backup.sql.gz
+php bin/build-content.php
+```
+
+Lee el `.sql.gz` que generaba el botón de backup del admin (o cualquier
+mysqldump) y escribe el árbol `content/` completo. No pisa archivos existentes
+salvo que le pases `--force`, y deja afuera los secretos que vivían en
+`settings` — nada sensible entra al repo.
+
+## SEO
+
+- JSON-LD: `Review` con `itemReviewed` + `reviewRating` en reseñas, `Article` /
+  `NewsArticle` en el resto, `Product` con review editorial, `BreadcrumbList`,
+  `FAQPage`, `Organization`, `WebSite` y `Person`
+- Open Graph, Twitter Cards, canonical, `noindex, follow` en listados filtrados
+- `sitemap.xml` con imágenes, `robots.txt`, `feed.xml`
+- `llms.txt` y `llms-full.txt` para los crawlers de LLMs
+- Redirects 301 declarativos para cambiar URLs sin perder posiciones
+- TOC automático y artículos relacionados por afinidad
+
+## Analítica y operación
+
+Nada de esto vive en el repo: son paneles externos ya cableados en el layout.
+
+| Qué | Dónde |
+|---|---|
+| Pageviews, referrers, top pages | GA4 |
+| Heatmaps y grabaciones | Microsoft Clarity |
+| Indexación, queries, CTR | Search Console |
+| Clicks y **conversiones** de afiliado | El panel de la red (Impact, PartnerStack) |
+| WAF, rate limiting, bans | Cloudflare |
+
+Los IDs de tracking se configuran en `content/site.php`; el que dejes en `null`
+no emite snippet.
+
+`/healthz` devuelve 200 con el conteo de contenido, o 503 si `content/` no
+compila.
+
+## Seguridad
+
+Sin base de datos, sin panel de admin, sin login y sin un solo formulario que
+postee al servidor, la superficie de ataque es casi nula: no hay nada que
+inyectar ni nada a lo que autenticarse. Lo que queda:
+
+- HTTPS forzado y HSTS por `.htaccess`
+- Headers: `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`,
+  `Permissions-Policy`, COOP y CORP
+- Markdown sanitizado: se escapa el HTML del input, se bloquean `javascript:` y
+  `data:`, y los links externos salen con `rel="nofollow noopener"`
+- `content/`, `core/`, `var/` y compañía bloqueados a nivel de `.htaccess`
+- El único secreto posible es `.env`, que no se commitea
 
 ## Estructura
 
 ```
-core/          Motor compartido (Router, Database, Site, Autoloader, Migrator, ...)
-models/        Modelos de dominio (Article, Product, etc.)
-controllers/   Controllers HTTP (Redirect, Sitemap, Robots, ...)
-themes/        Un subdirectorio por tema (layouts/partials/assets/views)
-admin/         Panel admin unificado
-public/        Entry point + install.php + assets estaticos + uploads
-migrations/    Scripts SQL versionados
-bin/           Scripts CLI (backup, create-admin, setup, post-deploy)
-tests/         Smoke tests
-config/        config.php + .env (no commiteado)
+content/       El contenido (fuente de verdad)
+core/          Motor: Content, ContentBuilder, FrontMatter, Router, SEO, Markdown…
+models/        Lectura tipada sobre el store
+controllers/   Controllers HTTP
+themes/        Un subdirectorio por tema (layouts/partials/views)
+public/        Front controller + assets + imágenes
+bin/           CLI: build, export, list-urls
+tests/         Suite propia, ~50 líneas de runner
+var/           Cache compilado (gitignoreado, se regenera solo)
 ```
-
-## Features
-
-- Frontend publico: home, catalogo, categoria, producto, 4 tipos de articulo,
-  sitemap, robots, tracking `/go/{slug}`, autor `/autor/{slug}`, RSS `/feed.xml`,
-  busqueda `/buscar`, comparador `/comparar?ids=`
-- Admin panel: login con rate limit + CRUD completo (sites/categories/authors/
-  affiliate_links/products/articles/redirects) + biblioteca de imagenes con
-  picker reusable + settings por sitio + analytics + migraciones y backup
-  on-demand.
-- SEO first-class: JSON-LD (Product + Review editorial, Article/NewsArticle,
-  Review con `itemReviewed` + `reviewRating`, BreadcrumbList, FAQPage,
-  Organization, WebSite, Person), Open Graph, Twitter Cards, meta templates
-  por sitio, hreflang ready.
-- Veredicto editorial por artículo: nota 0-5, párrafo de veredicto y
-  a favor / en contra propios, independientes del producto. Es lo que
-  alimenta el `reviewRating` del schema `Review`.
-- FAQ automático: un `## Preguntas frecuentes` con las preguntas como `###`
-  se convierte en `FAQPage` sin cargar nada aparte (`core/Faq.php`).
-- Uploads: MIME-check real con finfo, SVG sanitization, whitelist de formatos,
-  storage bajo `public/uploads/{site-slug}/YYYY/MM/`.
-- Newsletter: form embebido configurable por sitio (ConvertKit, Buttondown,
-  Mailchimp), postea directo al proveedor — no guardamos emails.
-- Health check `/healthz` con 503 si la DB falla.
-- CI: GitHub Actions corre lint + tests en PHP 8.1/8.2/8.3.
-
-## Seguridad
-
-- Prepared statements en todo acceso a DB.
-- Hash de IP con `APP_SALT` para clicks y rate limit (no se guarda IP plana).
-- HTTPS forzado por `.htaccess`.
-- Headers: `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`.
-- Admin: passwords bcrypt (cost 12), CSRF en toda mutacion, `session_regenerate_id`
-  post-login, `noindex`, rate limit login (5/IP, 10/email por 15min).
-- Markdown sanitizado (escape HTML input, block de `javascript:` / `data:`,
-  `rel="nofollow noopener" target="_blank"` en links externos).
-- Installer `install.php` se auto-bloquea con `.installed` tras completar.

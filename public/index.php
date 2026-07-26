@@ -6,7 +6,6 @@
 require dirname(__DIR__) . '/core/bootstrap.php';
 
 use Core\Router;
-use Core\Security;
 use Core\Site;
 use Controllers\ArticleController;
 use Controllers\AuthorController;
@@ -22,19 +21,10 @@ use Controllers\RobotsController;
 use Controllers\SearchController;
 use Controllers\SitemapController;
 
-// Security middleware: bloquear IPs baneadas ANTES de cualquier routing.
-// enforceBans() termina con 403 si hay match; sigue si la IP esta limpia.
-Security::enforceBans();
-
-// El admin es global (no requiere tenant). Se delega antes de resolver Site.
 $currentPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?? '/';
-if (strncmp($currentPath, '/admin', 6) === 0
-    && ($currentPath === '/admin' || $currentPath[6] === '/')) {
-    require APP_ROOT . '/admin/entry.php';
-    exit;
-}
 
-// Health check: global, sin dependencia de tenant. Para UptimeRobot / BetterStack.
+// Health check: se responde antes de resolver el sitio, asi sigue contestando
+// aunque el dominio no matchee la config.
 if ($currentPath === '/healthz') {
     (new Controllers\HealthController())->check();
     exit;
@@ -48,16 +38,9 @@ if ($site === null) {
     exit;
 }
 
-// Si el operador definio un redirect en el admin para este path, ejecutarlo
-// antes de cualquier routing (preserva SEO ante cambios de URL).
+// Redirects declarados en content/redirects.php: se ejecutan antes del routing
+// para preservar posiciones ante cambios de URL.
 \Core\Redirects::maybeHandle($site->id, $currentPath);
-
-// IndexNow key verification file (Bing/Yandex lo piden en https://{domain}/{key}.txt).
-// Se intercepta antes del router porque el path es dinamico y no queremos
-// declararlo como ruta formal.
-if (\Core\IndexNow::serveKeyFileIfMatch($site->id, $currentPath)) {
-    exit;
-}
 
 $router = new Router();
 

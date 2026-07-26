@@ -1,8 +1,7 @@
 <?php
 namespace Controllers;
 
-use Core\Database;
-use Core\Markdown;
+use Core\Content;
 use Core\Site;
 
 /**
@@ -14,22 +13,19 @@ final class FeedController
     {
         $site = Site::current();
 
-        $articles = Database::instance()->fetchAll(
-            "SELECT a.*, au.name AS author_name
-             FROM articles a
-             LEFT JOIN authors au ON au.id = a.author_id
-             WHERE a.site_id = :site AND a.status = 'published' AND a.published_at <= NOW()
-             ORDER BY a.published_at DESC
-             LIMIT 30",
-            ['site' => $site->id]
-        );
+        $articles = array_slice(Content::publishedArticles(), 0, 30);
 
         header('Content-Type: application/rss+xml; charset=utf-8');
         $base = 'https://' . $site->domain;
         $now = date(DATE_RSS);
 
         echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
-        echo '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">' . "\n";
+        // dc: hace falta declararlo o <dc:creator> deja el feed invalido y los
+        // lectores lo rechazan entero.
+        echo '<rss version="2.0"' . "\n";
+        echo '     xmlns:atom="http://www.w3.org/2005/Atom"' . "\n";
+        echo '     xmlns:content="http://purl.org/rss/1.0/modules/content/"' . "\n";
+        echo '     xmlns:dc="http://purl.org/dc/elements/1.1/">' . "\n";
         echo "  <channel>\n";
         echo "    <title>" . self::xml($site->name) . "</title>\n";
         echo "    <link>" . self::xml($base . '/') . "</link>\n";
@@ -41,7 +37,7 @@ final class FeedController
         foreach ($articles as $a) {
             $url = $base . article_url($a);
             $pub = !empty($a['published_at']) ? date(DATE_RSS, strtotime($a['published_at'])) : $now;
-            $html = Markdown::toHtml($a['content'] ?? '');
+            $html = (string)($a['content_html'] ?? '');
             echo "    <item>\n";
             echo "      <title>" . self::xml($a['title']) . "</title>\n";
             echo "      <link>" . self::xml($url) . "</link>\n";

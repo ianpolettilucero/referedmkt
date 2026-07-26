@@ -30,20 +30,9 @@ final class ArticleController extends Controller
             $relatedProducts = Product::byIds($this->site->id, $a['related_product_ids']);
         }
 
-        Article::incrementViews((int)$a['id']);
-
-        // Defensivo: si el parser falla por algun edge case, no damos 500 -
-        // mostramos el articulo con contenido escapado como texto plano y
-        // loggeamos el error para debugging.
-        try {
-            $contentHtml = Markdown::toHtml($a['content'] ?? '');
-        } catch (\Throwable $e) {
-            error_log('[referedmkt] Markdown parse failed for article #'
-                . $a['id'] . ': ' . $e->getMessage() . ' @ ' . $e->getFile() . ':' . $e->getLine());
-            $contentHtml = '<pre style="white-space:pre-wrap">'
-                . htmlspecialchars((string)($a['content'] ?? ''), ENT_QUOTES, 'UTF-8')
-                . '</pre>';
-        }
+        // El HTML ya viene renderizado desde el build: en runtime no se parsea
+        // Markdown. Si el parser fallara, habria roto el build, no la pagina.
+        $contentHtml = (string)($a['content_html'] ?? '');
 
         // TOC: agrega ids a h2/h3 y extrae la estructura para el nav lateral.
         $toc = Toc::process($contentHtml);
@@ -88,14 +77,7 @@ final class ArticleController extends Controller
             $this->seo->schemaFaq($faqs);
         }
 
-        $verdictHtml = '';
-        if (!empty($a['verdict'])) {
-            try {
-                $verdictHtml = Markdown::toHtml((string)$a['verdict']);
-            } catch (\Throwable $e) {
-                $verdictHtml = '<p>' . htmlspecialchars((string)$a['verdict'], ENT_QUOTES, 'UTF-8') . '</p>';
-            }
-        }
+        $verdictHtml = !empty($a['verdict']) ? Markdown::toHtml((string)$a['verdict']) : '';
 
         $this->render('article', [
             'article'          => $a,
@@ -122,10 +104,7 @@ final class ArticleController extends Controller
 
         // Filtro por categoria
         if (!empty($_GET['cat'])) {
-            $catRow = \Core\Database::instance()->fetch(
-                'SELECT id FROM categories WHERE site_id = :s AND slug = :slug LIMIT 1',
-                ['s' => $this->site->id, 'slug' => (string)$_GET['cat']]
-            );
+            $catRow = \Models\Category::findBySlug($this->site->id, (string)$_GET['cat']);
             if ($catRow) {
                 $filters['category_id'] = (int)$catRow['id'];
             }
@@ -133,10 +112,7 @@ final class ArticleController extends Controller
 
         $data = Article::paginate($this->site->id, $filters, $page, 20);
 
-        $categories = \Core\Database::instance()->fetchAll(
-            'SELECT id, slug, name FROM categories WHERE site_id = :s ORDER BY sort_order, name',
-            ['s' => $this->site->id]
-        );
+        $categories = \Models\Category::all($this->site->id);
 
         $label = $this->breadcrumbLabelForType($type);
 

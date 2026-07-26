@@ -1,11 +1,12 @@
 <?php
 /**
- * Bootstrap compartido por el frontend publico, admin y CLI.
+ * Bootstrap compartido por el frontend publico y los CLI.
  * - Define APP_ROOT
  * - Registra autoloader
  * - Carga config
- * - Inicializa Database
  * - Configura timezone y error reporting segun env
+ *
+ * No hay base de datos: el contenido se lee de content/ via Core\Content.
  */
 
 if (!defined('APP_ROOT')) {
@@ -18,7 +19,6 @@ require APP_ROOT . '/core/Autoloader.php';
 \Core\Autoloader::addNamespace('Core',        APP_ROOT . '/core');
 \Core\Autoloader::addNamespace('Models',      APP_ROOT . '/models');
 \Core\Autoloader::addNamespace('Controllers', APP_ROOT . '/controllers');
-\Core\Autoloader::addNamespace('Admin',       APP_ROOT . '/admin');
 
 /** @var array $config */
 $config = require APP_ROOT . '/config/config.php';
@@ -29,11 +29,9 @@ if ($config['app']['debug']) {
     error_reporting(E_ALL);
     ini_set('display_errors', '1');
 } else {
-    error_reporting(E_ALL & ~E_DEPRECATED & ~E_STRICT);
+    error_reporting(E_ALL & ~E_DEPRECATED);
     ini_set('display_errors', '0');
 }
-
-\Core\Database::boot($config['db']);
 
 require APP_ROOT . '/core/helpers/functions.php';
 require APP_ROOT . '/core/helpers/slug.php';

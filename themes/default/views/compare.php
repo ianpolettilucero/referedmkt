@@ -10,7 +10,7 @@ $view->layout('default');
     <h1>Comparador</h1>
 
     <?php if (!$products): ?>
-        <p class="muted">No hay productos para comparar. Agregá <code>?ids=1,2,3</code> a la URL o seleccioná productos desde el catálogo.</p>
+        <p class="muted">No hay productos para comparar. Agregá <code>?ids=slug-1,slug-2</code> a la URL o seleccioná productos desde el catálogo.</p>
         <p><a class="btn btn-primary" href="/productos">Ir al catálogo</a></p>
     <?php else: ?>
         <div style="overflow-x:auto">

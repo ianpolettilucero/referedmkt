@@ -1,38 +1,33 @@
 <?php
 namespace Controllers;
 
-use Core\Database;
-use Core\Security;
+use Core\Content;
 use Core\Site;
+use Models\AffiliateLink;
 
 /**
- * Tracking de clicks + redirect a afiliado.
- * Endpoint: GET /go/{tracking_slug}?article_id=...&product_id=...
+ * Redirect a afiliado. Endpoint: GET /go/{tracking_slug}?a={articulo}&p={producto}
  *
  * Features:
- *  - Redirect <100ms con 1 SELECT + 1 INSERT + 1 header.
+ *  - Redirect con una lectura en memoria y un header: sin I/O.
  *  - UTM params automaticos: utm_source (nuestro dominio), utm_medium=affiliate,
  *    utm_campaign (slug del articulo si aplica), utm_content (slug del producto).
- *    Si el vendor ya los tenía en la URL destino, respetamos los existentes.
- *  - Rate limit anti-abuse: >20 clicks/min desde misma IP al mismo link -> skip log.
- *  - Preview mode: /go/{slug}?preview=1 muestra info del link sin trackear.
- *  - IP hasheada con APP_SALT (GDPR-friendly).
+ *    Si el vendor ya los traia en la URL destino, se respetan los existentes.
+ *  - Preview mode: /go/{slug}?preview=1 muestra la URL final sin redirigir.
+ *
+ * Los clicks NO se registran aca. Los cuenta la red de afiliados (Impact,
+ * PartnerStack), que ademas ve las conversiones y la comision — no solo el
+ * click — y GA4 por el evento de salida. Contar redirects por nuestra cuenta
+ * era duplicar peor un dato que ya teniamos mejor en otro lado.
  */
 final class RedirectController
 {
-    private const CLICK_MAX_PER_MIN = 20;
-
     public function affiliate(array $params): void
     {
         $site = Site::current();
         $slug = $params['slug'] ?? '';
 
-        $link = Database::instance()->fetch(
-            'SELECT id, name, destination_url, network_name, commission_structure
-             FROM affiliate_links
-             WHERE site_id = :site AND tracking_slug = :slug AND active = 1 LIMIT 1',
-            ['site' => $site->id, 'slug' => $slug]
-        );
+        $link = AffiliateLink::findActiveBySlug($site->id, $slug);
 
         if (!$link) {
             http_response_code(404);
@@ -40,26 +35,10 @@ final class RedirectController
             return;
         }
 
-        $articleId = isset($_GET['article_id']) ? (int)$_GET['article_id'] : null;
-        $productId = isset($_GET['product_id']) ? (int)$_GET['product_id'] : null;
-
-        // Resolver slugs para UTM params
-        $articleSlug = null;
-        $productSlug = null;
-        if ($articleId) {
-            $a = Database::instance()->fetch(
-                'SELECT slug FROM articles WHERE id = :id AND site_id = :s LIMIT 1',
-                ['id' => $articleId, 's' => $site->id]
-            );
-            $articleSlug = $a['slug'] ?? null;
-        }
-        if ($productId) {
-            $p = Database::instance()->fetch(
-                'SELECT slug FROM products WHERE id = :id AND site_id = :s LIMIT 1',
-                ['id' => $productId, 's' => $site->id]
-            );
-            $productSlug = $p['slug'] ?? null;
-        }
+        // Contexto para los UTM. Aceptamos los nombres cortos (a/p) y los
+        // largos de la version anterior, para no romper links ya publicados.
+        $articleSlug = self::resolveSlug(Content::articles(), $_GET['a'] ?? ($_GET['article_id'] ?? null));
+        $productSlug = self::resolveSlug(Content::products(), $_GET['p'] ?? ($_GET['product_id'] ?? null));
 
         // Armar la URL final con UTMs auto
         $finalUrl = self::addUtmParams(
@@ -69,60 +48,36 @@ final class RedirectController
             $productSlug
         );
 
-        // Preview mode: muestra info sin redirigir ni loguear. Solo para admin testing.
+        // Preview mode: muestra la URL final sin redirigir. Para verificar UTMs.
         if (($_GET['preview'] ?? '') === '1') {
             self::renderPreview($link, $finalUrl, $articleSlug, $productSlug);
             return;
         }
 
-        // Tracking normal
-        $ip      = Security::getClientIp();
-        $salt    = getenv('APP_SALT') ?: 'change-me-in-env';
-        $ipHash  = $ip !== '' && $ip !== '0.0.0.0' ? hash('sha256', $ip . '|' . $salt) : null;
-        $ua      = mb_substr((string)($_SERVER['HTTP_USER_AGENT'] ?? ''), 0, 500);
-        $referer = mb_substr((string)($_SERVER['HTTP_REFERER']    ?? ''), 0, 1000);
-        $country = isset($_SERVER['HTTP_CF_IPCOUNTRY']) ? substr($_SERVER['HTTP_CF_IPCOUNTRY'], 0, 2) : null;
-
-        // Rate limit anti-abuse
-        $shouldLog = true;
-        if ($ipHash !== null) {
-            try {
-                $recent = (int)Database::instance()->fetchColumn(
-                    "SELECT COUNT(*) FROM affiliate_clicks
-                     WHERE affiliate_link_id = :lid AND user_ip_hash = :h
-                       AND clicked_at >= (NOW() - INTERVAL 1 MINUTE)",
-                    ['lid' => $link['id'], 'h' => $ipHash]
-                );
-                if ($recent >= self::CLICK_MAX_PER_MIN) {
-                    $shouldLog = false;
-                    error_log(sprintf(
-                        '[referedmkt][click-rate-limit] link_id=%d recent_clicks=%d',
-                        $link['id'], $recent
-                    ));
-                }
-            } catch (\Throwable $e) {
-                error_log('[referedmkt] click rate-check failed: ' . $e->getMessage());
-            }
-        }
-
-        if ($shouldLog) {
-            try {
-                Database::instance()->insert('affiliate_clicks', [
-                    'affiliate_link_id' => $link['id'],
-                    'article_id'        => $articleId ?: null,
-                    'product_id'        => $productId ?: null,
-                    'user_ip_hash'      => $ipHash,
-                    'user_agent'        => $ua ?: null,
-                    'referer'           => $referer ?: null,
-                    'country'           => $country,
-                ]);
-            } catch (\Throwable $e) {
-                error_log('[referedmkt] click log failed: ' . $e->getMessage());
-            }
-        }
-
         header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
         header('Location: ' . $finalUrl, true, 302);
+    }
+
+    /**
+     * Resuelve una referencia a slug. Acepta el slug directo o un id entero
+     * de la epoca en que el contexto viajaba como article_id/product_id.
+     *
+     * @param array<string, array<string, mixed>> $collection
+     */
+    private static function resolveSlug(array $collection, $ref): ?string
+    {
+        if ($ref === null || $ref === '') {
+            return null;
+        }
+        $ref = (string)$ref;
+        if (isset($collection[$ref])) {
+            return $ref;
+        }
+        if (ctype_digit($ref)) {
+            $row = Content::byId($collection, (int)$ref);
+            return $row['slug'] ?? null;
+        }
+        return null;
     }
 
     /**
@@ -207,7 +162,6 @@ code { background: #f4f6fb; padding: 0.15rem 0.4rem; border-radius: 4px; font-si
 <div class="card">
     <div class="row"><div>Nombre</div><div><strong>{$e($link['name'])}</strong></div></div>
     <div class="row"><div>Red</div><div>{$e($link['network_name'] ?? '—')}</div></div>
-    <div class="row"><div>Comisión</div><div>{$e($link['commission_structure'] ?? '—')}</div></div>
     <div class="row"><div>URL original</div><div><code>{$e($link['destination_url'])}</code></div></div>
     <div class="row"><div>URL con UTMs</div><div><code>{$e($finalUrl)}</code></div></div>
     <div class="row"><div>article_slug</div><div>{$e($articleSlug ?? '—')}</div></div>

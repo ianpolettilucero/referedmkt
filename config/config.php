@@ -1,7 +1,9 @@
 <?php
 /**
- * App-wide configuration. Valores sensibles deben cargarse desde .env (no commiteado).
- * En Hostinger definir variables de entorno o incluir un config.local.php sin committear.
+ * Configuracion de entorno. Lo publico del sitio (dominio, nombre, tracking IDs,
+ * textos) vive en content/site.php; aca solo queda lo que cambia entre entornos.
+ *
+ * Valores sensibles se cargan desde .env, que no se commitea.
  */
 
 if (!defined('APP_ROOT')) {
@@ -28,20 +30,12 @@ return [
     'app' => [
         'env'   => getenv('APP_ENV')   ?: 'production',
         'debug' => filter_var(getenv('APP_DEBUG') ?: 'false', FILTER_VALIDATE_BOOLEAN),
-        'salt'  => getenv('APP_SALT')  ?: 'change-me-in-env',
         'tz'    => getenv('APP_TZ')    ?: 'UTC',
-    ],
-    'db' => [
-        'host'    => getenv('DB_HOST')    ?: 'localhost',
-        'port'    => (int)(getenv('DB_PORT') ?: 3306),
-        'name'    => getenv('DB_NAME')    ?: 'referedmkt',
-        'user'    => getenv('DB_USER')    ?: 'root',
-        'pass'    => getenv('DB_PASS')    ?: '',
-        'charset' => 'utf8mb4',
     ],
     'paths' => [
         'root'    => APP_ROOT,
+        'content' => APP_ROOT . '/content',
         'themes'  => APP_ROOT . '/themes',
-        'uploads' => APP_ROOT . '/public/uploads',
+        'cache'   => APP_ROOT . '/var',
     ],
 ];

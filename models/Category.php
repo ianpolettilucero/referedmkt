@@ -1,26 +1,25 @@
 <?php
 namespace Models;
 
+use Core\Content;
+
 final class Category extends Model
 {
-    protected const TABLE = 'categories';
+    protected const COLLECTION = 'categories';
 
     /** @return array<int, array<string, mixed>> */
     public static function all(int $siteId): array
     {
-        return self::db()->fetchAll(
-            "SELECT * FROM categories WHERE site_id = :site ORDER BY sort_order ASC, name ASC",
-            ['site' => $siteId]
-        );
+        return self::sort(array_values(Content::categories()), [['sort_order', 'asc'], ['name', 'asc']]);
     }
 
-    /** @return array<int, array<string, mixed>> Categorias top-level (parent_id IS NULL). */
+    /** @return array<int, array<string, mixed>> Categorias raiz (sin parent). */
     public static function topLevel(int $siteId): array
     {
-        return self::db()->fetchAll(
-            "SELECT * FROM categories WHERE site_id = :site AND parent_id IS NULL
-             ORDER BY sort_order ASC, name ASC",
-            ['site' => $siteId]
-        );
+        $rows = array_values(array_filter(
+            Content::categories(),
+            fn($c) => empty($c['parent_id'])
+        ));
+        return self::sort($rows, [['sort_order', 'asc'], ['name', 'asc']]);
     }
 }

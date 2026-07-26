@@ -1,20 +1,20 @@
 <?php
 namespace Controllers;
 
-use Core\Database;
+use Core\Content;
 
 /**
  * Busqueda full-site de articulos y productos.
  *
- * Estrategia: LIKE plano con scoring en SQL. Sin MATCH AGAINST porque
- * requiere indices FULLTEXT que no siempre estan presentes y arman 500
- * silenciosos. Para sites <10k items LIKE escala bien.
+ * Estrategia: scan en memoria sobre el contenido ya compilado, con el mismo
+ * scoring por campo que tenia la version SQL. A esta escala (cientos de
+ * documentos) recorrer el array cuesta menos de lo que costaba abrir la
+ * conexion a MySQL, y desaparecen los wildcards de LIKE y su escaping.
  *
  * Sanitizacion:
- *   - Cap de 100 chars
  *   - Strip de control chars (\x00-\x1F, \x7F)
- *   - Escape de wildcards LIKE (% y _)
- *   - Validacion de longitud minima (2 chars)
+ *   - Cap de 100 chars
+ *   - Longitud minima de 2 chars
  *   - Output siempre escapado en el view (e()/htmlspecialchars)
  */
 final class SearchController extends Controller
@@ -23,16 +23,19 @@ final class SearchController extends Controller
     private const MIN_LEN = 2;
     private const RESULTS_LIMIT = 25;
 
+    /** Peso de cada campo en el score. */
+    private const ARTICLE_WEIGHTS = ['title' => 10, 'subtitle' => 6, 'excerpt' => 4, 'content' => 1];
+    private const PRODUCT_WEIGHTS = ['name' => 10, 'brand' => 6, 'description_short' => 4, 'description_long' => 1];
+
     public function index(): void
     {
-        $rawQ = (string)($_GET['q'] ?? '');
-        $q = $this->sanitize($rawQ);
+        $q = $this->sanitize((string)($_GET['q'] ?? ''));
 
         $articles = [];
         $products = [];
         if ($q !== '' && mb_strlen($q) >= self::MIN_LEN) {
-            $articles = $this->searchArticles($q);
-            $products = $this->searchProducts($q);
+            $articles = $this->search(Content::publishedArticles(), self::ARTICLE_WEIGHTS, $q, 'published_at');
+            $products = $this->search(array_values(Content::products()), self::PRODUCT_WEIGHTS, $q, 'rating');
         }
 
         $this->seo
@@ -51,15 +54,12 @@ final class SearchController extends Controller
     }
 
     /**
-     * Sanitiza el query: trim, cap, strip de controles. Devuelve string vacio
-     * si queda sin contenido valido despues de limpiar.
+     * Sanitiza el query: strip de controles, trim y cap de longitud.
      */
     private function sanitize(string $q): string
     {
-        // Strip de control chars (newline, tab, NUL, etc.). Conservamos espacios.
         $q = preg_replace('/[\x00-\x1F\x7F]+/u', ' ', $q) ?? '';
         $q = trim($q);
-        // Cap longitud (proteccion DoS y limite practico)
         if (mb_strlen($q) > self::MAX_LEN) {
             $q = mb_substr($q, 0, self::MAX_LEN);
         }
@@ -67,77 +67,40 @@ final class SearchController extends Controller
     }
 
     /**
-     * Convierte el query a un patron LIKE escapando wildcards. El usuario
-     * escribiendo "%" no matchea TODO, solo el "%" literal.
-     */
-    private function likePattern(string $q): string
-    {
-        // Orden importa: backslash primero para no doble-escapar
-        $escaped = str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $q);
-        return '%' . $escaped . '%';
-    }
-
-    /**
-     * Busca en title, subtitle, excerpt y content (markdown). Score por
-     * donde matchea: title=10, subtitle=6, excerpt=4, content=1.
+     * Suma el peso de cada campo donde aparece el termino. Desempata por
+     * $tieBreak descendente (fecha en articulos, rating en productos).
      *
+     * @param array<int, array<string, mixed>> $rows
+     * @param array<string, int> $weights
      * @return array<int, array<string, mixed>>
      */
-    private function searchArticles(string $q): array
+    private function search(array $rows, array $weights, string $q, string $tieBreak): array
     {
-        $pat = $this->likePattern($q);
-        // PDO con ATTR_EMULATE_PREPARES=false no permite reusar placeholders →
-        // todos unicos aunque el valor sea el mismo.
-        $sql = "SELECT a.id, a.slug, a.title, a.subtitle, a.excerpt, a.article_type,
-                       a.published_at, a.featured_image,
-                       ( (CASE WHEN a.title    LIKE :p1 THEN 10 ELSE 0 END)
-                       + (CASE WHEN a.subtitle LIKE :p2 THEN 6  ELSE 0 END)
-                       + (CASE WHEN a.excerpt  LIKE :p3 THEN 4  ELSE 0 END)
-                       + (CASE WHEN a.content  LIKE :p4 THEN 1  ELSE 0 END) ) AS score
-                FROM articles a
-                WHERE a.site_id = :site
-                  AND a.status = 'published'
-                  AND a.published_at <= NOW()
-                  AND ( a.title    LIKE :p5
-                     OR a.subtitle LIKE :p6
-                     OR a.excerpt  LIKE :p7
-                     OR a.content  LIKE :p8 )
-                ORDER BY score DESC, a.published_at DESC
-                LIMIT " . self::RESULTS_LIMIT;
-        return Database::instance()->fetchAll($sql, [
-            'site' => $this->site->id,
-            'p1' => $pat, 'p2' => $pat, 'p3' => $pat, 'p4' => $pat,
-            'p5' => $pat, 'p6' => $pat, 'p7' => $pat, 'p8' => $pat,
-        ]);
-    }
+        $needle = mb_strtolower($q);
 
-    /**
-     * Busca en name, brand, description_short y description_long.
-     * Score: name=10, brand=6, description_short=4, description_long=1.
-     *
-     * @return array<int, array<string, mixed>>
-     */
-    private function searchProducts(string $q): array
-    {
-        $pat = $this->likePattern($q);
-        $sql = "SELECT p.id, p.slug, p.name, p.brand, p.description_short,
-                       p.rating, p.price_from, p.price_currency, p.pricing_model, p.logo_url,
-                       ( (CASE WHEN p.name              LIKE :p1 THEN 10 ELSE 0 END)
-                       + (CASE WHEN p.brand             LIKE :p2 THEN 6  ELSE 0 END)
-                       + (CASE WHEN p.description_short LIKE :p3 THEN 4  ELSE 0 END)
-                       + (CASE WHEN p.description_long  LIKE :p4 THEN 1  ELSE 0 END) ) AS score
-                FROM products p
-                WHERE p.site_id = :site
-                  AND ( p.name              LIKE :p5
-                     OR p.brand             LIKE :p6
-                     OR p.description_short LIKE :p7
-                     OR p.description_long  LIKE :p8 )
-                ORDER BY score DESC, p.rating DESC, p.updated_at DESC
-                LIMIT " . self::RESULTS_LIMIT;
-        return Database::instance()->fetchAll($sql, [
-            'site' => $this->site->id,
-            'p1' => $pat, 'p2' => $pat, 'p3' => $pat, 'p4' => $pat,
-            'p5' => $pat, 'p6' => $pat, 'p7' => $pat, 'p8' => $pat,
-        ]);
+        $hits = [];
+        foreach ($rows as $row) {
+            $score = 0;
+            foreach ($weights as $field => $weight) {
+                $value = $row[$field] ?? null;
+                if ($value === null || $value === '') { continue; }
+                if (mb_strpos(mb_strtolower((string)$value), $needle) !== false) {
+                    $score += $weight;
+                }
+            }
+            if ($score > 0) {
+                $row['score'] = $score;
+                $hits[] = $row;
+            }
+        }
+
+        usort($hits, static function (array $a, array $b) use ($tieBreak): int {
+            if ($a['score'] !== $b['score']) {
+                return $b['score'] <=> $a['score'];
+            }
+            return strcmp((string)($b[$tieBreak] ?? ''), (string)($a[$tieBreak] ?? ''));
+        });
+
+        return array_slice($hits, 0, self::RESULTS_LIMIT);
     }
 }

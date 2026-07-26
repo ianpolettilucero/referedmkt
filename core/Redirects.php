@@ -2,8 +2,8 @@
 namespace Core;
 
 /**
- * Resuelve redirects definidos en la tabla `redirects` (de la admin) antes de
- * que el router siquiera vea la request. Permite cambiar URLs sin perder SEO.
+ * Resuelve los redirects declarados en content/redirects.php antes de que el
+ * router vea la request. Permite cambiar URLs sin perder posiciones.
  *
  * Match exacto sobre el path normalizado (sin trailing slash, sin query).
  */
@@ -17,12 +17,10 @@ final class Redirects
         $path = self::normalize($path);
         if ($path === '') { return; }
 
-        $row = Database::instance()->fetch(
-            'SELECT to_path, status_code FROM redirects
-             WHERE site_id = :s AND from_path = :p AND active = 1
-             LIMIT 1',
-            ['s' => $siteId, 'p' => $path]
-        );
+        $row = null;
+        foreach (Content::redirects() as $r) {
+            if ($r['from_path'] === $path) { $row = $r; break; }
+        }
         if (!$row) { return; }
 
         $to = (string)$row['to_path'];

@@ -6,7 +6,7 @@
  */
 $view->layout('default');
 $ctaUrl = !empty($product['affiliate_slug'])
-    ? affiliate_url($product['affiliate_slug'], null, (int)$product['id'])
+    ? affiliate_url($product['affiliate_slug'], null, $product['slug'])
     : null;
 ?>
 <article class="product">

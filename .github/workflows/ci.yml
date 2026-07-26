@@ -8,7 +8,7 @@ on:
 
 jobs:
   test:
-    name: PHP tests + lint
+    name: PHP tests + lint + contenido
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -20,17 +20,84 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          extensions: pdo_mysql, mbstring, fileinfo, gd
+          extensions: mbstring, fileinfo
           coverage: none
           tools: none
 
       - name: PHP syntax lint
         run: |
           set -e
-          find core controllers models admin public bin tests -name "*.php" -print0 \
+          find core controllers models public bin tests themes content -name "*.php" -print0 \
             | xargs -0 -n1 -P4 php -l > /tmp/lint.log 2>&1 || (cat /tmp/lint.log && exit 1)
           grep -v "No syntax errors" /tmp/lint.log && exit 1 || true
           echo "Lint OK"
 
       - name: Run test suite
         run: php tests/run.php
+
+      # Valida el contenido sin escribir el cache: front-matter bien formado,
+      # slugs limpios, enums validos y toda referencia (categoria, autor,
+      # producto, afiliado) apuntando a algo que existe. Si esto falla, el
+      # sitio no levantaria en produccion.
+      - name: Validar content/
+        run: php bin/build-content.php --check
+
+  smoke:
+    name: Smoke test de rutas
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, fileinfo
+          coverage: none
+          tools: none
+
+      # Levanta el sitio de verdad y verifica que cada ruta publica responda lo
+      # que tiene que responder. Un 500 por una vista rota no lo agarran ni el
+      # lint ni los unit tests.
+      - name: Levantar servidor
+        run: |
+          DOMAIN=$(php -r 'echo (require "content/site.php")["domain"];')
+          DEV_SITE_DOMAIN=$DOMAIN php -S 127.0.0.1:8080 -t public > /tmp/server.log 2>&1 &
+          for i in $(seq 1 20); do
+            curl -sf -o /dev/null http://127.0.0.1:8080/healthz && break
+            sleep 0.5
+          done
+
+      - name: Chequear rutas
+        run: |
+          fail=0
+          check() {
+            code=$(curl -s -o /dev/null -w '%{http_code}' "http://127.0.0.1:8080$1")
+            if [ "$code" != "$2" ]; then
+              echo "  FAIL $1 -> $code (esperado $2)"; fail=1
+            else
+              echo "  ok   $1 -> $code"
+            fi
+          }
+          check /                    200
+          check /productos           200
+          check /guias               200
+          check /resenas             200
+          check /comparativas        200
+          check /noticias            200
+          check "/buscar?q=seguridad" 200
+          check /comparar            200
+          check /sitemap.xml         200
+          check /robots.txt          200
+          check /feed.xml            200
+          check /llms.txt            200
+          check /llms-full.txt       200
+          check /healthz             200
+          check /no-existe           404
+          check /admin               404
+          # Cada articulo, producto, categoria y autor publicado debe renderizar.
+          for url in $(php bin/list-urls.php); do check "$url" 200; done
+          if [ "$fail" = "1" ]; then echo; echo "Hay rutas rotas."; cat /tmp/server.log; exit 1; fi
+
+      - name: Log del servidor si algo fallo
+        if: failure()
+        run: cat /tmp/server.log
