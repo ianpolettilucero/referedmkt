@@ -86,8 +86,6 @@ specs:
   Clientes globales: Más de 3 millones en 150+ países
 ---
 
-# Hostinger Business
-
 **Hostinger Business** es el plan de hosting WordPress intermedio de **Hostinger International**, compañía fundada en 2004 en Lituania y actualmente uno de los proveedores de hosting con **más alto crecimiento global**. Hostinger atiende a **más de 3 millones de clientes** en 150+ países, con una reputación construida en los últimos años sobre tres pilares: **stack técnico moderno**, **precio accesible** y **simplificación radical de la gestión** mediante hPanel, su panel propietario.
 
 En 2024, Hostinger fue incluido en la **lista oficial de hosts recomendados por WordPress.org**, reemplazando a SiteGround — una señal relevante del reconocimiento de la plataforma WordPress hacia la infraestructura que Hostinger construyó. Dentro del portafolio, el plan **Business** es el que equilibra mejor features, performance y precio para el perfil de PyME, profesional independiente y sitio corporativo con tráfico medio.

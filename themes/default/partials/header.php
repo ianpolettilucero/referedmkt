@@ -9,9 +9,11 @@
         </a>
         <nav class="site-nav" aria-label="Principal">
             <a href="/productos">Productos</a>
-            <a href="/guias">Guías</a>
-            <a href="/comparativas">Comparativas</a>
-            <a href="/resenas">Reseñas</a>
+            <?php /* Solo las secciones con articulos publicados: enlazar un
+                     listado vacio es contenido delgado y confunde al crawler. */ ?>
+            <?php foreach (active_sections() as $sec): ?>
+                <a href="<?= e($sec['path']) ?>"><?= e($sec['label']) ?></a>
+            <?php endforeach; ?>
             <a href="/buscar" aria-label="Buscar">Buscar</a>
         </nav>
         <button type="button" class="theme-toggle" data-theme-toggle aria-label="Cambiar tema">

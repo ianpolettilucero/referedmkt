@@ -135,3 +135,36 @@ if (!function_exists('reading_time')) {
         return max(1, (int)round($words / $wordsPerMin));
     }
 }
+
+if (!function_exists('active_sections')) {
+    /**
+     * Secciones que tienen al menos un articulo publicado.
+     *
+     * El menu y el sitemap la usan para no exponer secciones vacias: una
+     * pagina de listado sin items es contenido delgado y, si ademas nadie la
+     * enlaza, queda huerfana. Cuando se publica el primer articulo de un tipo,
+     * la seccion aparece sola.
+     *
+     * @return array<string, array{path:string, label:string}> indexado por tipo
+     */
+    function active_sections(): array
+    {
+        static $cache = null;
+        if ($cache !== null) { return $cache; }
+
+        $defs = [
+            'guide'      => ['path' => '/guias',         'label' => 'Guías'],
+            'comparison' => ['path' => '/comparativas',  'label' => 'Comparativas'],
+            'review'     => ['path' => '/resenas',       'label' => 'Reseñas'],
+            'news'       => ['path' => '/noticias',      'label' => 'Noticias'],
+        ];
+
+        $conContenido = [];
+        foreach (\Core\Content::publishedArticles() as $a) {
+            $conContenido[$a['article_type']] = true;
+        }
+
+        $cache = array_intersect_key($defs, $conContenido);
+        return $cache;
+    }
+}

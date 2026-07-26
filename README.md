@@ -81,9 +81,26 @@ el número de línea, en vez de perder el dato en silencio.
 ```bash
 php bin/build-content.php          # compila y muestra el resumen
 php bin/build-content.php --check  # solo valida, no escribe (lo corre el CI)
+php bin/audit.php                  # auditoría de SEO, GEO y arquitectura
 php bin/list-urls.php              # todas las URLs públicas
 php tests/run.php                  # 117 tests, sin dependencias
 ```
+
+`bin/audit.php` levanta el sitio y mide sobre el HTML servido: largo de title y
+meta description, H1 duplicados, saltos de jerarquía, canonical, alt de
+imágenes, densidad de datos, presencia de FAQ, profundidad de click, huérfanas y
+enlazado interno. Sale con error solo ante problemas graves, así puede correr en
+CI; el resto queda como informe. Acepta una URL para auditar producción:
+
+```bash
+php bin/audit.php https://capacero.online
+```
+
+## Escribir una guía
+
+Copiar `content/_plantillas/guia.md` a `content/articles/{slug}.md`. La
+plantilla lleva la estructura y el checklist comentado — cada punto sale de algo
+que mide la auditoría. Antes de publicar, `php bin/audit.php`.
 
 Desarrollo local:
 

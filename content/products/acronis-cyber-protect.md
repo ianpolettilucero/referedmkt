@@ -70,8 +70,6 @@ specs:
   Variantes: Cyber Protect Cloud (MSP-first), Cyber Protect (on-premise), True Image (consumer)
 ---
 
-# Acronis Cyber Protect
-
 **Acronis Cyber Protect** es la plataforma empresarial de ciberprotección integrada desarrollada por **Acronis**, compañía fundada en 2003 en Singapur y con sede actual en Schaffhausen, Suiza. Es uno de los **nombres más reconocidos del mercado histórico de backup**, con más de **20 millones de usuarios finales** y presencia en más de **150 países** a través de una red de **50.000 partners** que hace de Acronis uno de los ecosistemas de canal más grandes del mundo en protección de datos.
 
 La propuesta de Acronis Cyber Protect es poco común en el mercado: en lugar de ser *solo* un producto de backup al que se le agregaron features de seguridad, o *solo* un producto de seguridad al que se le agregó backup, Acronis construyó desde cero una plataforma que **integra nativamente backup, antimalware, EDR, gestión de endpoints y seguridad de correo en un único agente y una única consola**. Es el producto con la **mayor amplitud funcional en una sola licencia** del mercado empresarial.

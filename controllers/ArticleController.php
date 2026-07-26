@@ -116,9 +116,12 @@ final class ArticleController extends Controller
 
         $label = $this->breadcrumbLabelForType($type);
 
+        // Titulo y descripcion propios por seccion: "Guías | Capa Cero" no dice
+        // nada y desaprovecha el espacio del SERP.
+        $meta = $this->sectionMeta($type, $data['total']);
         $this->seo
-            ->title($label)
-            ->description("Listado de {$label} publicadas en " . $this->site->name)
+            ->title($meta['title'])
+            ->description($meta['description'])
             ->canonical($this->sectionPathForType($type))
             ->breadcrumb([['Inicio', '/'], [$label, $this->sectionPathForType($type)]]);
 
@@ -141,6 +144,35 @@ final class ArticleController extends Controller
             'sorts'      => Article::SORTS,
             'categories' => $categories,
         ]);
+    }
+
+    /**
+     * Metadatos del listado por tipo. El conteo real entra en la descripcion:
+     * es una senal concreta y se actualiza sola al publicar.
+     *
+     * @return array{title:string, description:string}
+     */
+    private function sectionMeta(string $type, int $total): array
+    {
+        $n = $total > 0 ? "$total " : '';
+        return match ($type) {
+            'review' => [
+                'title'       => 'Reseñas de herramientas de ciberseguridad',
+                'description' => "Análisis independientes de {$n}herramientas de seguridad, probadas en escenarios reales. Qué hace bien cada una, qué no, y para qué tamaño de empresa conviene.",
+            ],
+            'comparison' => [
+                'title'       => 'Comparativas de software de seguridad',
+                'description' => "Comparativas cara a cara de soluciones de ciberseguridad: detección, precio, consola y soporte, con la recomendación según el caso de uso.",
+            ],
+            'news' => [
+                'title'       => 'Novedades de ciberseguridad',
+                'description' => "Novedades del sector que afectan a PyMEs: vulnerabilidades, cambios de producto y movimientos de mercado, sin ruido.",
+            ],
+            default => [
+                'title'       => 'Guías de ciberseguridad para PyMEs',
+                'description' => "{$n}guías prácticas para proteger una empresa sin equipo de seguridad dedicado: qué implementar, en qué orden y cuánto cuesta.",
+            ],
+        };
     }
 
     private function breadcrumbLabelForType(string $type): string

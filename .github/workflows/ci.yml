@@ -97,6 +97,12 @@ jobs:
           for url in $(php bin/list-urls.php); do check "$url" 200; done
           if [ "$fail" = "1" ]; then echo; echo "Hay rutas rotas."; cat /tmp/server.log; exit 1; fi
 
+      # Auditoria de SEO, GEO y arquitectura sobre el HTML servido. Falla solo
+      # ante errores (H1 duplicado, huerfana, sin canonical); las advertencias
+      # quedan como informe para leer en el log.
+      - name: Auditoria SEO / GEO / arquitectura
+        run: php bin/audit.php
+
       - name: Log del servidor si algo fallo
         if: failure()
         run: cat /tmp/server.log

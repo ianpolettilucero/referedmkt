@@ -70,8 +70,6 @@ specs:
   Presencia: Oficinas propias en 20+ países, fuerte en LATAM y Europa del Este
 ---
 
-# ESET PROTECT Enterprise
-
 **ESET PROTECT Enterprise** es la plataforma empresarial de protección de endpoints desarrollada por **ESET**, compañía fundada en 1992 en Bratislava, Eslovaquia, y hoy una de las **marcas europeas más reconocidas del mercado de ciberseguridad** a nivel global. ESET es responsable del motor **NOD32**, uno de los motores antimalware con **más premios VB100** de la historia y referencia histórica por combinar detección de alto nivel con un impacto extraordinariamente bajo en rendimiento.
 
 ESET PROTECT Enterprise es el tier superior del portafolio empresarial, diseñado para empresas medianas y grandes que necesitan **EDR/XDR real, threat intelligence premium, sandbox cloud, cifrado, protección de correo y la consola completa** en un solo paquete. Es particularmente fuerte en el mercado **latinoamericano**, donde ESET tiene una presencia comercial consolidada y uno de los canales de partners más maduros de la región.

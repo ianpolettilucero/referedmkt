@@ -53,8 +53,10 @@ final class SitemapController
 
         $this->url($base . '/', null);
         $this->url($base . '/productos', null);
-        foreach (['guias','comparativas','resenas','noticias'] as $section) {
-            $this->url($base . '/' . $section, null);
+        // Solo secciones con contenido: un listado vacio en el sitemap invita a
+        // Google a rastrear una pagina sin valor.
+        foreach (active_sections() as $sec) {
+            $this->url($base . $sec['path'], null);
         }
 
         foreach ($categories as $c) {

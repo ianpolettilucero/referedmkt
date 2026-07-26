@@ -18,6 +18,9 @@ namespace Core;
  */
 final class SEO
 {
+    /** Limite practico de la meta description en el SERP. */
+    private const MAX_DESCRIPTION = 158;
+
     private Site $site;
 
     private ?string $title = null;
@@ -62,6 +65,14 @@ final class SEO
 
         $rendered = str_replace('{title}', $title, $template);
 
+        // Google corta el title cerca de los 60 caracteres. Si el sufijo de
+        // marca es lo que lo empuja mas alla, preferimos el title solo: las
+        // palabras clave valen mas en el snippet que la marca repetida, y la
+        // marca ya aparece en el dominio y en el breadcrumb del resultado.
+        if (mb_strlen($rendered) > 60 && mb_strlen($title) <= 60) {
+            $rendered = $title;
+        }
+
         // Defensa extra: si el render contiene el title duplicado (X | X | ...),
         // colapsar a una sola aparicion.
         $rendered = preg_replace(
@@ -80,11 +91,28 @@ final class SEO
         return $this;
     }
 
+    /**
+     * Google muestra ~155-160 caracteres de meta description. Todo lo que pase
+     * de ahi no se ve nunca, asi que se recorta en limite de palabra: es mejor
+     * una frase completa que un corte a mitad de palabra hecho por Google.
+     */
     public function description(?string $description): self
     {
-        if ($description !== null) {
-            $this->description = mb_substr(trim(preg_replace('/\s+/', ' ', strip_tags($description))), 0, 300);
+        if ($description === null) {
+            return $this;
         }
+        $clean = trim(preg_replace('/\s+/', ' ', strip_tags($description)));
+
+        if (mb_strlen($clean) > self::MAX_DESCRIPTION) {
+            $cut = mb_substr($clean, 0, self::MAX_DESCRIPTION);
+            $lastSpace = mb_strrpos($cut, ' ');
+            if ($lastSpace !== false && $lastSpace > self::MAX_DESCRIPTION - 30) {
+                $cut = mb_substr($cut, 0, $lastSpace);
+            }
+            $clean = rtrim($cut, " ,;:.-") . '…';
+        }
+
+        $this->description = $clean;
         return $this;
     }
 

@@ -61,8 +61,6 @@ specs:
   Sede: Mountain View, California, EE.UU. (fundada en 2013, NYSE: S)
 ---
 
-# SentinelOne Singularity
-
 **SentinelOne Singularity** es la plataforma de ciberseguridad empresarial desarrollada por SentinelOne, compañía fundada en 2013 y cotizada en la Bolsa de Nueva York desde 2021 (*NYSE: S*).
 
 Su propuesta se centra en una idea clara: **automatizar al máximo la detección, la prevención y la respuesta** mediante inteligencia artificial ejecutándose directamente en el endpoint, de manera que el agente pueda tomar decisiones incluso **sin conectividad a la nube**.

@@ -143,7 +143,6 @@
         <?= $content ?>
     </main>
 
-    <?= $view->partial('affiliate_disclosure') ?>
     <?= $view->partial('footer') ?>
 
     <script src="<?= e(theme_asset('js/theme.js')) ?>" defer></script>

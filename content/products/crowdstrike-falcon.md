@@ -61,8 +61,6 @@ specs:
   Sede: Austin, Texas, EE.UU. (fundada en 2011)
 ---
 
-# CrowdStrike Falcon
-
 **CrowdStrike Falcon** es una plataforma unificada de ciberseguridad de endpoints entregada **100% desde la nube**, diseñada para proteger estaciones de trabajo, servidores, cargas cloud, contenedores y dispositivos móviles frente a amenazas modernas. Fundada en 2011 por George Kurtz y Dmitri Alperovitch, CrowdStrike redefinió el estándar de la industria al abandonar el modelo basado en firmas y construir una arquitectura que combina **inteligencia artificial, análisis de comportamiento, telemetría masiva y threat intelligence** de primer nivel.
 
 Hoy es considerada por *Gartner*, *Forrester* e *IDC* como una de las soluciones líderes del mercado, con decenas de miles de clientes empresariales en todo el mundo, incluyendo gran parte del Fortune 500.

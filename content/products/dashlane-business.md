@@ -67,8 +67,6 @@ specs:
   Usuarios empresariales: Más de 23.000 organizaciones
 ---
 
-# Dashlane Business
-
 **Dashlane Business** es la oferta empresarial de **Dashlane**, compañía fundada en 2009 en París y actualmente con sede principal en Nueva York. A lo largo de más de quince años se consolidó como una de las **marcas más reconocidas** en el mundo del *password management*, con presencia tanto en el mercado consumer como en el empresarial. Es utilizada por más de **23.000 organizaciones**, incluyendo nombres como *Air France*, *Booking.com*, *Sephora* y *Super 73*.
 
 Su propuesta combina tres pilares: **experiencia de usuario premium**, **features de privacidad diferenciales** (VPN, dark web monitoring) y una **arquitectura SSO patentada** que permite mantener el modelo zero-knowledge incluso con *Single Sign-On* empresarial.

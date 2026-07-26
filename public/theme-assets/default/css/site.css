@@ -1891,3 +1891,39 @@ html { scroll-behavior: smooth; }
     h1, h2, h3, h4 { page-break-after: avoid; break-after: avoid; }
     img, figure, pre, blockquote { page-break-inside: avoid; break-inside: avoid; }
 }
+
+/* =============================================================================
+   FOOTER — columnas de enlazado interno
+   ============================================================================= */
+.footer-cols {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: var(--s-3);
+    text-align: left;
+    padding-bottom: var(--s-3);
+    border-bottom: 1px solid var(--border);
+    margin-bottom: var(--s-2);
+}
+.footer-col-wide { grid-column: span 2; }
+@media (max-width: 720px) { .footer-col-wide { grid-column: span 1; } }
+
+.footer-title {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+    color: var(--text-subtle);
+    margin: 0 0 var(--s-1);
+}
+.footer-cols ul { list-style: none; margin: 0; padding: 0; }
+.footer-cols li { margin: 0 0 0.3rem; }
+.footer-cols a {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    text-decoration: none;
+}
+.footer-cols a:hover { color: var(--primary); text-decoration: underline; text-underline-offset: 3px; }
+.footer-cats { columns: 2; column-gap: var(--s-3); }
+@media (max-width: 560px) { .footer-cats { columns: 1; } }
+
+.footer-legal { color: var(--text-subtle); font-size: 0.85rem; margin: 0; text-align: left; }

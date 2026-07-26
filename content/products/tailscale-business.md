@@ -79,8 +79,6 @@ specs:
   Fundadores: Avery Pennarun, David Crawshaw, Brad Fitzpatrick, David Carney
 ---
 
-# Tailscale Business
-
 **Tailscale** es una plataforma moderna de **mesh VPN** desarrollada por **Tailscale Inc.**, compañía fundada en 2019 en Toronto, Canadá, por **Avery Pennarun**, **David Crawshaw**, **Brad Fitzpatrick** (ex-Google, creador original de memcached) y **David Carney**. Desde su lanzamiento público en 2020, Tailscale se convirtió en uno de los productos de networking más queridos por la comunidad técnica global, con un crecimiento orgánico impulsado por recomendaciones entre desarrolladores, excelente documentación y una experiencia de usuario radicalmente superior a la VPN tradicional.
 
 El producto se construye sobre **WireGuard**, el protocolo VPN moderno creado por Jason A. Donenfeld y mergeado al kernel de Linux en 2020. Tailscale agrega sobre WireGuard lo que al protocolo le falta para ser usable a escala empresarial: **coordinación automática**, **autenticación con IdPs**, **NAT traversal**, **políticas de acceso** y **gestión centralizada**. El resultado es una VPN mesh que *simplemente funciona* sin configurar servidores, firewalls ni certificados.
