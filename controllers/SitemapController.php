@@ -1,11 +1,11 @@
 <?php
 namespace Controllers;
 
-use Core\Database;
+use Core\Content;
 use Core\Site;
 
 /**
- * Sitemap.xml generado desde DB.
+ * Sitemap.xml generado desde content/.
  *
  * Incluye image:image extension para que Google Image Search indexe las
  * featured_images de articles y logos de productos.
@@ -15,43 +15,36 @@ final class SitemapController
     public function index(): void
     {
         $site = Site::current();
-        $db = Database::instance();
 
         $base = 'https://' . $site->domain;
 
-        $articles = $db->fetchAll(
-            "SELECT slug, title, article_type, featured_image,
-                    COALESCE(updated_at, published_at) AS lastmod
-             FROM articles
-             WHERE site_id = :site AND status = 'published'
-             ORDER BY published_at DESC",
-            ['site' => $site->id]
-        );
+        // Solo lo publicado: un borrador en el sitemap es una URL que devuelve 404.
+        $articles = Content::publishedArticles();
+        foreach ($articles as &$a) {
+            $a['lastmod'] = $a['updated_at'] ?? $a['published_at'];
+        }
+        unset($a);
 
-        $products = $db->fetchAll(
-            "SELECT slug, name, logo_url, updated_at AS lastmod
-             FROM products
-             WHERE site_id = :site
-             ORDER BY updated_at DESC",
-            ['site' => $site->id]
-        );
+        $products   = array_values(Content::products());
+        $categories = array_values(Content::categories());
+        foreach ($products as &$p)   { $p['lastmod'] = $p['updated_at'] ?? null; }
+        unset($p);
+        foreach ($categories as &$c) { $c['lastmod'] = $c['updated_at'] ?? null; }
+        unset($c);
 
-        $categories = $db->fetchAll(
-            "SELECT slug, name, featured_image, updated_at AS lastmod
-             FROM categories WHERE site_id = :site
-             ORDER BY updated_at DESC",
-            ['site' => $site->id]
-        );
-
-        $authors = $db->fetchAll(
-            "SELECT a.slug, a.avatar_url, MAX(art.updated_at) AS lastmod
-             FROM authors a
-             LEFT JOIN articles art
-               ON art.author_id = a.id AND art.site_id = a.site_id AND art.status = 'published'
-             WHERE a.site_id = :site
-             GROUP BY a.id, a.slug, a.avatar_url",
-            ['site' => $site->id]
-        );
+        // lastmod del autor = la nota suya mas recientemente tocada.
+        $authors = [];
+        foreach (Content::authors() as $au) {
+            $lastmod = null;
+            foreach ($articles as $a) {
+                if ((int)($a['author_id'] ?? 0) !== (int)$au['id']) { continue; }
+                if ($lastmod === null || (string)$a['updated_at'] > $lastmod) {
+                    $lastmod = (string)$a['updated_at'];
+                }
+            }
+            $au['lastmod'] = $lastmod;
+            $authors[] = $au;
+        }
 
         header('Content-Type: application/xml; charset=utf-8');
         echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";

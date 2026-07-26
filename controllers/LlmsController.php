@@ -1,8 +1,11 @@
 <?php
 namespace Controllers;
 
-use Core\Database;
+use Core\Content;
 use Core\Site;
+use Models\Author;
+use Models\Category;
+use Models\Product;
 
 /**
  * llms.txt (estándar propuesto en llmstxt.org).
@@ -23,7 +26,6 @@ final class LlmsController
     public function index(): void
     {
         $site = Site::current();
-        $db = Database::instance();
         $base = $this->siteBase($site);
 
         header('Content-Type: text/plain; charset=utf-8');
@@ -35,10 +37,7 @@ final class LlmsController
         }
 
         // Autores (credibilidad para el LLM)
-        $authors = $db->fetchAll(
-            'SELECT name, slug, bio, expertise FROM authors WHERE site_id = :s ORDER BY name',
-            ['s' => $site->id]
-        );
+        $authors = Author::all($site->id);
         if ($authors) {
             echo "## Autores\n\n";
             foreach ($authors as $a) {
@@ -50,10 +49,7 @@ final class LlmsController
         }
 
         // Categorias
-        $cats = $db->fetchAll(
-            'SELECT name, slug, description FROM categories WHERE site_id = :s ORDER BY sort_order, name',
-            ['s' => $site->id]
-        );
+        $cats = Category::all($site->id);
         if ($cats) {
             echo "## Categorías\n\n";
             foreach ($cats as $c) {
@@ -65,12 +61,7 @@ final class LlmsController
         }
 
         // Productos (top 100)
-        $products = $db->fetchAll(
-            "SELECT name, slug, brand, description_short
-             FROM products WHERE site_id = :s
-             ORDER BY featured DESC, rating DESC, updated_at DESC LIMIT 100",
-            ['s' => $site->id]
-        );
+        $products = array_slice(Product::catalog($site->id, [], 1, 100)['items'], 0, 100);
         if ($products) {
             echo "## Productos\n\n";
             foreach ($products as $p) {
@@ -92,14 +83,10 @@ final class LlmsController
             'news'       => 'Noticias',
         ];
         foreach ($sections as $type => $label) {
-            $rows = $db->fetchAll(
-                "SELECT title, slug, excerpt, published_at
-                 FROM articles
-                 WHERE site_id = :s AND article_type = :t
-                   AND status = 'published' AND published_at <= NOW()
-                 ORDER BY published_at DESC",
-                ['s' => $site->id, 't' => $type]
-            );
+            $rows = array_values(array_filter(
+                Content::publishedArticles(),
+                fn($a) => $a['article_type'] === $type
+            ));
             if (!$rows) { continue; }
             echo "## " . $label . "\n\n";
             foreach ($rows as $r) {
@@ -124,7 +111,6 @@ final class LlmsController
     public function full(): void
     {
         $site = Site::current();
-        $db = Database::instance();
         $base = $this->siteBase($site);
 
         header('Content-Type: text/plain; charset=utf-8');
@@ -139,16 +125,7 @@ final class LlmsController
         echo "Generado: " . date('c') . "\n\n";
         echo "---\n\n";
 
-        $articles = $db->fetchAll(
-            "SELECT a.*, au.name AS author_name, c.name AS category_name, c.slug AS category_slug
-             FROM articles a
-             LEFT JOIN authors au ON au.id = a.author_id
-             LEFT JOIN categories c ON c.id = a.category_id
-             WHERE a.site_id = :s
-               AND a.status = 'published' AND a.published_at <= NOW()
-             ORDER BY a.published_at DESC",
-            ['s' => $site->id]
-        );
+        $articles = Content::publishedArticles();
 
         foreach ($articles as $a) {
             $path = $this->articlePath($a['article_type'], $a['slug']);
@@ -179,15 +156,7 @@ final class LlmsController
         }
 
         // Resumen de productos para contexto
-        $products = $db->fetchAll(
-            "SELECT p.name, p.slug, p.brand, p.rating, p.price_from, p.price_currency, p.pricing_model,
-                    p.description_short, p.description_long, c.name AS category_name
-             FROM products p
-             LEFT JOIN categories c ON c.id = p.category_id
-             WHERE p.site_id = :s
-             ORDER BY p.featured DESC, p.rating DESC",
-            ['s' => $site->id]
-        );
+        $products = Product::catalog($site->id, [], 1, 1000)['items'];
         if ($products) {
             echo "# Catálogo de productos\n\n";
             foreach ($products as $p) {

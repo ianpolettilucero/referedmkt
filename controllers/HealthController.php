@@ -1,13 +1,17 @@
 <?php
 namespace Controllers;
 
-use Core\Database;
+use Core\Content;
 
 /**
- * Health check endpoint. Usado por UptimeRobot/BetterStack/etc.
+ * Health check. Usado por UptimeRobot/BetterStack/etc.
  *
  * Responde 200 + JSON si el sistema esta OK, 503 + JSON si algo falla.
- * No requiere tenant (se chequea antes del Site::resolve en el front).
+ *
+ * Sin base de datos lo unico que puede fallar es el contenido: que content/ no
+ * compile (front-matter roto, referencia a algo que no existe) o que el sitio
+ * no este configurado. Los dos casos dejan el sitio inservible, asi que
+ * merecen el 503.
  */
 final class HealthController
 {
@@ -18,21 +22,21 @@ final class HealthController
         $checks = [];
 
         try {
-            $db = Database::instance();
             $t0 = microtime(true);
-            $one = $db->fetchColumn('SELECT 1');
-            $checks['db'] = [
-                'ok' => $one === '1' || $one === 1,
+            $site = Content::site();
+
+            $checks['content'] = [
+                'ok' => $site !== [] && !empty($site['domain']),
                 'ms' => round((microtime(true) - $t0) * 1000, 1),
             ];
-            if (!$checks['db']['ok']) { $status = 'fail'; }
+            if (!$checks['content']['ok']) { $status = 'fail'; }
 
-            // Migraciones conocidas (opcional pero util).
-            $migrations = (int)$db->fetchColumn('SELECT COUNT(*) FROM migrations');
-            $checks['migrations_applied'] = $migrations;
+            $checks['articles']  = count(Content::articles());
+            $checks['published'] = count(Content::publishedArticles());
+            $checks['products']  = count(Content::products());
         } catch (\Throwable $e) {
             $status = 'fail';
-            $checks['db'] = ['ok' => false, 'error' => $e->getMessage()];
+            $checks['content'] = ['ok' => false, 'error' => $e->getMessage()];
         }
 
         $checks['php']      = PHP_VERSION;

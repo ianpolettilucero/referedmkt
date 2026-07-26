@@ -1,32 +1,21 @@
 <?php
 namespace Controllers;
 
-use Core\Database;
+use Models\Article;
+use Models\Author;
 
 final class AuthorController extends Controller
 {
     public function show(array $params): void
     {
         $slug = $params['slug'] ?? '';
-        $author = Database::instance()->fetch(
-            'SELECT * FROM authors WHERE site_id = :s AND slug = :slug LIMIT 1',
-            ['s' => $this->site->id, 'slug' => $slug]
-        );
+        $author = Author::findBySlug($this->site->id, $slug);
         if (!$author) {
             $this->notFound("Autor no encontrado");
             return;
         }
-        $author['social_links'] = is_string($author['social_links'] ?? null)
-            ? (json_decode($author['social_links'], true) ?: [])
-            : ($author['social_links'] ?? []);
 
-        $articles = Database::instance()->fetchAll(
-            "SELECT * FROM articles
-             WHERE site_id = :s AND author_id = :a AND status = 'published' AND published_at <= NOW()
-             ORDER BY published_at DESC
-             LIMIT 50",
-            ['s' => $this->site->id, 'a' => $author['id']]
-        );
+        $articles = Article::byAuthor($this->site->id, (int)$author['id'], 50);
 
         $this->seo
             ->title($author['name'])

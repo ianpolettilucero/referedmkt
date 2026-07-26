@@ -1,17 +1,19 @@
 <?php
 namespace Models;
 
+use Core\Content;
+
 final class AffiliateLink extends Model
 {
-    protected const TABLE = 'affiliate_links';
-
+    /**
+     * @return array<string, mixed>|null
+     */
     public static function findActiveBySlug(int $siteId, string $slug): ?array
     {
-        return self::db()->fetch(
-            "SELECT * FROM affiliate_links
-             WHERE site_id = :site AND tracking_slug = :slug AND active = 1
-             LIMIT 1",
-            ['site' => $siteId, 'slug' => $slug]
-        );
+        $row = Content::affiliateLinks()[$slug] ?? null;
+        if ($row === null || empty($row['active'])) {
+            return null;
+        }
+        return $row;
     }
 }

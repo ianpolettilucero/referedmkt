@@ -1,10 +1,11 @@
 .env
 .env.local
-config/config.local.php
 vendor/
-/public/uploads/*
-!/public/uploads/.gitkeep
-/backups/
+
+# Cache compilado de content/. Se regenera solo en el primer request
+# despues de un deploy; commitearlo solo agregaria ruido a los diffs.
+/var/
+
 *.log
 .DS_Store
 .idea/

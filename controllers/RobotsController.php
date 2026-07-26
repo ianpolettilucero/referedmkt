@@ -16,9 +16,7 @@ final class RobotsController
         $base = 'https://' . $site->domain;
 
         echo "User-agent: *\n";
-        echo "Disallow: /admin/\n";
         echo "Disallow: /go/\n";
-        echo "Disallow: /install.php\n";
         echo "\n";
         echo "Sitemap: {$base}/sitemap.xml\n";
         // Hint no-estandar para crawlers de LLMs que miran este campo.

@@ -1,24 +1,21 @@
 <?php
 namespace Models;
 
+use Core\Content;
+
 final class Product extends Model
 {
-    protected const TABLE = 'products';
-    protected const JSON_COLUMNS = ['features', 'pros', 'cons', 'specs'];
+    protected const COLLECTION = 'products';
 
     /** @return array<int, array<string, mixed>> */
     public static function featured(int $siteId, int $limit = 6): array
     {
-        $stmt = self::db()->query(
-            "SELECT p.*, c.slug AS category_slug, c.name AS category_name
-             FROM products p
-             LEFT JOIN categories c ON c.id = p.category_id
-             WHERE p.site_id = :site AND p.featured = 1
-             ORDER BY p.rating DESC, p.updated_at DESC
-             LIMIT $limit",
-            ['site' => $siteId]
-        );
-        return self::hydrateAll($stmt->fetchAll());
+        $rows = array_values(array_filter(
+            Content::products(),
+            fn($p) => !empty($p['featured'])
+        ));
+        $rows = self::sort($rows, [['rating', 'desc'], ['updated_at', 'desc']]);
+        return array_slice($rows, 0, max(1, $limit));
     }
 
     public const SORTS = [
@@ -31,8 +28,7 @@ final class Product extends Model
     ];
 
     /**
-     * Catalogo paginado con filtros + orden. Opcional: categoria, brand,
-     * rating minimo, precio max, orden.
+     * Catalogo paginado con filtros + orden.
      *
      * @param array{category_id?:?int, brand?:string, min_rating?:?float, max_price?:?float, sort?:string} $filters
      * @return array{items: array<int, array<string, mixed>>, total: int, page: int, per_page: int, brands: array<int,string>}
@@ -40,143 +36,116 @@ final class Product extends Model
     public static function catalog(int $siteId, array $filters = [], int $page = 1, int $perPage = 24): array
     {
         $page = max(1, $page);
-        $offset = ($page - 1) * $perPage;
-
-        $where  = 'p.site_id = :site';
-        $params = ['site' => $siteId];
+        $rows = array_values(Content::products());
 
         if (!empty($filters['category_id'])) {
-            $where .= ' AND p.category_id = :cat';
-            $params['cat'] = (int)$filters['category_id'];
+            $cat = (int)$filters['category_id'];
+            $rows = array_filter($rows, fn($p) => (int)($p['category_id'] ?? 0) === $cat);
         }
         if (!empty($filters['brand'])) {
-            $where .= ' AND p.brand = :brand';
-            $params['brand'] = (string)$filters['brand'];
+            $rows = array_filter($rows, fn($p) => ($p['brand'] ?? null) === $filters['brand']);
         }
         if (!empty($filters['min_rating'])) {
-            $where .= ' AND p.rating >= :minr';
-            $params['minr'] = (float)$filters['min_rating'];
+            $min = (float)$filters['min_rating'];
+            $rows = array_filter($rows, fn($p) => ($p['rating'] ?? 0) >= $min);
         }
         if (!empty($filters['max_price'])) {
-            $where .= ' AND (p.price_from IS NULL OR p.price_from <= :maxp)';
-            $params['maxp'] = (float)$filters['max_price'];
+            $max = (float)$filters['max_price'];
+            // Sin precio declarado no se descarta: no sabemos si entra o no.
+            $rows = array_filter($rows, fn($p) => $p['price_from'] === null || $p['price_from'] <= $max);
         }
+        $rows = array_values($rows);
 
-        $sort = $filters['sort'] ?? 'featured';
-        $orderBy = match ($sort) {
-            'rating'     => 'p.rating DESC, p.updated_at DESC',
-            'price-asc'  => 'p.price_from IS NULL, p.price_from ASC, p.rating DESC',
-            'price-desc' => 'p.price_from DESC, p.rating DESC',
-            'recent'     => 'p.updated_at DESC',
-            'az'         => 'p.name ASC',
-            default      => 'p.featured DESC, p.rating DESC, p.updated_at DESC',
+        $rows = match ($filters['sort'] ?? 'featured') {
+            'rating'     => self::sort($rows, [['rating', 'desc'], ['updated_at', 'desc']]),
+            'price-asc'  => self::sort($rows, [['price_from', 'asc'], ['rating', 'desc']]),
+            'price-desc' => self::sort($rows, [['price_from', 'desc'], ['rating', 'desc']]),
+            'recent'     => self::sort($rows, [['updated_at', 'desc']]),
+            'az'         => self::sort($rows, [['name', 'asc']]),
+            default      => self::sort($rows, [['featured', 'desc'], ['rating', 'desc'], ['updated_at', 'desc']]),
         };
 
-        $total = (int)self::db()->fetchColumn(
-            "SELECT COUNT(*) FROM products p WHERE $where",
-            $params
-        );
-
-        $rows = self::db()->fetchAll(
-            "SELECT p.*, c.slug AS category_slug, c.name AS category_name
-             FROM products p
-             LEFT JOIN categories c ON c.id = p.category_id
-             WHERE $where
-             ORDER BY $orderBy
-             LIMIT $perPage OFFSET $offset",
-            $params
-        );
-
-        // Lista de brands distintas para el filtro del front (limite 200).
-        $brandRows = self::db()->fetchAll(
-            "SELECT DISTINCT brand FROM products
-             WHERE site_id = :site AND brand IS NOT NULL AND brand <> ''
-             ORDER BY brand ASC LIMIT 200",
-            ['site' => $siteId]
-        );
-        $brands = array_column($brandRows, 'brand');
-
         return [
-            'items'    => self::hydrateAll($rows),
-            'total'    => $total,
+            'items'    => array_slice($rows, ($page - 1) * $perPage, $perPage),
+            'total'    => count($rows),
             'page'     => $page,
             'per_page' => $perPage,
-            'brands'   => $brands,
+            'brands'   => self::brands($siteId),
         ];
     }
 
-    /** @return array<int, array<string, mixed>> */
-    public static function byIds(int $siteId, array $ids): array
+    /**
+     * Marcas distintas presentes en el catalogo, para el filtro del front.
+     *
+     * @return array<int, string>
+     */
+    public static function brands(int $siteId): array
     {
-        $ids = array_values(array_filter(array_map('intval', $ids)));
-        if (!$ids) {
-            return [];
+        $brands = [];
+        foreach (Content::products() as $p) {
+            $b = trim((string)($p['brand'] ?? ''));
+            if ($b !== '' && !in_array($b, $brands, true)) { $brands[] = $b; }
         }
-        $placeholders = implode(',', array_fill(0, count($ids), '?'));
-        $stmt = self::db()->query(
-            "SELECT * FROM products WHERE site_id = ? AND id IN ($placeholders)",
-            array_merge([$siteId], $ids)
-        );
-        return self::hydrateAll($stmt->fetchAll());
+        sort($brands);
+        return $brands;
     }
 
     /**
-     * Catalogo agrupado por categoria: retorna solo categorias con productos,
-     * cada una con sus N mejores productos (destacados / rating / recientes).
-     *
-     * Ideal para renderizar el catalogo global como secciones H2 por categoria
-     * (mejor SEO: estructura de headings + keywords de cada nicho visibles).
+     * @param array<int, int|string> $ids ids enteros o slugs
+     * @return array<int, array<string, mixed>>
+     */
+    public static function byIds(int $siteId, array $ids): array
+    {
+        $all = Content::products();
+        $out = [];
+        foreach ($ids as $ref) {
+            // Aceptamos slug o id: las URLs internas usan slug, pero un
+            // /comparar?ids=1,2 viejo tiene que seguir resolviendo.
+            if (is_string($ref) && isset($all[$ref])) {
+                $out[] = $all[$ref];
+                continue;
+            }
+            $row = Content::byId($all, (int)$ref);
+            if ($row !== null) { $out[] = $row; }
+        }
+        return $out;
+    }
+
+    /**
+     * Catalogo agrupado por categoria: solo categorias con productos, cada una
+     * con sus N mejores. Se renderiza como secciones H2 (mejor estructura de
+     * headings para SEO que una grilla plana).
      *
      * @return array<int, array{category:array<string,mixed>, products:array<int,array<string,mixed>>, total:int}>
      */
     public static function groupedByCategory(int $siteId, int $limitPerCat = 8): array
     {
-        $cats = self::db()->fetchAll(
-            "SELECT c.id, c.slug, c.name, c.description
-             FROM categories c
-             WHERE c.site_id = :s
-               AND EXISTS (SELECT 1 FROM products p WHERE p.site_id = c.site_id AND p.category_id = c.id)
-             ORDER BY c.sort_order, c.name",
-            ['s' => $siteId]
-        );
+        $cats = self::sort(array_values(Content::categories()), [['sort_order', 'asc'], ['name', 'asc']]);
+        $products = array_values(Content::products());
 
         $out = [];
         foreach ($cats as $cat) {
-            $products = self::db()->fetchAll(
-                "SELECT p.*, c.slug AS category_slug, c.name AS category_name
-                 FROM products p
-                 LEFT JOIN categories c ON c.id = p.category_id
-                 WHERE p.site_id = :s AND p.category_id = :cid
-                 ORDER BY p.featured DESC, p.rating DESC, p.updated_at DESC
-                 LIMIT $limitPerCat",
-                ['s' => $siteId, 'cid' => $cat['id']]
-            );
-            $total = (int)self::db()->fetchColumn(
-                'SELECT COUNT(*) FROM products WHERE site_id = :s AND category_id = :cid',
-                ['s' => $siteId, 'cid' => $cat['id']]
-            );
-            if (!$products) { continue; }
+            $inCat = array_values(array_filter(
+                $products,
+                fn($p) => (int)($p['category_id'] ?? 0) === (int)$cat['id']
+            ));
+            if (!$inCat) { continue; }
+            $sorted = self::sort($inCat, [['featured', 'desc'], ['rating', 'desc'], ['updated_at', 'desc']]);
             $out[] = [
                 'category' => $cat,
-                'products' => self::hydrateAll($products),
-                'total'    => $total,
+                'products' => array_slice($sorted, 0, $limitPerCat),
+                'total'    => count($inCat),
             ];
         }
 
-        // Productos sin categoria (opcional, al final)
-        $uncategorized = self::db()->fetchAll(
-            "SELECT p.*, NULL AS category_slug, NULL AS category_name
-             FROM products p
-             WHERE p.site_id = :s AND p.category_id IS NULL
-             ORDER BY p.featured DESC, p.rating DESC
-             LIMIT $limitPerCat",
-            ['s' => $siteId]
-        );
-        if ($uncategorized) {
+        // Productos sin categoria, al final.
+        $orphans = array_values(array_filter($products, fn($p) => empty($p['category_id'])));
+        if ($orphans) {
+            $sorted = self::sort($orphans, [['featured', 'desc'], ['rating', 'desc']]);
             $out[] = [
                 'category' => ['id' => 0, 'slug' => null, 'name' => 'Otros productos', 'description' => null],
-                'products' => self::hydrateAll($uncategorized),
-                'total'    => count($uncategorized),
+                'products' => array_slice($sorted, 0, $limitPerCat),
+                'total'    => count($orphans),
             ];
         }
 

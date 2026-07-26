@@ -1,7 +1,7 @@
 <?php
 namespace Controllers;
 
-use Core\Database;
+use Models\Category;
 use Models\Product;
 
 final class CategoryController extends Controller
@@ -23,10 +23,7 @@ final class CategoryController extends Controller
             || (($filters['sort'] ?? 'featured') !== 'featured')
             || $page > 1;
 
-        $cats = Database::instance()->fetchAll(
-            'SELECT id, slug, name FROM categories WHERE site_id = :s ORDER BY sort_order, name',
-            ['s' => $this->site->id]
-        );
+        $cats = Category::all($this->site->id);
 
         $this->seo
             ->title('Catálogo de productos')
@@ -43,18 +40,7 @@ final class CategoryController extends Controller
         if (!$hasActiveFilters) {
             // Vista agrupada por categoria con H2s
             $grouped = Product::groupedByCategory($this->site->id, 8);
-            $totalProducts = (int)Database::instance()->fetchColumn(
-                'SELECT COUNT(*) FROM products WHERE site_id = :s',
-                ['s' => $this->site->id]
-            );
-
-            // Brands disponibles para el filtro (incluso en vista grouped)
-            $brandRows = Database::instance()->fetchAll(
-                "SELECT DISTINCT brand FROM products
-                 WHERE site_id = :s AND brand IS NOT NULL AND brand <> ''
-                 ORDER BY brand ASC LIMIT 200",
-                ['s' => $this->site->id]
-            );
+            $totalProducts = count(\Core\Content::products());
 
             $this->render('category', [
                 'category'        => null,
@@ -64,7 +50,7 @@ final class CategoryController extends Controller
                 'total'           => $totalProducts,
                 'filters'         => $filters,
                 'sorts'           => Product::SORTS,
-                'brands'          => array_column($brandRows, 'brand'),
+                'brands'          => Product::brands($this->site->id),
                 'categories'      => $cats,
                 'selected_cat_id' => null,
                 'products'        => [],
@@ -100,10 +86,7 @@ final class CategoryController extends Controller
     public function show(array $params): void
     {
         $slug = $params['slug'] ?? '';
-        $cat = Database::instance()->fetch(
-            'SELECT * FROM categories WHERE site_id = :site AND slug = :slug LIMIT 1',
-            ['site' => $this->site->id, 'slug' => $slug]
-        );
+        $cat = Category::findBySlug($this->site->id, $slug);
         if (!$cat) {
             $this->notFound("Categoría no encontrada");
             return;
@@ -113,10 +96,7 @@ final class CategoryController extends Controller
         $page = max(1, (int)($_GET['page'] ?? 1));
         $data = Product::catalog($this->site->id, $filters, $page, 24);
 
-        $cats = Database::instance()->fetchAll(
-            'SELECT id, slug, name FROM categories WHERE site_id = :s ORDER BY sort_order, name',
-            ['s' => $this->site->id]
-        );
+        $cats = Category::all($this->site->id);
 
         // Filtros que NO sean la categoria base (que viene fija de la URL)
         // hacen que esta variante se considere parametrizada -> noindex follow.
@@ -174,10 +154,7 @@ final class CategoryController extends Controller
         ];
         // Para el listado global, permitir cambiar de categoria via ?cat=slug
         if ($forcedCategoryId === null && !empty($_GET['cat'])) {
-            $catRow = Database::instance()->fetch(
-                'SELECT id FROM categories WHERE site_id = :s AND slug = :slug LIMIT 1',
-                ['s' => $this->site->id, 'slug' => (string)$_GET['cat']]
-            );
+            $catRow = Category::findBySlug($this->site->id, (string)$_GET['cat']);
             if ($catRow) {
                 $f['category_id'] = (int)$catRow['id'];
             }

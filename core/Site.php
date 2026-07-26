@@ -2,16 +2,18 @@
 namespace Core;
 
 /**
- * Tenant resolver.
+ * Resolver del sitio activo.
  *
- * Resuelve el sitio activo a partir del host HTTP. Todas las consultas
- * tenant-scoped deben usar Site::current()->id como filtro obligatorio.
+ * La configuracion viene de content/site.php via Content::site().
  *
  * Flujo:
  *   1. Normaliza el host (lowercase, sin puerto, sin "www.").
- *   2. Busca en tabla `sites` por `domain`.
- *   3. Fallback: override por env (DEV_SITE_DOMAIN) util para dev local.
- *   4. Si no hay match: 404 tenant (no revelar sitios existentes).
+ *   2. Compara contra el dominio configurado.
+ *   3. Override por env (DEV_SITE_DOMAIN) util para dev local.
+ *   4. Si no hay match: 404 (no revelar nada del sitio).
+ *
+ * Los metodos conservan la firma con $siteId de la epoca multi-tenant para no
+ * tocar todas las llamadas; hoy siempre es 1.
  */
 final class Site
 {
@@ -98,12 +100,11 @@ final class Site
             return null;
         }
 
-        $row = Database::instance()->fetch(
-            'SELECT * FROM sites WHERE domain = :domain AND active = 1 LIMIT 1',
-            ['domain' => $host]
-        );
-
-        if (!$row) {
+        $row = Content::site();
+        if (!$row || empty($row['active'])) {
+            return null;
+        }
+        if (self::normalizeHost((string)$row['domain']) !== $host) {
             return null;
         }
 

@@ -2,79 +2,52 @@
 namespace Core;
 
 /**
- * KV settings por sitio. Cache por request (un SELECT por sitio por request).
+ * Settings del sitio (ex tabla `settings`). Ahora es el bloque 'settings' de
+ * content/site.php: en memoria y de solo lectura.
+ *
+ * Se conserva la firma con $siteId de la epoca multi-tenant para no tocar a los
+ * llamadores (el layout y el partial del newsletter). Hoy el parametro se ignora.
  *
  * Uso:
- *   Settings::get($siteId, 'newsletter_enabled', '0');
- *   Settings::set($siteId, 'newsletter_enabled', '1');
- *   Settings::all($siteId);
+ *   Settings::get($site->id, 'theme_preset', 'indigo-night');
+ *   Settings::getBool($site->id, 'newsletter_enabled', false);
  */
 final class Settings
 {
-    /** @var array<int, array<string, string>> */
-    private static array $cache = [];
-
+    /**
+     * @param mixed $default
+     * @return mixed
+     */
     public static function get(int $siteId, string $key, $default = null)
     {
-        self::loadIfNeeded($siteId);
-        return self::$cache[$siteId][$key] ?? $default;
+        $all = self::all($siteId);
+        if (!array_key_exists($key, $all)) {
+            return $default;
+        }
+        $v = $all[$key];
+        // Los booleanos del archivo de config se exponen como '1'/'0' para que
+        // los callers que castean a string se comporten igual que con la DB.
+        if (is_bool($v)) {
+            return $v ? '1' : '0';
+        }
+        return $v;
     }
 
     public static function getBool(int $siteId, string $key, bool $default = false): bool
     {
-        $v = self::get($siteId, $key, null);
-        if ($v === null) { return $default; }
-        return filter_var($v, FILTER_VALIDATE_BOOLEAN);
+        $all = self::all($siteId);
+        if (!array_key_exists($key, $all)) {
+            return $default;
+        }
+        return filter_var($all[$key], FILTER_VALIDATE_BOOLEAN);
     }
 
     /**
-     * @return array<string, string>
+     * @return array<string, mixed>
      */
-    public static function all(int $siteId): array
+    public static function all(int $siteId = 1): array
     {
-        self::loadIfNeeded($siteId);
-        return self::$cache[$siteId];
-    }
-
-    public static function set(int $siteId, string $key, ?string $value): void
-    {
-        if ($value === null || $value === '') {
-            Database::instance()->query(
-                'DELETE FROM settings WHERE site_id = :s AND `key` = :k',
-                ['s' => $siteId, 'k' => $key]
-            );
-        } else {
-            Database::instance()->query(
-                'INSERT INTO settings (site_id, `key`, `value`) VALUES (:s, :k, :v)
-                 ON DUPLICATE KEY UPDATE `value` = VALUES(`value`), updated_at = CURRENT_TIMESTAMP',
-                ['s' => $siteId, 'k' => $key, 'v' => $value]
-            );
-        }
-        unset(self::$cache[$siteId]); // invalidate
-    }
-
-    public static function forgetCache(?int $siteId = null): void
-    {
-        if ($siteId === null) {
-            self::$cache = [];
-        } else {
-            unset(self::$cache[$siteId]);
-        }
-    }
-
-    private static function loadIfNeeded(int $siteId): void
-    {
-        if (isset(self::$cache[$siteId])) {
-            return;
-        }
-        $rows = Database::instance()->fetchAll(
-            'SELECT `key`, `value` FROM settings WHERE site_id = :s',
-            ['s' => $siteId]
-        );
-        $map = [];
-        foreach ($rows as $r) {
-            $map[$r['key']] = $r['value'];
-        }
-        self::$cache[$siteId] = $map;
+        $site = Content::site();
+        return is_array($site['settings'] ?? null) ? $site['settings'] : [];
     }
 }

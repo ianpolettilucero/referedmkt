@@ -77,13 +77,17 @@ if (!function_exists('category_url')) {
 if (!function_exists('affiliate_url')) {
     /**
      * URL de tracking /go/{slug} con contexto opcional.
+     *
+     * El contexto viaja como slug (a=articulo, p=producto) y solo alimenta los
+     * UTM del destino, para saber desde donde salio el click en el reporte de
+     * la red de afiliados.
      */
-    function affiliate_url(string $trackingSlug, ?int $articleId = null, ?int $productId = null): string
+    function affiliate_url(string $trackingSlug, ?string $articleSlug = null, ?string $productSlug = null): string
     {
         $url = '/go/' . rawurlencode($trackingSlug);
         $qs = [];
-        if ($articleId) { $qs['article_id'] = $articleId; }
-        if ($productId) { $qs['product_id'] = $productId; }
+        if ($articleSlug) { $qs['a'] = $articleSlug; }
+        if ($productSlug) { $qs['p'] = $productSlug; }
         return $qs ? $url . '?' . http_build_query($qs) : $url;
     }
 }
