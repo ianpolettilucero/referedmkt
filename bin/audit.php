@@ -240,7 +240,17 @@ foreach ($pages as $url => $html) {
 
         // Densidad de datos: numeros, porcentajes, precios. Un LLM cita lo
         // verificable antes que lo generico.
-        preg_match_all('/\b\d+([.,]\d+)?\s*(%|USD|EUR|ARS|GB|TB|MB|dias?|meses|años?|horas?|min)\b/iu', $text, $datos);
+        //
+        // Dos formas, porque en castellano la moneda va adelante ("USD 58") tanto
+        // como atras ("58 USD"), y contar solo una subestimaba articulos que estan
+        // llenos de cifras. Las ramas son excluyentes: la primera arranca en digito
+        // y la segunda en letra, asi que ninguna cifra se cuenta dos veces.
+        preg_match_all(
+            '/\b\d+([.,]\d+)?\s*(%|USD|EUR|ARS|GB|TB|MB|d[ií]as?|semanas?|meses|años?|horas?|min)\b'
+            . '|\b(USD|EUR|ARS)\s*\d+([.,]\d+)?/iu',
+            $text,
+            $datos
+        );
         $nDatos = count($datos[0]);
         if ($nDatos < 5) {
             $add('warn', 'geo', $url, "Solo $nDatos datos cuantificados. Los asistentes citan cifras concretas.");

@@ -37,7 +37,7 @@ El cambio no fue cultural. Fue **técnico y económico**:
 - Los atacantes **automatizaron el reconocimiento** — bots escanean internet completo cada pocas horas buscando objetivos vulnerables
 - El **ransomware-as-a-service (RaaS)** bajó la barrera de entrada: hoy cualquier criminal sin habilidades técnicas puede alquilar herramientas de ataque completas
 - La **IA generativa** potenció la ingeniería social: los phishings son indistinguibles del correo legítimo, los deepfakes de voz son convincentes y los ataques se escalan masivamente
-- Los **mercados de credenciales comprometidas** permiten comprar acceso inicial a empresas por entre USD 50 y USD 5.000, según tamaño
+- Los **mercados de credenciales comprometidas** permiten comprar acceso inicial a empresas por entre USD 50 y USD 5.000, según tamaño — y el segundo factor corta esa venta solo si cubre todos los accesos, que es donde [el MFA deja huecos](/guia/ya-tenes-mfa-y-no-alcanza) en casi cualquier PyME
 
 Resultado: las PyMEs pasaron de ser ignoradas a ser **el objetivo preferido**. Son suficientemente grandes para pagar un rescate, suficientemente chicas para no tener defensas serias, y hay millones — el atacante no te elige, te encuentra.
 
@@ -58,7 +58,7 @@ Para **PyMEs latinoamericanas**, los números absolutos son más chicos pero **p
 
 - Rescates típicos de ransomware: **USD 25.000 a USD 500.000**
 - Costo total de recovery (rescate + downtime + consultoría + pérdida clientes): **USD 50.000 a USD 250.000**
-- Entre el **30% y 40%** de las PyMEs que sufren ransomware **cierran dentro de los 6 meses** siguientes al incidente
+- Entre el **30% y 40%** de las PyMEs que sufren ransomware **cierran dentro de los 6 meses** siguientes al incidente; de qué lado caés depende casi siempre de si el backup sobrevivió, y para las empresas que trabajan en la nube eso significa tener [backup de Microsoft 365](/guia/backup-microsoft-365-hace-falta) propio
 
 ### Qué compone realmente el costo de una brecha
 
@@ -78,7 +78,7 @@ El componente más subestimado es el **business loss** (pérdida de negocio). Se
 
 Un hallazgo clave del reporte 2025 que cambia el marco completo:
 
-- **1 de cada 6 brechas** involucró atacantes usando IA (principalmente para phishing y deepfakes)
+- **1 de cada 6 brechas** involucró atacantes usando IA (principalmente para phishing y deepfakes) — el filtro de correo pasó a ser control de primera línea, y la [comparativa de seguridad de email para PyMEs](/comparativa/comparativa-seguridad-email-pymes) mide cuál detecta qué y a qué precio por buzón
 - El **20% de las brechas** involucró *Shadow AI* — empleados usando herramientas como ChatGPT, Claude o Copilot sin autorización ni controles, filtrando información sensible
 - El **Shadow AI agregó en promedio USD 670.000** al costo de los incidentes donde estuvo presente
 - Organizaciones que usaron **IA y automatización extensivamente en defensa** ahorraron en promedio **USD 1,9 millones por brecha** comparado con las que no
@@ -116,7 +116,7 @@ Benchmarks reales del mercado en 2026:
 
 **Regla general**: entre **1% y 2% del revenue** debería ir a ciberseguridad. Sectores regulados (financiero, salud, gobierno) típicamente llegan al **3-5%**. Si gastás menos del 1%, estás subsidiando a los atacantes.
 
-Para un plan concreto de implementación por capas en 90 días, podés leer la [Guía de ciberseguridad para PyMEs LATAM](https://capacero.online/guia/guia-ciberseguridad-pymes-latam-2026) que cubre el stack mínimo paso a paso.
+Para un plan concreto de implementación por capas en 90 días, podés leer la [Guía de ciberseguridad para PyMEs LATAM](/guia/guia-ciberseguridad-pymes-latam-2026) que cubre el stack mínimo paso a paso.
 
 ### Compliance: ya no es solo "cumplir", es sobrevivir
 
@@ -233,13 +233,13 @@ A continuación, los roles más comunes en 2026, con rangos salariales en USD (E
 
 **Penetration Tester / Red Team**
 
-- **Qué hace**: pruebas de penetración, simulación de ataques, reporting
+- **Qué hace**: pruebas de penetración, simulación de ataques, reporting — el detalle del rol está en [qué es un pentester](/guia/que-es-un-pentester-perfil-rol-como-evaluar)
 - **Salario**: USD 100.000-160.000 (OSCP + 2-4 años de experiencia)
 - **Requisitos**: mentalidad ofensiva + certificaciones prácticas (OSCP, OSEP)
 
 **Red Team Operator senior**
 
-- **Qué hace**: operaciones ofensivas avanzadas, adversary emulation
+- **Qué hace**: operaciones ofensivas avanzadas, adversary emulation — la disciplina, explicada en [red teaming: qué es y cuándo contratarlo](/guia/red-teaming-que-es-cuando-contratarlo)
 - **Salario**: USD 150.000-220.000
 - **Requisitos**: experiencia en red team + certificaciones avanzadas (OSEP, CRTO)
 
@@ -294,7 +294,7 @@ Más allá de los salarios, los aspectos de cultura y día-a-día importan:
 
 - **Pressure point** — los roles de respuesta a incidentes son intensos; estar de guardia, trabajar fines de semana cuando hay crisis, presión psicológica durante brechas activas
 - **Burnout real** — la industria tiene tasas de burnout por encima del promedio tecnológico; ISC2 reporta que el 60% del personal considera dejar el área en algún momento
-- **Remote work** — alto porcentaje de roles son remotos o híbridos, especialmente en ingeniería y GRC
+- **Remote work** — alto porcentaje de roles son remotos o híbridos, especialmente en ingeniería y GRC, lo que traslada el problema al [acceso remoto seguro](/guia/acceso-remoto-seguro-sin-vpn) de la propia empresa
 - **Carrera global** — las habilidades son transferibles internacionalmente; un *security engineer* argentino puede trabajar para empresas europeas o estadounidenses sin mudarse
 - **Aprendizaje continuo obligatorio** — el campo cambia tan rápido que parar de estudiar equivale a quedar obsoleto en 2-3 años
 - **Diversidad aún en construcción** — el área está trabajando activamente en mejorar representación femenina y minorías, con programas y becas específicos que vale la pena buscar
@@ -394,7 +394,7 @@ Basado en premiums salariales documentados y demanda real del mercado global:
 - **Costo**: USD 1.650-2.500 (incluye curso y examen)
 - **Salario asociado**: USD 90.000-130.000 (OSCP + 1-2 años experiencia)
 - **Para quién**: pentesters, red teamers, professionals técnicos ofensivos
-- **Por qué**: certificación 100% práctica; 24 horas de pentest real + 24 de reporte; la más respetada en el mundo ofensivo
+- **Por qué**: certificación 100% práctica; 24 horas de pentest real + 24 de reporte; la más respetada en el mundo ofensivo. El resto de las siglas ofensivas están decodificadas en [certificaciones de pentesting](/guia/certificaciones-pentesting-que-exigir-proveedor)
 
 **OSEP (Offensive Security Experienced Penetration Tester)**
 
@@ -520,17 +520,17 @@ El criterio simple: **si una certificación no aparece pedida en al menos 20% de
 Si esta guía te resultó útil y querés profundizar en aspectos específicos:
 
 - [Guía de ciberseguridad para PyMEs LATAM 2026](https://capacero.online/guia/guia-ciberseguridad-pymes-latam-2026) — plan práctico de implementación por capas en 90 días
-- [Cómo configurar MFA en toda tu PyME en un fin de semana](https://capacero.online/guia/configurar-mfa-pyme-fin-de-semana) — guía tactical paso a paso
-- [Comparativa Bitdefender vs Kaspersky vs ESET](https://capacero.online/comparativa/bitdefender-vs-kaspersky-vs-eset) — análisis detallado de productos EDR empresariales
-- [Reseña de 1Password Business (12 meses)](https://capacero.online/resena/resena-1password-business-12-meses) — experiencia real con password manager empresarial
+- [Cómo configurar MFA en toda tu PyME en un fin de semana](/guia/configurar-mfa-pyme-fin-de-semana) — guía tactical paso a paso
+- [Comparativa Bitdefender vs Kaspersky vs ESET](/comparativa/bitdefender-vs-kaspersky-vs-eset) — análisis detallado de productos EDR empresariales
+- [Reseña de 1Password Business (12 meses)](/resena/resena-1password-business-12-meses) — experiencia real con password manager empresarial
 
 ### Categorías de productos que complementan lo explicado acá
 
-- [Antivirus y EDR](https://capacero.online/productos/antivirus-y-edr) — para detección y respuesta en endpoints
-- [Gestión de contraseñas](https://capacero.online/productos/gestion-contrasenas) — para eliminar el problema del reuso de contraseñas
-- [Backup y recuperación](https://capacero.online/productos/backup-y-recuperacion) — último recurso ante ransomware
-- [VPN y acceso remoto](https://capacero.online/productos/vpn-y-acceso-remoto) — ZTNA moderno para fuerza de trabajo distribuida
-- [MFA y autenticación](https://capacero.online/productos/mfa-y-autenticacion) — el control con mejor ROI del mercado
+- [Antivirus y EDR](/productos/antivirus-y-edr) — para detección y respuesta en endpoints
+- [Gestión de contraseñas](/productos/gestion-contrasenas) — para eliminar el problema del reuso de contraseñas
+- [Backup y recuperación](/productos/backup-y-recuperacion) — último recurso ante ransomware
+- [VPN y acceso remoto](/productos/vpn-y-acceso-remoto) — ZTNA moderno para fuerza de trabajo distribuida
+- [MFA y autenticación](/productos/mfa-y-autenticacion) — el control con mejor ROI del mercado
 
 ---
 

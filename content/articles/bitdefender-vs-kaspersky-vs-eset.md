@@ -126,6 +126,8 @@ Acá aparece la diferencia más importante del 2026. Los tres tienen EDR, pero c
 - **Para usabilidad con equipo chico** — Kaspersky (diseñado explícitamente para admins sin SOC)
 - **Para prevención proactiva** — Bitdefender (Risk Management es único)
 
+Un matiz que conviene tener presente en los tres: el rollback anti-ransomware actúa sobre archivos del endpoint. Lo que vive en la nube queda afuera de esa red de contención, y ahí el que responde es el [backup de Microsoft 365](/guia/backup-microsoft-365-hace-falta), no el EDR.
+
 ---
 
 ## 4. Ecosistema e integraciones
@@ -144,7 +146,7 @@ Los tres integran con **Splunk, Microsoft Sentinel, IBM QRadar y ArcSight** vía
 
 ### Integraciones con identidad moderna (Okta, Entra ID)
 
-- **Bitdefender** — buena integración con Azure AD/Entra ID
+- **Bitdefender** — buena integración con Azure AD/[Microsoft Entra ID](/producto/microsoft-entra-id)
 - **Kaspersky** — AD on-premise muy bueno, Entra ID funcional
 - **ESET** — AD on-premise excelente, integraciones cloud-native algo más limitadas
 
@@ -171,6 +173,8 @@ Datos de **precio de lista referencial** 2026 para el tier comparado (pueden var
 - **Bitdefender** — NGAV, EDR, Risk Management, Anti-Ransomware, controles completos. **Mail Security es add-on.**
 - **Kaspersky** — NGAV, EDR, Adaptive Anomaly Control, controles completos. **Mail Security es add-on.**
 - **ESET** — NGAV, EDR, Cifrado, **Mail Security incluida**, Cloud App Security, MFA básico. El más completo por default.
+
+El módulo de correo pesa más de lo que parece en la cuenta final. Si el filtro de email es la pieza que te falta, la [comparativa de seguridad de email para PyMEs](/comparativa/comparativa-seguridad-email-pymes) tiene el precio por buzón y el mínimo de licencias de los cinco productos dedicados del mercado.
 
 ### Costo total real (lo que se ve después de licenciar lo que falta)
 
@@ -340,9 +344,9 @@ Esta dimensión **no existía** hace 10 años y hoy es uno de los factores decis
 
 Siendo honestos: si tu empresa tiene **presupuesto holgado y equipo SOC maduro**, los tres quedan un escalón por debajo de los líderes top del mercado en 2026:
 
-- **CrowdStrike Falcon** — la referencia top en XDR cloud-native y threat hunting gestionado
-- **SentinelOne Singularity** — rollback automático de ransomware único en el mercado
-- **Microsoft Defender for Endpoint P2** — inmejorable si ya tenés Microsoft 365 E5
+- **[CrowdStrike Falcon](/producto/crowdstrike-falcon)** — la referencia top en XDR cloud-native y threat hunting gestionado
+- **[SentinelOne Singularity](/producto/sentinelone-singularity)** — rollback automático de ransomware único en el mercado
+- **[Microsoft Defender for Endpoint P2](/producto/microsoft-defender-for-endpoint-p2)** — inmejorable si ya tenés Microsoft 365 E5
 
 Bitdefender, Kaspersky y ESET compiten contra estos tres en el **mid-market** donde el costo-beneficio manda. Para empresas grandes con equipos de seguridad sofisticados, la comparación se debería ampliar a los líderes top.
 

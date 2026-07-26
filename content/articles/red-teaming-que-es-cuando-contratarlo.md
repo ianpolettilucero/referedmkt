@@ -88,12 +88,12 @@ Esta es la sección que te va a ahorrar dinero si la leés con honestidad.
 
 Red team **no tiene sentido** si:
 
-- **No tenés MFA obligatorio** en todas las cuentas corporativas. El red team va a entrar en el día uno con phishing exitoso y el engagement pierde todo valor educativo.
+- **No tenés MFA obligatorio** en todas las cuentas corporativas. El red team va a entrar en el día uno con phishing exitoso y el engagement pierde todo valor educativo. Y "todas" es literal: [los accesos que quedan sin segundo factor](/guia/ya-tenes-mfa-y-no-alcanza) son la puerta que se prueba primero.
 - **No tenés EDR desplegado** en la mayoría de endpoints. Sin detección en endpoint, no hay red team serio que medir.
 - **Tu equipo de seguridad son menos de 3 personas** dedicadas full-time. Red team sin SOC que evaluar es teatro caro.
 - **Nunca hiciste un pentest real.** Si hay vulnerabilidades básicas sin arreglar, el red team las va a explotar en 48 horas y el resto del engagement es irrelevante.
 - **No tenés proceso documentado de respuesta a incidentes.** No podés evaluar la respuesta si no tenés proceso que evaluar.
-- **Tu empresa tiene menos de 200 empleados** y el problema real es que no tenés los controles básicos todavía. Plata mejor gastada en implementar [MFA](https://capacero.online/productos/mfa-y-autenticacion), [EDR](https://capacero.online/productos/antivirus-y-edr) y [backup](https://capacero.online/productos/backup-y-recuperacion).
+- **Tu empresa tiene menos de 200 empleados** y el problema real es que no tenés los controles básicos todavía. Plata mejor gastada en implementar [MFA y autenticación](/productos/mfa-y-autenticacion), EDR y [backup y recuperación](/productos/backup-y-recuperacion).
 
 Red team **sí tiene sentido** si:
 
@@ -116,7 +116,7 @@ Un engagement bien estructurado tiene varias fases que exceden lo que un pentest
 
 **Threat intelligence previa (1 semana).** El red team investiga al adversario elegido y al cliente. Reconocimiento OSINT de empleados, infraestructura, vendors, tecnologías. Preparación de infraestructura atacante (dominios, C2, certificados).
 
-**Initial access (variable, 1-4 semanas típicamente).** Intentos de entrar. Phishing dirigido, explotación de vulnerabilidades expuestas, ingeniería social, en algunos casos ataques a la cadena de suministro. Esta es la fase más incierta — puede funcionar rápido o demorar semanas.
+**Initial access (variable, 1-4 semanas típicamente).** Intentos de entrar. Phishing dirigido, explotación de vulnerabilidades expuestas, ingeniería social, en algunos casos ataques a la cadena de suministro. Del lado defensivo, lo primero que achica esa superficie es autenticar el propio dominio con [SPF, DKIM y DMARC](/guia/configurar-spf-dkim-dmarc-paso-a-paso) para que el spear phishing no llegue firmado como tuyo. Esta es la fase más incierta — puede funcionar rápido o demorar semanas.
 
 **Establecimiento de persistencia y C2 (1-2 semanas).** Una vez adentro, el red team establece canales de comunicación encubiertos, instala mecanismos de persistencia para sobrevivir reinicios, comienza reconocimiento interno.
 

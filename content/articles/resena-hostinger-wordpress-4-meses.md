@@ -50,7 +50,7 @@ Elegí Hostinger por tres razones concretas:
 - **Presencia en la lista oficial de hosts recomendados por WordPress.org** — que es una señal real, no marketing (Hostinger reemplazó a SiteGround en esa lista en los últimos años)
 - **Precio inicial bajo** con buen margen de prueba
 
-El plan contratado fue **Hostinger Business con término largo**, que es el que tiene sentido cuando se cree que el hosting va a quedarse — el precio por mes baja fuerte comparado con el plan mensual o anual.
+El plan contratado fue **[Hostinger Business](/producto/hostinger-business) con término largo**, que es el que tiene sentido cuando se cree que el hosting va a quedarse — el precio por mes baja fuerte comparado con el plan mensual o anual.
 
 ---
 
@@ -155,6 +155,8 @@ El plan Business incluye **backups diarios automáticos** con retención y posib
 
 Todavía no tuve que usar backups para recuperarme de un desastre, pero probé el proceso de restore en staging para verificar que funciona. Funciona.
 
+Un recordatorio que vale fuera del hosting: estos backups cubren el sitio web, no el correo ni los archivos que viven en la nube. Esa parte queda descubierta y necesita [backup de Microsoft 365](/guia/backup-microsoft-365-hace-falta) aparte, porque la retención del proveedor se mide en días, no en años.
+
 ### SSL que simplemente funciona
 
 No toqué nada relacionado con certificados en 4 meses. Let's Encrypt se renueva solo, el HTTPS está activo por default con redirección desde HTTP, el wildcard cubre subdominios. Suena básico pero en hostings peores perdía tiempo reconfigurando esto cada 90 días.
@@ -175,6 +177,8 @@ Hostinger tiene por default:
 - **Malware scan** periódico
 
 No reemplaza a Wordfence o a una capa de seguridad seria, pero es más de lo que ofrecen muchos competidores al mismo precio. Yo sumé **Wordfence** como segunda capa en los dos sitios.
+
+Aparte: hPanel soporta segundo factor y conviene activarlo el primer día. El panel del hosting es uno de [los accesos que quedan afuera cuando se despliega MFA](/guia/ya-tenes-mfa-y-no-alcanza) — casi nunca está en la lista, y controla el sitio entero.
 
 ---
 
@@ -198,7 +202,7 @@ Si sos técnico y podés diagnosticar vos, no es crítico. Si dependés 100% del
 
 El email incluido en el plan funciona pero es **básico**. Para un sitio personal o blog chico es suficiente. Para cualquier proyecto serio, tiene más sentido mantener email corporativo en **Google Workspace** o **Microsoft 365** y usar Hostinger solo para hosting web.
 
-Configurar MX records para desacoplar email del hosting web es simple desde hPanel — solo hay que saber que lo querés hacer.
+Configurar MX records para desacoplar email del hosting web es simple desde hPanel — solo hay que saber que lo querés hacer. Y si estás tocando el DNS, aprovechá el mismo viaje para dejar bien [SPF, DKIM y DMARC](/guia/configurar-spf-dkim-dmarc-paso-a-paso): son los tres registros que evitan que te suplanten el dominio, y se configuran en el mismo panel.
 
 ### Latencia desde Sudamérica
 
