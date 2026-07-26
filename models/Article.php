@@ -4,7 +4,7 @@ namespace Models;
 final class Article extends Model
 {
     protected const TABLE = 'articles';
-    protected const JSON_COLUMNS = ['related_product_ids'];
+    protected const JSON_COLUMNS = ['related_product_ids', 'pros', 'cons'];
 
     /** @return array<int, array<string, mixed>> */
     public static function recent(int $siteId, int $limit = 10, ?string $type = null): array

@@ -16,6 +16,11 @@ if (!empty($row['published_at'])) {
     $publishedLocal = date('Y-m-d\TH:i', strtotime($row['published_at']));
 }
 $broken_links = $broken_links ?? [];
+$prosText = implode("\n", array_map('strval', is_array($row['pros'] ?? null) ? $row['pros'] : []));
+$consText = implode("\n", array_map('strval', is_array($row['cons'] ?? null) ? $row['cons'] : []));
+$ratingValue = ($row['rating'] ?? null) !== null && $row['rating'] !== ''
+    ? rtrim(rtrim(number_format((float)$row['rating'], 2, '.', ''), '0'), '.')
+    : '';
 ?>
 <div class="admin-page-header">
     <h1 class="admin-page-title"><?= $is_new ? 'Nuevo artículo' : 'Editar artículo' ?></h1>
@@ -157,6 +162,49 @@ $broken_links = $broken_links ?? [];
         <?php endif; ?>
     </div>
 
+    <details class="admin-field" <?= ($ratingValue !== '' || $prosText !== '' || $consText !== '' || !empty($row['verdict'])) ? 'open' : '' ?>
+             style="background:var(--a-bg-elev);border:1px solid var(--a-border);border-radius:var(--a-radius);padding:0.75rem 1rem">
+        <summary style="cursor:pointer;font-weight:600;color:var(--a-text)">
+            Veredicto editorial
+            <small class="admin-hint" style="display:inline;font-weight:400">
+                (opcional — para reseñas y comparativas)
+            </small>
+        </summary>
+
+        <p class="admin-hint" style="margin:0.6rem 0 0.9rem">
+            Con <strong>nota</strong> + al menos un producto relacionado, la reseña emite
+            schema.org <code>Review</code> con <code>itemReviewed</code> y <code>reviewRating</code>.
+            Sin nota o sin producto se emite <code>Article</code>, que también es válido.
+        </p>
+
+        <div class="admin-grid admin-grid-2">
+            <div class="admin-field">
+                <label>Nota (0 a 5)</label>
+                <input type="number" name="rating" min="0" max="5" step="0.1"
+                       value="<?= htmlspecialchars($ratingValue, ENT_QUOTES, 'UTF-8') ?>"
+                       placeholder="4.5">
+                <small class="admin-hint">Dejala vacía si el artículo no puntúa nada.</small>
+            </div>
+            <div class="admin-field">
+                <label>Veredicto</label>
+                <textarea name="verdict" style="min-height:90px" placeholder="Para quién sí y para quién no. Acepta Markdown."><?= htmlspecialchars($row['verdict'] ?? '', ENT_QUOTES, 'UTF-8') ?></textarea>
+            </div>
+        </div>
+
+        <div class="admin-grid admin-grid-2">
+            <div class="admin-field">
+                <label>A favor</label>
+                <textarea name="pros" style="min-height:110px" placeholder="Un ítem por línea"><?= htmlspecialchars($prosText, ENT_QUOTES, 'UTF-8') ?></textarea>
+                <small class="admin-hint">Un ítem por línea.</small>
+            </div>
+            <div class="admin-field">
+                <label>En contra</label>
+                <textarea name="cons" style="min-height:110px" placeholder="Un ítem por línea"><?= htmlspecialchars($consText, ENT_QUOTES, 'UTF-8') ?></textarea>
+                <small class="admin-hint">Un ítem por línea.</small>
+            </div>
+        </div>
+    </details>
+
     <div class="admin-field">
         <label>Contenido (Markdown)</label>
         <textarea name="content" id="content" style="min-height:400px" required><?= htmlspecialchars($row['content'] ?? '', ENT_QUOTES, 'UTF-8') ?></textarea>
@@ -209,6 +257,11 @@ $broken_links = $broken_links ?? [];
             <p style="margin:0.75rem 0 0;font-family:var(--a-font);color:var(--a-text-muted)">
                 Tip: dejá una línea en blanco entre párrafos. Los enlaces externos se agregan
                 automáticamente con <code>rel="nofollow noopener"</code> y <code>target="_blank"</code>.
+            </p>
+            <p style="margin:0.5rem 0 0;font-family:var(--a-font);color:var(--a-text-muted)">
+                <strong>FAQ automático:</strong> si agregás un <code>## Preguntas frecuentes</code> y colgás
+                cada pregunta como <code>###</code>, se emite schema.org <code>FAQPage</code> solo, sin
+                cargar nada aparte.
             </p>
         </details>
         <div id="preview" class="admin-card" style="margin-top:0.5rem;display:none"></div>

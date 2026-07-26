@@ -1,6 +1,7 @@
 <?php
 namespace Controllers;
 
+use Core\Faq;
 use Core\Markdown;
 use Core\Toc;
 use Models\Article;
@@ -70,12 +71,36 @@ final class ArticleController extends Controller
             ->canonical(article_url($a))
             ->ogImage($a['featured_image'])
             ->ogType('article')
-            ->breadcrumb($breadcrumb)
-            ->schemaArticle($a);
+            ->breadcrumb($breadcrumb);
+
+        // Las resenas emiten Review (itemReviewed + reviewRating). El producto
+        // reseñado es el primero de los relacionados; sin producto o sin nota,
+        // schemaReview degrada solo a Article.
+        if (($a['article_type'] ?? '') === 'review') {
+            $this->seo->schemaReview($a, $relatedProducts[0] ?? null);
+        } else {
+            $this->seo->schemaArticle($a);
+        }
+
+        // FAQPage a partir de la seccion "## Preguntas frecuentes" del markdown.
+        $faqs = Faq::extract($a['content'] ?? '');
+        if ($faqs) {
+            $this->seo->schemaFaq($faqs);
+        }
+
+        $verdictHtml = '';
+        if (!empty($a['verdict'])) {
+            try {
+                $verdictHtml = Markdown::toHtml((string)$a['verdict']);
+            } catch (\Throwable $e) {
+                $verdictHtml = '<p>' . htmlspecialchars((string)$a['verdict'], ENT_QUOTES, 'UTF-8') . '</p>';
+            }
+        }
 
         $this->render('article', [
             'article'          => $a,
             'content_html'     => $contentHtml,
+            'verdict_html'     => $verdictHtml,
             'related_products' => $relatedProducts,
             'related_articles' => $relatedArticles,
             'toc_items'        => $tocItems,

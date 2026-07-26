@@ -84,7 +84,9 @@ TestRunner::group('SEO', function () {
         assert_contains('"position":1', $head);
     });
 
-    TestRunner::run('schemaProduct con rating', function () {
+    TestRunner::run('schemaProduct con rating emite Review, no aggregateRating', function () {
+        // Nuestra nota es una opinion editorial unica. Un aggregateRating con
+        // ratingCount 1 le declara a Google un agregado que no existe.
         $site = make_fake_site();
         $seo = new SEO($site);
         $seo->schemaProduct([
@@ -94,8 +96,113 @@ TestRunner::group('SEO', function () {
         ]);
         $head = $seo->renderHead();
         assert_contains('"@type":"Product"', $head);
-        assert_contains('"aggregateRating"', $head);
+        assert_not_contains('aggregateRating', $head);
+        assert_contains('"review"', $head);
         assert_contains('"ratingValue":"4.6"', $head);
+        assert_contains('"bestRating":"5"', $head);
+    });
+
+    /** Articulo minimo de tipo review para los tests de schema. */
+    function fake_review_article(array $overrides = []): array
+    {
+        return array_merge([
+            'id' => 7, 'slug' => 'bitdefender-analisis', 'title' => 'Bitdefender: analisis',
+            'excerpt' => 'Resumen corto.', 'verdict' => 'Buena opcion para PyMEs.',
+            'featured_image' => null, 'article_type' => 'review', 'rating' => 4.5,
+            'published_at' => '2026-01-10 10:00:00', 'updated_at' => '2026-03-01 09:00:00',
+            'author_name' => 'Equipo Editorial', 'author_slug' => 'equipo-editorial',
+        ], $overrides);
+    }
+
+    /** Producto minimo para los tests de schema. */
+    function fake_reviewed_product(array $overrides = []): array
+    {
+        return array_merge([
+            'name' => 'Bitdefender GravityZone', 'brand' => 'Bitdefender',
+            'slug' => 'bitdefender-gravityzone', 'logo_url' => null, 'rating' => 4.6,
+        ], $overrides);
+    }
+
+    TestRunner::run('schemaReview emite itemReviewed + reviewRating', function () {
+        $site = make_fake_site();
+        $seo = new SEO($site);
+        $seo->schemaReview(fake_review_article(), fake_reviewed_product());
+        $head = $seo->renderHead();
+        assert_contains('"@type":"Review"', $head);
+        assert_contains('"itemReviewed"', $head);
+        assert_contains('"reviewRating"', $head);
+        assert_contains('"ratingValue":"4.5"', $head);  // gana la nota del articulo
+        assert_contains('Bitdefender GravityZone', $head);
+        assert_contains('"@type":"Person"', $head);
+        assert_contains('"publisher"', $head);
+    });
+
+    TestRunner::run('schemaReview cae al rating del producto si el articulo no tiene', function () {
+        $site = make_fake_site();
+        $seo = new SEO($site);
+        $seo->schemaReview(fake_review_article(['rating' => null]), fake_reviewed_product());
+        $head = $seo->renderHead();
+        assert_contains('"@type":"Review"', $head);
+        assert_contains('"ratingValue":"4.6"', $head);
+    });
+
+    TestRunner::run('schemaReview degrada a Article sin producto', function () {
+        // Un Review sin itemReviewed es invalido: mejor un Article correcto.
+        $site = make_fake_site();
+        $seo = new SEO($site);
+        $seo->schemaReview(fake_review_article(), null);
+        $head = $seo->renderHead();
+        assert_contains('"@type":"Article"', $head);
+        assert_not_contains('"itemReviewed"', $head);
+    });
+
+    TestRunner::run('schemaReview degrada a Article sin ninguna nota', function () {
+        $site = make_fake_site();
+        $seo = new SEO($site);
+        $seo->schemaReview(
+            fake_review_article(['rating' => null]),
+            fake_reviewed_product(['rating' => null])
+        );
+        $head = $seo->renderHead();
+        assert_contains('"@type":"Article"', $head);
+        assert_not_contains('"reviewRating"', $head);
+    });
+
+    TestRunner::run('schemaArticle nunca emite Review', function () {
+        // El tipo Review sale solo por schemaReview(), que garantiza los
+        // campos obligatorios.
+        $site = make_fake_site();
+        $seo = new SEO($site);
+        $seo->schemaArticle(fake_review_article());
+        $head = $seo->renderHead();
+        assert_contains('"@type":"Article"', $head);
+        assert_not_contains('"@type":"Review"', $head);
+    });
+
+    TestRunner::run('schemaArticle usa NewsArticle para noticias', function () {
+        $site = make_fake_site();
+        $seo = new SEO($site);
+        $seo->schemaArticle(fake_review_article(['article_type' => 'news']));
+        $head = $seo->renderHead();
+        assert_contains('"@type":"NewsArticle"', $head);
+    });
+
+    TestRunner::run('schemaFaq emite FAQPage', function () {
+        $site = make_fake_site();
+        $seo = new SEO($site);
+        $seo->schemaFaq([['question' => '¿Sirve?', 'answer' => 'Si.']]);
+        $head = $seo->renderHead();
+        assert_contains('"@type":"FAQPage"', $head);
+        assert_contains('"@type":"Question"', $head);
+        assert_contains('"@type":"Answer"', $head);
+    });
+
+    TestRunner::run('schemaFaq vacio no emite nada', function () {
+        $site = make_fake_site();
+        $seo = new SEO($site);
+        $seo->schemaFaq([]);
+        $head = $seo->renderHead();
+        assert_not_contains('FAQPage', $head);
     });
 
     TestRunner::run('JSON-LD escapa </ para evitar break-out', function () {

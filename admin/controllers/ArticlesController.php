@@ -99,9 +99,11 @@ final class ArticlesController extends BaseController
             ['id' => (int)$params['id'], 's' => $site['id']]
         );
         if (!$row) { $this->redirect('/admin/articles'); return; }
-        $row['related_product_ids'] = is_string($row['related_product_ids'] ?? null)
-            ? (json_decode($row['related_product_ids'], true) ?: [])
-            : ($row['related_product_ids'] ?? []);
+        foreach (['related_product_ids', 'pros', 'cons'] as $jsonCol) {
+            $row[$jsonCol] = is_string($row[$jsonCol] ?? null)
+                ? (json_decode($row[$jsonCol], true) ?: [])
+                : ($row[$jsonCol] ?? []);
+        }
         $brokenLinks = \Core\LinkChecker::brokenForArticle((int)$row['id']);
         $this->render('articles/form', [
             'row'          => $row,
@@ -193,9 +195,23 @@ final class ArticlesController extends BaseController
             'slug' => '', 'title' => '', 'subtitle' => '', 'excerpt' => '',
             'content' => '', 'featured_image' => '',
             'article_type' => 'guide', 'related_product_ids' => [],
+            'rating' => null, 'verdict' => '', 'pros' => [], 'cons' => [],
             'meta_title' => '', 'meta_description' => '',
             'status' => 'draft', 'published_at' => null,
         ];
+    }
+
+    /**
+     * Textarea de una linea por item -> JSON array. Vacio -> null (para no
+     * guardar "[]" y poder distinguir "sin cargar" de "cargado vacio").
+     *
+     * @param mixed $raw
+     */
+    private function linesToJson($raw): ?string
+    {
+        $lines = preg_split('/\R/', (string)$raw) ?: [];
+        $lines = array_values(array_filter(array_map('trim', $lines), fn($l) => $l !== ''));
+        return $lines ? json_encode($lines, JSON_UNESCAPED_UNICODE) : null;
     }
 
     private function collect(int $siteId): array
@@ -226,6 +242,13 @@ final class ArticlesController extends BaseController
         $type = $this->input('article_type', 'guide');
         if (!in_array($type, ['review','comparison','guide','news'], true)) { $type = 'guide'; }
 
+        // Nota editorial 0-5. Acepta coma decimal (teclado es-AR).
+        $ratingRaw = trim((string)$this->input('rating', ''));
+        $rating = null;
+        if ($ratingRaw !== '') {
+            $rating = round(max(0.0, min(5.0, (float)str_replace(',', '.', $ratingRaw))), 2);
+        }
+
         return [
             'site_id'             => $siteId,
             'category_id'         => $this->intInput('category_id'),
@@ -238,6 +261,10 @@ final class ArticlesController extends BaseController
             'featured_image'      => trim((string)$this->input('featured_image', '')) ?: null,
             'article_type'        => $type,
             'related_product_ids' => $related ? json_encode($related, JSON_UNESCAPED_UNICODE) : null,
+            'rating'              => $rating,
+            'verdict'             => trim((string)$this->input('verdict', '')) ?: null,
+            'pros'                => $this->linesToJson($this->input('pros', '')),
+            'cons'                => $this->linesToJson($this->input('cons', '')),
             'meta_title'          => trim((string)$this->input('meta_title', '')) ?: null,
             'meta_description'    => trim((string)$this->input('meta_description', '')) ?: null,
             'status'              => $status,
