@@ -50,8 +50,12 @@ if ($outDir[0] !== '/') {
 
 echo "\n  Leyendo " . basename($dumpPath) . "…\n";
 
+// OJO con gzdecode(): un .gz puede ser multi-miembro (varios streams gzip
+// concatenados, que es lo que baja phpMyAdmin para dumps grandes) y gzdecode
+// solo descomprime el primero — devolvia el dump truncado en silencio. El
+// wrapper compress.zlib:// lee todos los miembros, igual que `gzip -dc`.
 $sql = substr($dumpPath, -3) === '.gz'
-    ? (string)gzdecode((string)file_get_contents($dumpPath))
+    ? (string)file_get_contents('compress.zlib://' . $dumpPath)
     : (string)file_get_contents($dumpPath);
 
 if ($sql === '') {
@@ -59,10 +63,22 @@ if ($sql === '') {
     exit(1);
 }
 
+echo "  " . number_format(strlen($sql) / 1024) . " KB de SQL\n";
+
 $db = parseDump($sql);
 foreach (['sites', 'articles'] as $t) {
     if (empty($db[$t])) {
         fwrite(STDERR, "  ✗ El dump no tiene filas en `$t`. ¿Es el backup correcto?\n\n");
+        exit(1);
+    }
+}
+
+// Red de seguridad contra un dump truncado: si el SQL declara mas filas de las
+// que pudimos leer, algo se perdio y es mejor abortar que exportar a medias.
+foreach ($db as $table => $rows) {
+    $declared = preg_match_all('/INSERT INTO `' . preg_quote($table, '/') . '`/i', $sql);
+    if ($declared > 0 && $rows === []) {
+        fwrite(STDERR, "  ✗ `$table` tiene INSERTs en el dump pero no se leyo ninguna fila.\n\n");
         exit(1);
     }
 }
