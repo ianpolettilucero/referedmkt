@@ -135,14 +135,27 @@ smoke test que levanta el sitio → si todo queda verde, el workflow `Deploy`
 pinguea el webhook de Hostinger y después verifica `/healthz` hasta confirmar
 que el sitio quedó sano.
 
-Setup, una vez:
+Setup, una vez. Hay dos mecanismos y el workflow usa el que encuentre
+configurado; con cualquiera de los dos alcanza.
 
-1. hPanel → Avanzado → GIT → activar **Auto Deployment** y copiar la URL del webhook.
-2. GitHub → Settings → Secrets and variables → Actions → **New repository secret**,
-   nombre `HOSTINGER_DEPLOY_WEBHOOK`, valor esa URL.
+**A) SSH — recomendado.** El plan Business incluye acceso SSH.
 
-Sin el secret cargado el workflow avisa y termina sin fallar: el deploy sigue
-siendo manual desde hPanel.
+```bash
+ssh-keygen -t ed25519 -f ~/.ssh/capacero_deploy -N ""
+```
+
+La clave **pública** (`capacero_deploy.pub`) va en hPanel → Avanzado → Acceso
+SSH → Claves SSH. La **privada** (`capacero_deploy`, sin `.pub`) va como secret
+`SSH_KEY` en GitHub. Host, puerto y usuario los muestra esa misma pantalla de
+hPanel → secrets `SSH_HOST`, `SSH_USER` y, si el puerto no es el 22, `SSH_PORT`.
+
+**B) Webhook.** Si en hPanel → Avanzado → GIT te aparece una URL de
+auto-deployment, cargala como secret `HOSTINGER_DEPLOY_WEBHOOK`. No todos los
+planes la exponen.
+
+Los secrets se cargan en GitHub → Settings → Secrets and variables → Actions →
+**New repository secret**. Sin ninguno, el workflow avisa y termina sin fallar:
+el deploy sigue siendo manual desde hPanel.
 
 Conviene **no** conectar el webhook de GitHub directo a Hostinger: ese dispara
 con cualquier push, sin mirar si los tests pasan. Un front-matter roto tiraría
