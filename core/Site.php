@@ -36,6 +36,7 @@ final class Site
     public ?string $metaPixelId;
     public string $defaultLanguage;
     public string $defaultCountry;
+    public ?string $tagline;
     public ?string $metaTitleTemplate;
     public ?string $metaDescriptionTemplate;
     public bool   $active;
@@ -59,6 +60,7 @@ final class Site
         $this->metaPixelId                     = $row['meta_pixel_id'] ?? null;
         $this->defaultLanguage                 = $row['default_language'] ?: 'es';
         $this->defaultCountry                  = $row['default_country'] ?: 'AR';
+        $this->tagline                         = $row['tagline'] ?? null;
         $this->metaTitleTemplate               = $row['meta_title_template'];
         $this->metaDescriptionTemplate         = $row['meta_description_template'];
         $this->active                          = (bool)$row['active'];

@@ -128,6 +128,26 @@ salvo que le pases `--force`, y deja afuera los secretos que vivían en
 - Redirects 301 declarativos para cambiar URLs sin perder posiciones
 - TOC automático y artículos relacionados por afinidad
 
+## Deploy
+
+`git push` a `main` → el CI corre lint, tests y validación de contenido, más un
+smoke test que levanta el sitio → si todo queda verde, el workflow `Deploy`
+pinguea el webhook de Hostinger y después verifica `/healthz` hasta confirmar
+que el sitio quedó sano.
+
+Setup, una vez:
+
+1. hPanel → Avanzado → GIT → activar **Auto Deployment** y copiar la URL del webhook.
+2. GitHub → Settings → Secrets and variables → Actions → **New repository secret**,
+   nombre `HOSTINGER_DEPLOY_WEBHOOK`, valor esa URL.
+
+Sin el secret cargado el workflow avisa y termina sin fallar: el deploy sigue
+siendo manual desde hPanel.
+
+Conviene **no** conectar el webhook de GitHub directo a Hostinger: ese dispara
+con cualquier push, sin mirar si los tests pasan. Un front-matter roto tiraría
+el sitio entero.
+
 ## Analítica y operación
 
 Nada de esto vive en el repo: son paneles externos ya cableados en el layout.

@@ -7,13 +7,33 @@
  * @var array      $top_categories
  */
 $view->layout('default');
+
+// Numeros reales para la barra de confianza. Nada inventado: sale del contenido.
+$nArticles = count(\Core\Content::publishedArticles());
+$nProducts = count(\Core\Content::products());
+$lastUpdate = null;
+foreach (\Core\Content::publishedArticles() as $a) {
+    $ts = !empty($a['updated_at']) ? strtotime($a['updated_at']) : null;
+    if ($ts && ($lastUpdate === null || $ts > $lastUpdate)) { $lastUpdate = $ts; }
+}
 ?>
 <section class="hero">
-    <h1><?= e($site->name) ?></h1>
+    <p class="hero-eyebrow">Análisis independiente</p>
+    <h1><?= e($site->tagline ?: $site->name) ?></h1>
     <?php if ($site->metaDescriptionTemplate): ?>
         <p class="hero-sub"><?= e($site->metaDescriptionTemplate) ?></p>
     <?php endif; ?>
-    <p><a class="btn btn-primary" href="/productos">Ver catálogo</a></p>
+    <p class="hero-actions">
+        <a class="btn btn-primary" href="/guias">Ver guías</a>
+        <a class="btn btn-ghost" href="/productos">Explorar catálogo</a>
+    </p>
+    <ul class="hero-stats">
+        <li><strong><?= (int)$nArticles ?></strong> artículos publicados</li>
+        <li><strong><?= (int)$nProducts ?></strong> productos analizados</li>
+        <?php if ($lastUpdate): ?>
+            <li>Actualizado el <strong><?= e(date('d/m/Y', $lastUpdate)) ?></strong></li>
+        <?php endif; ?>
+    </ul>
 </section>
 
 <?php if ($top_categories): ?>
