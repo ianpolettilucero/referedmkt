@@ -6,17 +6,20 @@
 
 return [
     'domain' => 'capacero.online',
-    'name' => 'ciberseguridad',
+    'name' => 'Capa Cero',
     'slug' => 'ciberseguridad',
     'theme_name' => 'default',
     'primary_color' => '#ff0000',
     'logo_url' => '/uploads/ciberseguridad/2026/04/capacero-5cc468c5.png',
     'favicon_url' => '/uploads/ciberseguridad/2026/04/capacero-5cc468c5.png',
+    // H1 del home. Es la unica pagina donde el titulo no sale del contenido.
+    'tagline' => 'Guías y reseñas de ciberseguridad para PyMEs',
     'default_language' => 'es',
     'default_country' => 'AR',
-    'meta_title_template' => 'Capa Cero | Ciberseguridad, Guías y Reseñas de Software',
+    // {title} es obligatorio: sin el, todas las paginas comparten el mismo <title>.
+    'meta_title_template' => '{title} | Capa Cero',
     'meta_description_template' => 'Descubre en Capa Cero las mejores reseñas, guías y análisis sobre ciberseguridad. Protege tus datos y aprende a navegar de forma segura con contenido experto.',
-    'affiliate_disclosure_text' => null,
+    'affiliate_disclosure_text' => 'Divulgación: este sitio contiene enlaces de afiliados. Podemos recibir una comisión si comprás a través de ellos, sin costo adicional para vos. Esto no influye en nuestras evaluaciones.',
     'google_analytics_id' => 'G-SV0MDSTQL4',
     'google_tag_manager_id' => null,
     'google_ads_id' => 'AW-17984303851',

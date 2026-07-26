@@ -94,6 +94,7 @@ final class ContentBuilder
             'meta_pixel_id'                     => null,
             'default_language'                  => 'es',
             'default_country'                   => 'AR',
+            'tagline'                           => null,
             'meta_title_template'               => null,
             'meta_description_template'         => null,
             'active'                            => 1,

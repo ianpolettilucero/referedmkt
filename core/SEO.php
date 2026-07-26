@@ -52,6 +52,14 @@ final class SEO
         }
 
         $template = $this->site->metaTitleTemplate ?: '{title} | ' . $siteName;
+
+        // Un template sin el placeholder {title} daria el MISMO <title> en todas
+        // las paginas del sitio — de los peores problemas de SEO on-page que hay.
+        // Si falta, lo tratamos como sufijo de marca para garantizar unicidad.
+        if (strpos($template, '{title}') === false) {
+            $template = '{title} | ' . $template;
+        }
+
         $rendered = str_replace('{title}', $title, $template);
 
         // Defensa extra: si el render contiene el title duplicado (X | X | ...),

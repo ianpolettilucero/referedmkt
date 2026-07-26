@@ -1,0 +1,76 @@
+name: Deploy
+
+# Dispara el pull de Hostinger, pero SOLO si el CI de main quedo verde.
+#
+# Por que no el webhook de GitHub directo a Hostinger: ese pega en cuanto hay
+# push, sin mirar si los tests pasan ni si content/ compila. Un front-matter
+# roto tiraria el sitio entero. Asi el deploy espera al CI.
+#
+# Setup (una vez):
+#   1. hPanel -> Avanzado -> GIT -> activar "Auto Deployment" y copiar la URL
+#      del webhook que te da.
+#   2. GitHub -> Settings -> Secrets and variables -> Actions -> New repository
+#      secret, nombre HOSTINGER_DEPLOY_WEBHOOK, valor esa URL.
+#
+# Sin el secret cargado el job no falla: avisa y termina.
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    branches: [main]
+    types: [completed]
+  workflow_dispatch:        # tambien se puede correr a mano desde la pestana Actions
+
+jobs:
+  deploy:
+    name: Disparar deploy en Hostinger
+    runs-on: ubuntu-latest
+    # En workflow_dispatch no hay conclusion previa; en workflow_run exigimos exito.
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event.workflow_run.conclusion == 'success'
+    steps:
+      - name: Comprobar que el webhook este configurado
+        id: check
+        env:
+          HOOK: ${{ secrets.HOSTINGER_DEPLOY_WEBHOOK }}
+        run: |
+          if [ -z "$HOOK" ]; then
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::Falta el secret HOSTINGER_DEPLOY_WEBHOOK. El deploy sigue siendo manual."
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Pingear el webhook
+        if: steps.check.outputs.configured == 'true'
+        env:
+          HOOK: ${{ secrets.HOSTINGER_DEPLOY_WEBHOOK }}
+        run: |
+          code=$(curl -sS -o /tmp/resp.txt -w '%{http_code}' --max-time 60 --retry 3 --retry-delay 5 "$HOOK")
+          echo "HTTP $code"
+          head -c 400 /tmp/resp.txt || true
+          echo
+          case "$code" in
+            2*) echo "Deploy disparado." ;;
+            *)  echo "::error::Hostinger respondio $code"; exit 1 ;;
+          esac
+
+      # El pull tarda unos segundos; el primer request recompila content/.
+      # Verificamos contra el sitio real que quedo servido lo que esperamos.
+      - name: Verificar que el sitio quedo sano
+        if: steps.check.outputs.configured == 'true'
+        run: |
+          DOMAIN=$(curl -sS https://raw.githubusercontent.com/${{ github.repository }}/main/content/site.php \
+                   | grep -oP "(?<='domain' => ')[^']+" | head -1)
+          echo "Dominio: $DOMAIN"
+          for i in $(seq 1 12); do
+            sleep 10
+            body=$(curl -sS --max-time 20 "https://$DOMAIN/healthz" || true)
+            echo "  intento $i: $body"
+            case "$body" in
+              *'"status":"ok"'*'"content"'*) echo "Sitio sano."; exit 0 ;;
+            esac
+          done
+          echo "::error::El sitio no reporto healthy despues del deploy."
+          exit 1
