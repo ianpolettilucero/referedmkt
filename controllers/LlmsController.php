@@ -181,16 +181,45 @@ final class LlmsController
         }
     }
 
+    /**
+     * https fijo, igual que sitemap.xml y robots.txt.
+     *
+     * Antes se deducia del request. En produccion daba bien, pero dependia de
+     * que el proxy mandara HTTPS o X-Forwarded-Proto: si algun dia deja de
+     * hacerlo, estos archivos empiezan a publicar URLs http en silencio, y son
+     * justo los que consumen los crawlers de LLM. El sitio fuerza HTTPS y
+     * manda HSTS por .htaccess, asi que no hay caso legitimo de http.
+     */
     private function siteBase(Site $site): string
     {
-        $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
-            || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https') ? 'https' : 'http';
-        return $scheme . '://' . $site->domain;
+        return 'https://' . $site->domain;
     }
 
+    /**
+     * Aplana un texto a una sola linea de prosa.
+     *
+     * strip_tags() sacaba el HTML pero no el Markdown, y las descripciones de
+     * categoria y producto son Markdown crudo. El resultado era que llms.txt
+     * publicaba entradas como "Hostings y Cloud: ## Servicios de Hosting para
+     * Empresas El **hosting** es la base…", con los almohadillas y los
+     * asteriscos adentro. Se limpia antes de colapsar los espacios: despues
+     * los saltos de linea ya se perdieron y un "##" de titulo queda pegado al
+     * medio de la frase, donde no hay ancla para reconocerlo.
+     */
     private function oneLine(string $s, ?int $maxChars = null): string
     {
-        $s = trim(preg_replace('/\s+/', ' ', strip_tags($s)));
+        $s = strip_tags($s);
+
+        $s = preg_replace('/^\s*#{1,6}\s+/m', '', $s);        // titulos
+        $s = preg_replace('/^\s*>\s?/m', '', $s);             // citas
+        $s = preg_replace('/^\s*[-*+]\s+/m', '', $s);         // listas
+        $s = preg_replace('/^\s*\d+\.\s+/m', '', $s);         // listas numeradas
+        $s = preg_replace('/!?\[([^\]]*)\]\([^)]*\)/', '$1', $s); // links e imagenes
+        $s = preg_replace('/(\*\*\*|\*\*|\*|___|__|_)(?=\S)(.+?)(?<=\S)\1/', '$2', $s); // enfasis
+        $s = preg_replace('/`([^`]*)`/', '$1', $s);           // codigo
+        $s = preg_replace('/^\s*(-{3,}|\*{3,}|_{3,})\s*$/m', '', $s); // separadores
+
+        $s = trim(preg_replace('/\s+/', ' ', $s));
         if ($maxChars && mb_strlen($s) > $maxChars) {
             $s = rtrim(mb_substr($s, 0, $maxChars - 1)) . '…';
         }

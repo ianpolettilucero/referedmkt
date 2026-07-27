@@ -29,7 +29,26 @@ final class SitemapController
         $categories = array_values(Content::categories());
         foreach ($products as &$p)   { $p['lastmod'] = $p['updated_at'] ?? null; }
         unset($p);
-        foreach ($categories as &$c) { $c['lastmod'] = $c['updated_at'] ?? null; }
+        // Una categoria muestra los productos y las notas que tiene adentro,
+        // asi que se mueve cuando se mueve cualquiera de ellos, no solo cuando
+        // se edita su propio .md. Ademas hay categorias sin updated_at propio y
+        // quedaban sin lastmod, que es la senal que Google usa para decidir si
+        // vale la pena volver.
+        foreach ($categories as &$c) {
+            $stamps = [];
+            if (!empty($c['updated_at'])) { $stamps[] = (string)$c['updated_at']; }
+            foreach ($products as $p) {
+                if ((int)($p['category_id'] ?? 0) === (int)$c['id'] && !empty($p['updated_at'])) {
+                    $stamps[] = (string)$p['updated_at'];
+                }
+            }
+            foreach ($articles as $a) {
+                if ((int)($a['category_id'] ?? 0) === (int)$c['id'] && !empty($a['lastmod'])) {
+                    $stamps[] = (string)$a['lastmod'];
+                }
+            }
+            $c['lastmod'] = $stamps ? max($stamps) : null;
+        }
         unset($c);
 
         // lastmod del autor = la nota suya mas recientemente tocada.
@@ -51,15 +70,46 @@ final class SitemapController
         echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"' . "\n";
         echo '        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">' . "\n";
 
-        $this->url($base . '/', null);
-        $this->url($base . '/productos', null);
-        // Solo secciones con contenido: un listado vacio en el sitemap invita a
-        // Google a rastrear una pagina sin valor.
-        foreach (active_sections() as $sec) {
-            $this->url($base . $sec['path'], null);
+        // La home y los listados eran las unicas cinco URLs del sitemap sin
+        // lastmod, y son justamente las que cambian cada vez que se publica
+        // algo: su contenido es la lista de lo ultimo. Sin lastmod, Google no
+        // tiene senal de que valga la pena volver a rastrearlas, que es lo
+        // contrario de lo que se quiere en un sitio que publica seguido.
+        // Cada listado hereda la fecha de la nota mas reciente que muestra.
+        $newestOverall = null;
+        $newestByType  = [];
+        foreach ($articles as $a) {
+            $stamp = (string)$a['lastmod'];
+            if ($stamp === '') { continue; }
+            if ($newestOverall === null || $stamp > $newestOverall) { $newestOverall = $stamp; }
+            $t = $a['article_type'] ?? '';
+            if (!isset($newestByType[$t]) || $stamp > $newestByType[$t]) { $newestByType[$t] = $stamp; }
         }
 
+        // El listado de productos se mueve cuando se toca una ficha, no una nota.
+        $newestProduct = null;
+        foreach ($products as $p) {
+            $stamp = (string)($p['lastmod'] ?? '');
+            if ($stamp !== '' && ($newestProduct === null || $stamp > $newestProduct)) {
+                $newestProduct = $stamp;
+            }
+        }
+
+        $this->url($base . '/', $newestOverall);
+        $this->url($base . '/productos', $newestProduct);
+        // Solo secciones con contenido: un listado vacio en el sitemap invita a
+        // Google a rastrear una pagina sin valor.
+        foreach (active_sections() as $type => $sec) {
+            $this->url($base . $sec['path'], $newestByType[$type] ?? $newestOverall);
+        }
+
+        // Mismo criterio que arriba con las secciones: una categoria sin un
+        // solo producto ni articulo es un listado vacio, y meterla en el
+        // sitemap es pedirle a Google que gaste rastreo en una pagina sin nada.
+        // El lastmod nulo es justamente la senal de que no tiene contenido: se
+        // calcula arriba a partir de lo que la categoria lista.
         foreach ($categories as $c) {
+            if ($c['lastmod'] === null) { continue; }
             $this->url($base . '/productos/' . $c['slug'], $c['lastmod'],
                 $c['featured_image'] ?? null, $c['name'] ?? null);
         }
