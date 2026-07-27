@@ -18,3 +18,37 @@
         btn.setAttribute('aria-label', next === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro');
     });
 })();
+
+/**
+ * Indice del articulo: plegado en pantallas angostas, abierto cuando es riel
+ * lateral. Sin esto el riel se ve como una caja cerrada con 600px de aire al
+ * lado, que es justo lo que el riel viene a resolver.
+ *
+ * Se hace por JS y no por el atributo `open` en el HTML porque el servidor no
+ * sabe el ancho del viewport. Si el JS no corre, el indice queda plegado y
+ * funcional: la pagina no depende de esto.
+ */
+(function () {
+    var toc = document.querySelector('.article-toc');
+    if (!toc || !window.matchMedia) { return; }
+
+    var wide = window.matchMedia('(min-width: 1280px)');
+    var touched = false;
+    var lastSet = toc.open;
+
+    // El evento `toggle` es asincrono, asi que un flag no distingue el cambio
+    // propio del click: se compara contra el ultimo estado que fijamos. Si el
+    // usuario decide, deja de sincronizarse y su eleccion manda.
+    toc.addEventListener('toggle', function () {
+        if (toc.open !== lastSet) { touched = true; }
+    });
+
+    function sync(mq) {
+        if (touched) { return; }
+        lastSet = mq.matches;
+        toc.open = lastSet;
+    }
+
+    sync(wide);
+    if (wide.addEventListener) { wide.addEventListener('change', sync); }
+})();

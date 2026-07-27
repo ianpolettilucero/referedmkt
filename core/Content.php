@@ -22,6 +22,18 @@ final class Content
     public const CONTENT_DIR = '/content';
     public const CACHE_FILE  = '/var/content.php';
 
+    /**
+     * Codigo cuyo resultado queda congelado dentro del cache. Cambiar
+     * cualquiera de estos archivos tiene que invalidarlo, igual que cambiar un
+     * .md. Son cuatro stat() por request contra los ~60 que ya hace content/.
+     */
+    private const CODE_FILES = [
+        '/core/Markdown.php',
+        '/core/ContentBuilder.php',
+        '/core/FrontMatter.php',
+        '/core/Toc.php',
+    ];
+
     /** @var array<string, mixed>|null */
     private static ?array $data = null;
 
@@ -72,6 +84,18 @@ final class Content
             /** @var \SplFileInfo $file */
             if (!$file->isFile()) { continue; }
             $parts[] = $file->getPathname() . ':' . $file->getMTime() . ':' . $file->getSize();
+        }
+
+        // El cache guarda HTML ya renderizado, asi que tambien depende del
+        // codigo que lo renderiza. Sin esto, arreglar el Markdown no cambia la
+        // huella, el cache viejo sigue siendo valido y el arreglo no se ve en
+        // produccion hasta que alguien toque un .md por otro motivo. var/ es
+        // gitignoreado, asi que un deploy tampoco lo borra.
+        foreach (self::CODE_FILES as $rel) {
+            $path = APP_ROOT . $rel;
+            if (is_file($path)) {
+                $parts[] = $path . ':' . filemtime($path) . ':' . filesize($path);
+            }
         }
         sort($parts);
 

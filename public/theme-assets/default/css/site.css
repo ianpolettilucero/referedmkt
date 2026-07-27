@@ -65,6 +65,10 @@
     --radius-xl: 16px;
 
     --container: min(95vw, 1720px);
+    /* Padding horizontal fluido del contenedor: angosto en mobile, amplio en
+       desktop. Es variable y no un literal porque el escape de las tablas
+       necesita restarlo para no pasarse del borde de la pagina. */
+    --container-pad: clamp(0.875rem, 3vw, 1.75rem);
     --measure: 74ch;
     --transition: 200ms cubic-bezier(0.4, 0, 0.2, 1);
     --transition-fast: 130ms cubic-bezier(0.4, 0, 0.2, 1);
@@ -143,8 +147,7 @@ code, pre { font-family: var(--font-mono); font-size: 0.92em; }
 .container {
     max-width: var(--container);
     margin: 0 auto;
-    /* Padding horizontal fluido: angosto en mobile, amplio en desktop */
-    padding: 0 clamp(0.875rem, 3vw, 1.75rem);
+    padding: 0 var(--container-pad);
 }
 .muted { color: var(--text-muted); }
 
@@ -768,18 +771,73 @@ code, pre { font-family: var(--font-mono); font-size: 0.92em; }
 
 /* Bloques que respiran mejor anchos: se escapan de la columna de texto sin
    tocar la medida de la prosa. Solo desde 1100px, que es donde sobra margen a
-   los costados; abajo de eso no hay a donde escaparse y romperia el layout. */
+   los costados; abajo de eso no hay a donde escaparse y romperia el layout.
+
+   Los selectores llevan `.article` adelante a proposito. Sin ese prefijo
+   empatan en especificidad con `.article-body table { width: 100%; margin: x 0 }`,
+   que esta declarada mas abajo y por lo tanto ganaba: la tabla se quedaba sin
+   el margin-left pero conservaba el translateX(-50%), asi que en vez de
+   escaparse a los dos lados se corria media tabla hacia afuera por la
+   izquierda. */
 @media (min-width: 1100px) {
-    .article-body > table,
-    .article-body > pre,
-    .article-body > figure,
-    .article-verdict,
-    .related-products,
-    .related-articles {
+    .article .article-body > table,
+    .article .article-body > pre,
+    .article .article-body > figure,
+    .article .article-verdict,
+    .article .related-products,
+    .article .related-articles {
         width: min(92vw, 1180px);
         max-width: min(92vw, 1180px);
         margin-left: 50%;
         transform: translateX(-50%);
+    }
+}
+
+/* Pantallas anchas: el indice pasa a ser un riel fijo a la izquierda.
+   Una columna de 720px sola en un viewport de 2000px se lee como un error de
+   maquetado aunque la medida sea la correcta — el problema no es el largo de
+   linea, es que el resto de la pagina si usa el ancho y el texto no. El indice
+   ocupa ese hueco con algo util en vez de con aire, y en articulos de 25+
+   secciones cambia bastante la navegacion.
+
+   El H1 cruza las dos columnas; debajo quedan riel y cuerpo lado a lado. Son
+   tres hijos con posicion explicita, sin filas implicitas que adivinar. */
+@media (min-width: 1280px) {
+    .article {
+        /* Ancho del contenedor, no una isla centrada mas angosta: asi el H1 y
+           el indice arrancan en la misma vertical que el breadcrumb y la nav.
+           El desbalance que se ve en una columna centrada dentro de una pagina
+           que si usa el ancho no es la medida de lectura, es esa vertical que
+           no coincide con ninguna otra. La tercera columna se come el sobrante
+           y es a donde se escapan tablas y grillas. */
+        max-width: 100%;
+        display: grid;
+        grid-template-columns: 260px minmax(0, 760px) 1fr;
+        column-gap: var(--s-5);
+        align-items: start;
+    }
+    .article-header { grid-column: 1 / -1; }
+    .article-main   { grid-column: 2; min-width: 0; }
+
+    .article-toc { grid-column: 1; }
+
+    /* Con riel a la izquierda, un bloque centrado en la columna de texto se
+       montaria encima del indice. Los anchos se escapan solo hacia la derecha.
+       El calc es el ancho disponible real: mitad del viewport mas la mitad de
+       la reja, menos el riel y un margen de seguridad. */
+    .article .article-body > table,
+    .article .article-body > pre,
+    .article .article-body > figure,
+    .article .article-verdict,
+    .article .related-products,
+    .article .related-articles {
+        /* Espacio real disponible: del borde izquierdo de la columna de texto
+           hasta el borde derecho del contenedor. Calcularlo asi y no con vw
+           evita que en 1280 se pase de largo y en 1900 sobre medio riel. */
+        width: min(1180px, calc(var(--container) - var(--container-pad) * 2 - 260px - var(--s-5)));
+        max-width: none;
+        margin-left: 0;
+        transform: none;
     }
 }
 
@@ -1570,6 +1628,25 @@ html { scroll-behavior: smooth; }
     transition: transform var(--transition);
 }
 .article-toc[open] > summary::after { transform: rotate(180deg); }
+
+/* Modo riel. Va aca y no junto a la reja porque el `overflow: hidden` de
+   arriba pisaria el scroll propio del indice. El chevron se va: en el riel el
+   indice arranca abierto y plegarlo no tiene sentido, pero el <summary> sigue
+   siendo foco de teclado y sigue plegando si alguien lo usa. */
+@media (min-width: 1280px) {
+    .article-toc {
+        margin: 0;
+        position: sticky;
+        top: var(--s-4);
+        max-height: calc(100vh - var(--s-5) * 2);
+        overflow: hidden auto;
+        overscroll-behavior: contain;
+        font-size: 0.93rem;
+    }
+    .article-toc > summary { padding: 0.75rem 1rem; font-size: 0.8rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-muted); }
+    .article-toc > summary::after { display: none; }
+    .article-toc-count { display: none; }
+}
 
 .article-toc-icon {
     color: var(--primary);

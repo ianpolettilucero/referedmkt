@@ -211,8 +211,16 @@ final class Markdown
             $s
         );
 
-        // Bold **x**
-        $s = preg_replace('/\*\*(.+?)\*\*/', '<strong>$1</strong>', $s);
+        // Bold + italic ***x***. Va primero: el pase de negrita no distingue
+        // dos asteriscos de tres, se comeria dos de los tres y dejaria el
+        // sobrante para el pase de cursiva.
+        $s = preg_replace('/\*\*\*(.+?)\*\*\*/', '<strong><em>$1</em></strong>', $s);
+        // Bold **x**. El (?!\*) del cierre es lo que arregla "**a *b***": sin
+        // el, el cierre no-codicioso agarra los dos primeros de los tres
+        // asteriscos finales y el <em> termina cerrando fuera del <strong>
+        // (<strong>a <em>b</strong></em>). Los navegadores lo enderezan, pero
+        // el arbol que ve un parser estricto no es el que escribiste.
+        $s = preg_replace('/\*\*(.+?)\*\*(?!\*)/', '<strong>$1</strong>', $s);
         // Italic *x* (no-greedy)
         $s = preg_replace('/(?<!\*)\*(?!\s)([^*\n]+?)(?<!\s)\*(?!\*)/', '<em>$1</em>', $s);
         // Inline code `x`

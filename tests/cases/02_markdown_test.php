@@ -21,6 +21,21 @@ TestRunner::group('Markdown', function () {
         assert_contains('<em>importante</em>', $h);
     });
 
+    // El pase de negrita es no-codicioso: ante tres asteriscos de cierre
+    // agarraba los dos primeros y dejaba el tercero suelto, con lo que el
+    // <em> abria adentro del <strong> y cerraba afuera. El navegador lo
+    // endereza, pero el arbol que ve un parser estricto no es el escrito.
+    TestRunner::run('enfasis anidado no cruza etiquetas', function () {
+        $h = Markdown::toHtml('El backup **tiene que ser *immutable*** siempre.');
+        assert_contains('<strong>tiene que ser <em>immutable</em></strong>', $h);
+        assert_not_contains('<em>immutable</strong>', $h);
+    });
+
+    TestRunner::run('triple asterisco es negrita mas cursiva', function () {
+        $h = Markdown::toHtml('Una copia ***immutable*** no se borra.');
+        assert_contains('<strong><em>immutable</em></strong>', $h);
+    });
+
     TestRunner::run('code inline', function () {
         $h = Markdown::toHtml("Usa `npm install`.");
         assert_contains('<code>npm install</code>', $h);

@@ -76,6 +76,7 @@ $hasVerdict = $verdict_html !== '' || $articlePros || $articleCons || $articleRa
         </details>
     <?php endif; ?>
 
+    <div class="article-main">
     <div class="article-body">
         <?= $content_html /* HTML generado por Markdown::toHtml (input escapado) */ ?>
     </div>
@@ -190,4 +191,5 @@ $hasVerdict = $verdict_html !== '' || $articlePros || $articleCons || $articleRa
     </section>
 
     <?= $view->partial('newsletter_signup') ?>
+    </div><!-- /.article-main -->
 </article>
