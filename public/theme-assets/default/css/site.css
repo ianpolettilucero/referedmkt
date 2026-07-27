@@ -724,7 +724,7 @@ code, pre { font-family: var(--font-mono); font-size: 0.92em; }
    Estirar el texto a 1720px seria ilegible; dejarlo suelto en un contenedor
    ancho se veia desbalanceado. */
 .article {
-    max-width: min(92vw, 720px);
+    max-width: min(92vw, 790px);
     margin: 0 auto;
 }
 .article-header { margin: var(--s-4) 0; }
@@ -761,12 +761,26 @@ code, pre { font-family: var(--font-mono); font-size: 0.92em; }
     border: 1px solid var(--border);
 }
 .article-body {
-    /* Medida fija a proposito: no escala con el viewport. ~70 caracteres
-       reales por linea, el centro del rango legible (45-75). */
+    /* Medida fija a proposito: no escala con el viewport. Medido con Chromium
+       contando caracteres reales por linea, no estimando: ~66 por linea, que
+       es el centro del rango legible (45-75) y el numero que la tipografia
+       viene citando desde Bringhurst.
+
+       19px de cuerpo es lo que usa el GOV.UK Design System para parrafos en
+       escritorio, y Medium y Substack se mueven entre 18 y 21. 17px se lee
+       chico en una pantalla grande y es lo que hacia cansadora la lectura,
+       no el largo de la linea.
+
+       1.65 de interlineado y no 1.75: el estandar del W3C y de WCAG 2.2
+       SC 1.4.12 va de 1.4 a 1.6, y solo se recomienda subir a 1.7 con lineas
+       de 75+ caracteres, que no es el caso. Pasarse desconecta las lineas
+       entre si y agrega recorrido vertical, que en una nota de 3.000 palabras
+       se siente. El 0.05 extra sobre 1.6 es por el tema oscuro: el texto
+       claro sobre fondo oscuro aguanta un poco mas de aire. */
     max-width: 100%;
     margin: 0;
-    font-size: 1.09rem;
-    line-height: 1.75;
+    font-size: 1.19rem;
+    line-height: 1.65;
 }
 
 /* Bloques que respiran mejor anchos: se escapan de la columna de texto sin
@@ -812,7 +826,7 @@ code, pre { font-family: var(--font-mono); font-size: 0.92em; }
            y es a donde se escapan tablas y grillas. */
         max-width: 100%;
         display: grid;
-        grid-template-columns: 260px minmax(0, 760px) 1fr;
+        grid-template-columns: 260px minmax(0, 830px) 1fr;
         column-gap: var(--s-5);
         align-items: start;
     }
