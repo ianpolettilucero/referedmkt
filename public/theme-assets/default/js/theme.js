@@ -20,6 +20,42 @@
 })();
 
 /**
+ * Clicks de afiliado como evento de GA4.
+ *
+ * /go/{slug} es un redirect del servidor y vive en el mismo dominio, asi que
+ * la medicion automatica de GA4 no lo cuenta: "outbound click" solo dispara
+ * cuando el href apunta a otro host. Sin esto, el dato que mas importa en un
+ * sitio de afiliados —que articulo genera clicks y hacia que producto— no
+ * existe en el panel.
+ *
+ * gtag manda el evento con sendBeacon, que sobrevive a la descarga de la
+ * pagina, asi que no hace falta demorar la navegacion ni cancelar el click.
+ */
+(function () {
+    if (!window.gtag) { return; }
+
+    document.addEventListener('click', function (ev) {
+        var a = ev.target.closest && ev.target.closest('a[href*="/go/"]');
+        if (!a) { return; }
+
+        var url;
+        try { url = new URL(a.href, location.origin); } catch (e) { return; }
+        if (url.origin !== location.origin || url.pathname.indexOf('/go/') !== 0) { return; }
+
+        window.gtag('event', 'affiliate_click', {
+            // El slug del programa: con que red se monetizo el click.
+            programa:  decodeURIComponent(url.pathname.slice(4)),
+            // De donde salio y hacia que ficha: los dos parametros que ya
+            // arrastra affiliate_url(), asi el reporte cruza contenido con
+            // producto sin configurar nada aparte.
+            articulo:  url.searchParams.get('a') || '(ninguno)',
+            producto:  url.searchParams.get('p') || '(ninguno)',
+            transport_type: 'beacon'
+        });
+    }, true);
+})();
+
+/**
  * Indice del articulo: plegado en pantallas angostas, abierto cuando es riel
  * lateral. Sin esto el riel se ve como una caja cerrada con 600px de aire al
  * lado, que es justo lo que el riel viene a resolver.
