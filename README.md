@@ -102,6 +102,20 @@ Copiar `content/_plantillas/guia.md` a `content/articles/{slug}.md`. La
 plantilla lleva la estructura y el checklist comentado — cada punto sale de algo
 que mide la auditoría. Antes de publicar, `php bin/audit.php`.
 
+## Noticias
+
+`/noticias` es un blog de nicho con eje en hacking ético, alimentado por una
+tarea programada diaria. La sección aparece sola: `active_sections()` la muestra
+en la navegación, el sitemap y `llms.txt` en cuanto hay una nota publicada, y la
+esconde si no queda ninguna.
+
+El proceso completo está en **[docs/noticias.md](docs/noticias.md)** — escrito
+para leerse sin contexto previo, porque cada disparo de la tarea arranca en una
+sesión nueva. Ahí están el estándar que tiene que cumplir una historia, dónde
+mirar, las reglas de honestidad y la regla que ordena todo: **si nada llega al
+estándar, no se publica**. Un día sin publicar no cuesta nada; una nota floja
+sí. La plantilla es `content/_plantillas/noticia.md`.
+
 Desarrollo local:
 
 ```bash
