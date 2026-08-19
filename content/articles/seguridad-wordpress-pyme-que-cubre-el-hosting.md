@@ -24,6 +24,28 @@ Patchstack, junto a la firma de inteligencia de malware Monarx, midió qué prop
 
 Doce por ciento no es poco porque el proveedor haga mal su trabajo. Es poco porque **la capa donde ocurre el problema no es la capa que el proveedor administra**. Esta guía es el reparto de responsabilidades: qué cubre el hosting de verdad, qué no puede cubrir aunque quiera, y las seis cosas que quedan de tu lado, en orden de lo que rinde primero.
 
+```svg
+<svg viewBox="0 0 640 190" role="img" aria-label="Barra que muestra que las defensas del hosting frenaron el 12% de los ataques a vulnerabilidades de WordPress y el 88% restante depende del dueño del sitio">
+  <text x="20" y="28" font-size="14" font-weight="600" fill="currentColor">Ataques a vulnerabilidades de WordPress</text>
+
+  <rect x="20" y="48" width="72" height="46" rx="4" fill="#e23a3a"/>
+  <rect x="92" y="48" width="528" height="46" rx="4" fill="currentColor" opacity="0.14"/>
+  <rect x="20" y="48" width="600" height="46" rx="4" fill="none" stroke="currentColor" stroke-width="1.2" opacity="0.5"/>
+
+  <text x="56" y="77" text-anchor="middle" font-size="15" font-weight="700" fill="#ffffff">12%</text>
+  <text x="356" y="77" text-anchor="middle" font-size="15" font-weight="700" fill="currentColor">88%</text>
+
+  <line x1="56" y1="100" x2="56" y2="118" stroke="#e23a3a" stroke-width="1.5"/>
+  <text x="20" y="136" font-size="12" font-weight="600" fill="#e23a3a">lo frena el hosting</text>
+  <text x="20" y="152" font-size="11" fill="currentColor" opacity="0.7">WAF, DDoS y límite de tasa</text>
+
+  <line x1="356" y1="100" x2="356" y2="118" stroke="currentColor" stroke-width="1.5" opacity="0.6"/>
+  <text x="356" y="136" text-anchor="middle" font-size="12" font-weight="600" fill="currentColor">te toca a vos</text>
+  <text x="356" y="152" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">qué plugins instalaste, quién tiene acceso,</text>
+  <text x="356" y="166" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">y dónde están tus copias</text>
+</svg>
+```
+
 ---
 
 ## El dato que ordena todas las decisiones

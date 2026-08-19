@@ -21,6 +21,15 @@ namespace Core;
  */
 final class Markdown
 {
+    /**
+     * Contador de diagramas, para namespacear los id de cada SVG. Es global al
+     * proceso y no por documento a proposito: lo unico que importa es que dos
+     * SVG que terminen en la misma pagina no compartan prefijo, y como el
+     * cache se compila de una sola pasada, un contador incremental lo asegura
+     * sin tener que llevar estado por articulo.
+     */
+    private static int $svgSeq = 0;
+
     public static function toHtml(string $markdown): string
     {
         $text = str_replace(["\r\n", "\r"], "\n", $markdown);
@@ -43,6 +52,22 @@ final class Markdown
                     $i++;
                 }
                 $i++; // skip closing fence
+
+                // Diagramas: ```svg es la unica via por la que entra markup sin
+                // escapar, y pasa si o si por la lista blanca de Core\Svg. Se
+                // eligio un bloque cercado explicito en vez de permitir HTML
+                // suelto en el Markdown para que la superficie quede acotada a
+                // un lugar y sea obvia al leer la fuente.
+                if (strtolower($lang) === 'svg') {
+                    $clean = Svg::sanitize(implode("\n", $buf), 'd' . (++self::$svgSeq));
+                    if ($clean !== null) {
+                        $html[] = '<figure class="article-diagram">' . $clean . '</figure>';
+                        continue;
+                    }
+                    // Si no se puede sanear, cae al render de codigo de abajo:
+                    // se muestra escapado. Nunca se emite SVG sin verificar.
+                }
+
                 $code = self::escape(implode("\n", $buf));
                 $class = $lang ? ' class="language-' . self::escape($lang) . '"' : '';
                 $html[] = '<pre><code' . $class . '>' . $code . '</code></pre>';

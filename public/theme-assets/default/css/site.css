@@ -855,6 +855,42 @@ code, pre { font-family: var(--font-mono); font-size: 0.92em; }
     }
 }
 
+/* Diagramas. El SVG se escala al ancho disponible manteniendo su relacion de
+   aspecto, asi que el autor dibuja en las coordenadas que le resulten comodas
+   y el viewBox hace el resto.
+
+   La clave para que funcionen en los dos temas es que el SVG no traiga colores
+   propios: hereda `color` de la pagina y usa currentColor para trazos y texto.
+   Un diagrama con #000 hardcodeado desaparece en modo oscuro, que es
+   exactamente el error que se quiere evitar. Los pocos acentos que necesiten
+   color van con las variables del tema desde el atributo fill. */
+.article-diagram {
+    margin: var(--s-4) 0;
+    padding: var(--s-3);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    /* Un diagrama ancho scrollea dentro de su caja en vez de empujar la
+       pagina, igual que las tablas. */
+    overflow-x: auto;
+}
+.article-diagram svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+    /* Sin esto, un texto dentro del SVG hereda el tamano del cuerpo y queda
+       desproporcionado respecto del dibujo. */
+    font-family: inherit;
+}
+.article-diagram figcaption {
+    margin-top: var(--s-2);
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    text-align: center;
+}
+
 /* Las tablas scrollean dentro de su caja en cualquier ancho: una tabla mide
    por su contenido y sin esto empuja la pagina entera. */
 .article-body table {

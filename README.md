@@ -71,6 +71,37 @@ cons:
 Y si el artículo tiene un `## Preguntas frecuentes` con las preguntas como
 `###`, se emite `FAQPage` automáticamente, sin cargar nada aparte.
 
+## Diagramas
+
+Un bloque cercado con lenguaje `svg` se emite como dibujo en vez de como
+código:
+
+````markdown
+```svg
+<svg viewBox="0 0 400 100" role="img" aria-label="Qué muestra el diagrama">
+  <line x1="10" y1="50" x2="380" y2="50" stroke="currentColor" stroke-width="2"/>
+  <text x="195" y="30" text-anchor="middle" fill="currentColor">Etiqueta</text>
+</svg>
+```
+````
+
+Dos reglas para que se vea bien:
+
+- **Usá `currentColor` para trazos y texto.** El diagrama hereda el color de la
+  página, así que funciona igual en tema claro y oscuro. Un `#000` fijo
+  desaparece en modo oscuro. Para acentos, `#e23a3a` (el rojo de la marca).
+- **Poné `viewBox` y un `aria-label`** que describa qué muestra. El SVG se
+  escala solo al ancho disponible; dibujá en las coordenadas que te resulten
+  cómodas.
+
+Es la única vía por la que entra markup sin escapar, y pasa siempre por la
+lista blanca de `core/Svg.php`: se caen `script`, `foreignObject`, `image`,
+`use`, `style`, los atributos `on*`, `href` y `xlink:href`, los `url()` que no
+sean referencias locales, y cualquier DOCTYPE o entidad (XXE). Los `id` se
+namespacean por diagrama para que dos gráficos en la misma página no choquen.
+Si algo no se puede sanear, el bloque se muestra como código escapado: falla
+cerrado, nunca emite SVG sin verificar.
+
 El front-matter es un subconjunto acotado de YAML: escalares, listas inline
 (`[a, b]`), listas en bloque (`- item`), mapas de un nivel (para `specs`) y
 texto multilínea (`|` y `>`). Cualquier línea que no matchee rompe el build con

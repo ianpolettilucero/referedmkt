@@ -139,6 +139,32 @@ La sección publica varios formatos, no uno. Elegí el que le calce a la histori
 Todos comparten la misma columna vertebral: el hecho arriba con su fuente, a
 quién le toca y a quién no, y qué hacer en orden.
 
+## Diagramas
+
+Cuando el mecanismo se entiende mejor dibujado que descrito —una cadena de
+ataque, un flujo entre sistemas, una línea de tiempo—, va un diagrama. Se
+escribe como un bloque cercado con lenguaje `svg` y el sitio lo emite como
+dibujo:
+
+````markdown
+```svg
+<svg viewBox="0 0 400 100" role="img" aria-label="Qué muestra el diagrama">
+  <line x1="10" y1="50" x2="380" y2="50" stroke="currentColor" stroke-width="2"/>
+  <text x="195" y="30" text-anchor="middle" fill="currentColor">Etiqueta</text>
+</svg>
+```
+````
+
+- **`currentColor` para trazos y texto**, así funciona en tema claro y oscuro.
+  Un color fijo oscuro desaparece en modo oscuro. Para acentos, `#e23a3a`.
+- **Siempre `viewBox` y `aria-label`** describiendo qué muestra.
+- El SVG pasa por la lista blanca de `core/Svg.php`. Si algo no se puede
+  sanear, el bloque sale como código escapado en vez de romper la página.
+- **Un diagrama que no aclara nada, no va.** Es para el mecanismo, no para
+  decorar la nota.
+
+El detalle completo está en el README, sección Diagramas.
+
 ## Cómo se escribe
 
 Plantilla en `content/_plantillas/noticia.md`, con la estructura sugerida y el

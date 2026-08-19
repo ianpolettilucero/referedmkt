@@ -43,6 +43,45 @@ Si un atacante consigue esa cookie, **hereda tu sesión ya autenticada**. No nec
 
 El ataque se llama **adversary-in-the-middle** (AiTM), adversario en el medio. La pieza central es un servidor intermedio que el atacante pone entre vos y Microsoft, haciendo de espejo. La técnica está documentada por [Microsoft en su guía sobre autenticación resistente a phishing](https://www.microsoft.com/en-us/security/business/security-101/what-is-fido2) y es la que explica por qué el segundo factor común no alcanza.
 
+```svg
+<svg viewBox="0 0 720 250" role="img" aria-label="Diagrama del ataque: la víctima se autentica contra Microsoft a través de un servidor intermedio que copia la cookie de sesión">
+  <text x="60" y="26" text-anchor="middle" font-size="14" font-weight="600" fill="currentColor">Vos</text>
+  <text x="360" y="26" text-anchor="middle" font-size="14" font-weight="600" fill="#e23a3a">Servidor del atacante</text>
+  <text x="660" y="26" text-anchor="middle" font-size="14" font-weight="600" fill="currentColor">Microsoft</text>
+
+  <rect x="15" y="40" width="90" height="170" rx="6" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.45"/>
+  <rect x="290" y="40" width="140" height="170" rx="6" fill="none" stroke="#e23a3a" stroke-width="1.5"/>
+  <rect x="615" y="40" width="90" height="170" rx="6" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.45"/>
+
+  <line x1="105" y1="72" x2="288" y2="72" stroke="currentColor" stroke-width="1.5"/>
+  <polygon points="288,72 279,68 279,76" fill="currentColor"/>
+  <text x="196" y="66" text-anchor="middle" font-size="12" fill="currentColor">1. contraseña</text>
+
+  <line x1="432" y1="72" x2="613" y2="72" stroke="currentColor" stroke-width="1.5" opacity="0.6"/>
+  <polygon points="613,72 604,68 604,76" fill="currentColor" opacity="0.6"/>
+  <text x="522" y="66" text-anchor="middle" font-size="12" fill="currentColor" opacity="0.75">reenvía</text>
+
+  <line x1="105" y1="118" x2="288" y2="118" stroke="currentColor" stroke-width="1.5"/>
+  <polygon points="288,118 279,114 279,122" fill="currentColor"/>
+  <text x="196" y="112" text-anchor="middle" font-size="12" fill="currentColor">2. segundo factor</text>
+
+  <line x1="432" y1="118" x2="613" y2="118" stroke="currentColor" stroke-width="1.5" opacity="0.6"/>
+  <polygon points="613,118 604,114 604,122" fill="currentColor" opacity="0.6"/>
+  <text x="522" y="112" text-anchor="middle" font-size="12" fill="currentColor" opacity="0.75">reenvía</text>
+
+  <line x1="613" y1="166" x2="434" y2="166" stroke="currentColor" stroke-width="1.5" opacity="0.6"/>
+  <polygon points="434,166 443,162 443,170" fill="currentColor" opacity="0.6"/>
+  <text x="522" y="160" text-anchor="middle" font-size="12" fill="currentColor" opacity="0.75">3. cookie de sesión</text>
+
+  <line x1="288" y1="166" x2="107" y2="166" stroke="currentColor" stroke-width="1.5"/>
+  <polygon points="107,166 116,162 116,170" fill="currentColor"/>
+  <text x="196" y="160" text-anchor="middle" font-size="12" fill="currentColor">llega a vos</text>
+
+  <text x="360" y="196" text-anchor="middle" font-size="13" font-weight="600" fill="#e23a3a">copia la cookie</text>
+  <text x="360" y="232" text-anchor="middle" font-size="12" fill="currentColor" opacity="0.8">todo funciona: te autenticaste contra Microsoft de verdad</text>
+</svg>
+```
+
 Paso a paso, del lado de la víctima:
 
 1. **Llega el correo.** Un mensaje convincente —una factura, un documento compartido, un aviso de que "tu contraseña vence"— con un enlace. La puerta de entrada casi siempre es el correo, y por eso reforzarlo es la primera línea; la [comparativa de seguridad de email para PyMEs](/comparativa/comparativa-seguridad-email-pymes) y la [guía de SPF, DKIM y DMARC](/guia/configurar-spf-dkim-dmarc-paso-a-paso) atacan ese frente.

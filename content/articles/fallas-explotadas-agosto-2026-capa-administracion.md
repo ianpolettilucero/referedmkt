@@ -36,6 +36,25 @@ Si las mirás una por una son diez avisos sueltos. Si las mirás juntas aparece 
 
 Herramienta de administración remota, servidor de aplicaciones, plataforma de IA, servidor de integración continua, balanceador de carga, firewall de borde, tablero de datos, motor de cómputo distribuido. Y una sola de escritorio: la de Windows, que además es de elevación de privilegios, o sea que **solo sirve si el atacante ya entró**.
 
+```svg
+<svg viewBox="0 0 660 240" role="img" aria-label="Diagrama en capas: nueve de las diez vulnerabilidades explotadas en agosto están en la capa de administración e infraestructura, y solo una en el escritorio del usuario">
+  <rect x="30" y="30" width="600" height="86" rx="6" fill="#e23a3a" opacity="0.1"/>
+  <rect x="30" y="30" width="600" height="86" rx="6" fill="none" stroke="#e23a3a" stroke-width="1.6"/>
+  <text x="46" y="54" font-size="13" font-weight="700" fill="#e23a3a">Capa de administración e infraestructura</text>
+  <text x="614" y="54" text-anchor="end" font-size="13" font-weight="700" fill="#e23a3a">9 de 10</text>
+  <text x="46" y="78" font-size="11.5" fill="currentColor" opacity="0.85">N-central · Tomcat · Langflow · TeamCity · LoadMaster</text>
+  <text x="46" y="98" font-size="11.5" fill="currentColor" opacity="0.85">Cisco ASA · Metabase · Ray</text>
+
+  <rect x="30" y="140" width="600" height="66" rx="6" fill="currentColor" opacity="0.06"/>
+  <rect x="30" y="140" width="600" height="66" rx="6" fill="none" stroke="currentColor" stroke-width="1.4" opacity="0.5"/>
+  <text x="46" y="164" font-size="13" font-weight="700" fill="currentColor">Escritorio del usuario</text>
+  <text x="614" y="164" text-anchor="end" font-size="13" font-weight="700" fill="currentColor">1 de 10</text>
+  <text x="46" y="188" font-size="11.5" fill="currentColor" opacity="0.85">Windows AFD — elevación local: solo sirve si el atacante ya entró</text>
+
+  <text x="330" y="230" text-anchor="middle" font-size="12" fill="currentColor" opacity="0.75">No se ataca el objetivo más duro: se ataca el que tiene permiso sobre él</text>
+</svg>
+```
+
 ---
 
 ## Por qué el atacante mira ahí
