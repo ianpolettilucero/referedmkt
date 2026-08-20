@@ -50,7 +50,7 @@ Doce por ciento no es poco porque el proveedor haga mal su trabajo. Es poco porq
 
 ## El dato que ordena todas las decisiones
 
-Antes de repartir tareas conviene entender dónde aparecen los agujeros. El informe de Patchstack contabilizó **11.334 vulnerabilidades nuevas en el ecosistema WordPress durante 2025**, un 42% más que las cerca de 7.985 del año anterior. La distribución es lo interesante:
+El informe de Patchstack contabilizó **11.334 vulnerabilidades nuevas en el ecosistema WordPress durante 2025**, un 42% más que las cerca de 7.985 del año anterior. La distribución es lo interesante:
 
 | Dónde apareció | Proporción | Lectura |
 |---|---|---|
@@ -128,7 +128,7 @@ Un plugin desactivado **sigue en el disco** y su código sigue siendo alcanzable
 
 Entrá al listado, y para cada plugin respondé dos preguntas: ¿lo usa alguien esta semana? ¿tuvo una actualización en los últimos doce meses? Si la primera es "no", desinstalalo. Si la segunda es "no", buscá reemplazo con urgencia: un plugin sin mantenimiento es una vulnerabilidad futura con fecha abierta.
 
-A mi juicio este es el único paso de la lista que no tiene contraargumento. Todo lo demás implica una compensación; sacar código que no usás no implica ninguna.
+Es el único paso de la lista sin contraargumento: todo lo demás implica una compensación, sacar código que no usás no.
 
 ### 2. Actualizaciones automáticas, con red de contención
 
@@ -191,7 +191,7 @@ Si el sitio guarda datos de clientes, además hay obligaciones de notificación 
 
 ## Cuándo esta guía no aplica
 
-Tres casos donde el consejo de arriba es el equivocado, y vale decirlo:
+Tres casos donde el consejo de arriba es el equivocado:
 
 - **Si tu sitio es una landing estática sin base de datos ni formularios**, casi nada de esto aplica. No hay plugins, no hay sesiones y la superficie de ataque es el certificado y poco más. Meterle un plugin de seguridad a un sitio así agrega riesgo en vez de sacarlo.
 - **Si tenés un e-commerce con volumen de transacciones serio**, esta guía es el piso, no el techo. Ahí entran requisitos de cumplimiento de medios de pago, segmentación y monitoreo continuo que no se resuelven con hosting compartido de ningún proveedor.
@@ -240,7 +240,7 @@ Sirven contra el error propio y contra la falla de hardware. Contra un compromis
 
 ### ¿Conviene activar las actualizaciones automáticas aunque puedan romper algo?
 
-En mi lectura, sí, y la compensación se administra con staging y con una copia recuperable, no evitando actualizar. Con una mediana de cinco horas hasta el primer exploit, cualquier proceso que dependa de revisión humana llega tarde. Un sitio roto se restaura; uno comprometido durante semanas, no del todo.
+Sí. La compensación se administra con staging y con una copia recuperable, no evitando actualizar. Con una mediana de cinco horas hasta el primer exploit, cualquier proceso que dependa de revisión humana llega tarde. Un sitio roto se restaura; uno comprometido durante semanas, no del todo.
 
 ### ¿Cambiar de hosting mejora mi seguridad?
 

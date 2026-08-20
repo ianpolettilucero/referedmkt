@@ -29,7 +29,7 @@ Esta guía es para decidir. No compara productos —eso está en la [comparativa
 
 ## La diferencia que importa no es la que te venden
 
-La versión comercial dice que el antivirus detecta por firmas y el EDR por comportamiento. Es cierto y es irrelevante, porque desde hace años cualquier producto de nivel empresarial —incluidos los que se venden como "antivirus"— hace análisis de comportamiento y aprendizaje automático. La distinción por firmas describe el mercado de 2015.
+La versión comercial dice que el antivirus detecta por firmas y el EDR por comportamiento. Es cierto e irrelevante: desde hace años cualquier producto de nivel empresarial, incluidos los que se venden como "antivirus", hace análisis de comportamiento. La distinción por firmas describe el mercado de 2015.
 
 La diferencia real es de **capacidad operativa**, y son tres cosas concretas:
 
@@ -96,7 +96,7 @@ Cruzado con los seis productos que cubrimos en [antivirus y EDR](/productos/anti
 
 Cuatro de seis sin datos comparables del año. Si tu proceso de compra era "elijo el que mejor salió en MITRE", en 2026 ese proceso te deja eligiendo entre dos.
 
-Mi lectura, y la marco como opinión: la ausencia de un fabricante en la evaluación **no es evidencia de que su producto sea peor**. Las razones publicadas son plausibles y el ejercicio es genuinamente caro de preparar. Lo que sí cambia es tu situación como comprador: perdiste una fuente independiente y te quedaste con material producido por quien te vende. Eso hay que compensarlo con otras cosas, no ignorarlo.
+La ausencia de un fabricante en la evaluación **no es evidencia de que su producto sea peor**. Las razones publicadas son plausibles y el ejercicio es genuinamente caro de preparar. Lo que sí cambia es tu situación como comprador: perdiste una fuente independiente y te quedaste con material producido por quien te vende. Eso hay que compensarlo con otras cosas, no ignorarlo.
 
 ---
 
@@ -129,7 +129,7 @@ Eso obliga a pedir cotización para comparar, que es exactamente lo que el model
 
 Y el costo que ninguna cotización trae: **entre dos y seis semanas de trabajo interno** para desplegar agentes, ajustar exclusiones y afinar las reglas hasta que el ruido baje a un nivel manejable. Presupuestá ese tiempo o el proyecto se estanca al mes.
 
-Un atajo que vale la pena evaluar antes de comprar nada nuevo: si ya pagás Microsoft 365 en un plan que incluye capacidades de Defender, puede que tengas EDR sin usar. Vale la pena auditar la licencia actual antes de sumar otra.
+Un atajo antes de comprar nada nuevo: si ya pagás Microsoft 365 en un plan que incluye capacidades de Defender, puede que tengas EDR sin usar. Auditá la licencia actual antes de sumar otra.
 
 ---
 
@@ -170,4 +170,4 @@ Backup, y probado. Un EDR baja la probabilidad de que ocurra un incidente; una c
 
 ### ¿Tener Microsoft 365 significa que ya tengo EDR?
 
-Depende del plan, y vale la pena auditarlo antes de comprar nada. Las capacidades de Defender for Endpoint se distribuyen entre planes independientes y paquetes de Microsoft 365, y hay empresas pagando una licencia que incluye funciones de EDR sin haberlas activado nunca. Revisá qué incluye tu licencia actual antes de sumar un producto nuevo.
+Depende del plan, y conviene auditarlo antes de comprar nada. Las capacidades de Defender for Endpoint se distribuyen entre planes independientes y paquetes de Microsoft 365, y hay empresas pagando una licencia que incluye funciones de EDR sin haberlas activado nunca. Revisá qué incluye tu licencia actual antes de sumar un producto nuevo.

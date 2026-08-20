@@ -19,7 +19,7 @@ meta_description: "CISA confirmó diez vulnerabilidades explotadas en agosto. La
 
 El [catálogo de vulnerabilidades explotadas de CISA](https://www.cisa.gov/known-exploited-vulnerabilities-catalog) sumó **diez entradas entre el 1 y el 17 de agosto de 2026**. Ese catálogo no lista fallas peligrosas en abstracto: lista las que hay evidencia de que **se están usando ahora mismo** contra sistemas reales.
 
-Si las mirás una por una son diez avisos sueltos. Si las mirás juntas aparece algo más útil, y es lo que hace que esta nota exista: **casi ninguna está en la computadora de tu gente**.
+Una por una son diez avisos sueltos. Juntas muestran un patrón: **casi ninguna está en la computadora de tu gente**.
 
 | Agregada | CVE | Producto | Qué es |
 |---|---|---|---|
@@ -59,13 +59,13 @@ Herramienta de administración remota, servidor de aplicaciones, plataforma de I
 
 ## Por qué el atacante mira ahí
 
-Esto no es casualidad ni moda. Es la misma lógica con la que razona cualquier equipo de [red team](/guia/red-teaming-que-es-cuando-contratarlo): no se ataca el objetivo más duro, se ataca el que tiene permiso sobre el objetivo más duro.
+Es la misma lógica con la que razona cualquier equipo de [red team](/guia/red-teaming-que-es-cuando-contratarlo): no se ataca el objetivo más duro, se ataca el que tiene permiso sobre el objetivo más duro.
 
 Tu notebook tiene antivirus, disco cifrado y un usuario sin privilegios. La consola que administra tu notebook, en cambio, tiene credenciales de administrador sobre todas las notebooks de la empresa, corre en un servidor que nadie mira, y muchas veces está publicada en internet porque el proveedor necesita llegar desde afuera.
 
 Un solo bypass de autenticación ahí vale más que cien equipos comprometidos de a uno. Es exactamente lo que enseña cualquier [curso serio de pentesting](/guia/que-es-pentesting-como-funciona-fases-tipos): el camino corto casi nunca es el frontal.
 
-**El caso de N-able es el que mejor lo muestra**, y merece leerse con cuidado. N-central es software de administración remota que usan proveedores de servicios de IT para gestionar los equipos de sus clientes. Las dos entradas del catálogo son de bypass de autenticación, y la segunda tiene un detalle que la descripción de NVD dice con todas las letras: **CVE-2026-18577 es "un parche incompleto de CVE-2026-18556"**.
+**El caso de N-able es el que mejor lo muestra.** N-central es software de administración remota que usan proveedores de servicios de IT para gestionar los equipos de sus clientes. Las dos entradas del catálogo son de bypass de autenticación, y la segunda tiene un detalle que la descripción de NVD dice con todas las letras: **CVE-2026-18577 es "un parche incompleto de CVE-2026-18556"**.
 
 Traducido: se publicó un arreglo, el arreglo no arreglaba, y las dos terminaron en el catálogo de explotación activa con un día de diferencia. Si tu proveedor te dijo el 1 de agosto que ya había parcheado, esa afirmación quedó vencida el 3.
 
@@ -92,8 +92,6 @@ Si un organismo con equipo de seguridad tiene tres días, la pregunta interesant
 
 ## A quién le toca de verdad
 
-Vale ser preciso, porque el titular asusta más de lo que corresponde.
-
 **Te toca directo si:**
 
 - Tenés un **Cisco ASA o FTD** haciendo de firewall con VPN SSL de acceso remoto. Es el más común de esta lista en PyMEs de LATAM.
@@ -105,7 +103,7 @@ Vale ser preciso, porque el titular asusta más de lo que corresponde.
 
 - Si tu soporte de IT es tercerizado, preguntá hoy si usan **N-able N-central** y qué versión. No es una pregunta agresiva: es la misma que te van a hacer a vos tus clientes grandes, y sobre eso escribimos la [guía para responder cuestionarios de seguridad de clientes](/guia/cuestionario-seguridad-cliente-como-responder).
 
-**No te toca, y conviene decirlo:**
+**No te toca:**
 
 - Si no corrés Langflow, Ray, Tomcat ni LoadMaster —y la mayoría de las PyMEs no—, esas cuatro son ruido para vos. Perseguir cada CVE que sale en las noticias es la forma más rápida de agotar a la única persona que se ocupa de esto.
 
@@ -133,7 +131,7 @@ Todo lo de acá abajo es verificación desde tu lado, con tus credenciales. Nada
 4. **Verificá que tus copias sobrevivan a un administrador comprometido.** Si quien controla la consola puede borrar los respaldos, no son respaldos. [Veeam Data Platform](/producto/veeam-data-platform) y el resto de la [categoría de backup y recuperación](/productos/backup-y-recuperacion) cubren el requisito de inmutabilidad.
 5. **Escribí las tres preguntas a tu proveedor de IT.** Hoy, no el mes que viene.
 
-Mi lectura, y la marco como opinión: para la mayoría de las PyMEs de la región, el punto 2 rinde más que el 1. Parchear es una carrera que se corre todos los meses y se pierde algunas veces. Reducir lo que está publicado se hace una vez y baja el piso de riesgo de forma permanente.
+Para la mayoría de las PyMEs de la región, el punto 2 rinde más que el 1. Parchear es una carrera que se corre todos los meses y se pierde algunas veces. Reducir lo que está publicado se hace una vez y baja el piso de riesgo de forma permanente.
 
 Si estás armando el programa completo y no sabés en qué orden va cada cosa, la [guía de ciberseguridad para PyMEs de LATAM](/guia/guia-ciberseguridad-pymes-latam-2026) ubica todo esto dentro del resto.
 

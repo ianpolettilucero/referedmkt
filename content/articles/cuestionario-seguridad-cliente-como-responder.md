@@ -57,7 +57,7 @@ Dos errores simétricos, y el primero es mucho peor.
 
 **Pero tampoco te disculpes por lo que falta.** Un "no" con plan y fecha se lee muchísimo mejor que un "no" a secas, y en muchos casos mejor que un "sí" dudoso. Los equipos de riesgo evalúan proveedores todo el día y reconocen a la legua cuál está diciendo la verdad. Un proveedor que sabe exactamente qué le falta y cuándo lo va a tener es, en la práctica, más confiable que uno que responde que sí a todo en catorce minutos.
 
-A mi juicio esta es la parte que más se subestima. La planilla no mide tu madurez tanto como mide **si sabés cuál es tu madurez**. Es un examen de autoconocimiento disfrazado de examen técnico.
+Es la parte que más se subestima. La planilla no mide tu madurez tanto como mide **si sabés cuál es tu madurez**. Es un examen de autoconocimiento disfrazado de examen técnico.
 
 ---
 

@@ -62,7 +62,7 @@ Solo vCenter, la consola que administra máquinas virtuales, pertenece a la cate
 </svg>
 ```
 
-La lección no es "ahora el riesgo está en el escritorio". Es que **el patrón de una semana no es una estrategia**. Si hace dos días hubieras concluido que solo importa blindar la capa de administración, hoy estarías mirando para el lado equivocado. Lo que sirve es cubrir las dos y decidir por exposición, no por la moda de la semana.
+La lección no es "ahora el riesgo está en el escritorio", sino que **el patrón de una semana no es una estrategia**. Quien hace dos días hubiera concluido que solo importa la capa de administración, hoy estaría mirando para el lado equivocado. Se cubren las dos y se decide por exposición.
 
 ---
 
@@ -92,7 +92,7 @@ Los plazos que fija CISA para los organismos federales en estas cuatro son del *
 
 **No te toca:**
 
-- Si no tenés Microsoft 365, ni Macs, ni VPN IPsec propia, ni VMware, estas cuatro no son tuyas. Vale decirlo: perseguir cada CVE que aparece en las noticias es la forma más rápida de agotar a la única persona que se ocupa de esto en una PyME.
+- Si no tenés Microsoft 365, ni Macs, ni VPN IPsec propia, ni VMware, estas cuatro no son tuyas. Perseguir cada CVE que aparece en las noticias es la forma más rápida de agotar a la única persona que se ocupa de esto en una PyME.
 
 ---
 
@@ -104,7 +104,7 @@ Los plazos que fija CISA para los organismos federales en estas cuatro son del *
 4. **Buscá señales de compromiso, no solo parchees.** Cuando una falla lleva meses con parche disponible y recién ahora se confirma explotación, la pregunta honesta no es solo "¿ya lo cerré?" sino "¿alguien entró antes?". Revisá inicios de sesión anómalos y accesos raros a SharePoint. El tipo de señal que hay que mirar está en [cómo funciona el robo de sesión](/guia/como-funciona-el-robo-de-sesion-que-saltea-el-mfa).
 5. **Verificá que tus copias sobrevivan a un administrador comprometido.** Es el control que convierte un incidente en un mal día en vez de en una quiebra; [Veeam Data Platform](/producto/veeam-data-platform) y la [categoría de backup](/productos/backup-y-recuperacion) cubren la inmutabilidad.
 
-Mi lectura, marcada como opinión: los puntos 3 y 4 son los que más rinden. Parchear es una carrera que se corre todos los meses; reducir lo que está publicado y aprender a mirar los registros son capacidades que quedan.
+Los puntos 3 y 4 son los que más rinden. Parchear es una carrera que se corre todos los meses; reducir lo que está publicado y aprender a mirar los registros son capacidades que quedan.
 
 Si estás armando el programa desde cero y no sabés en qué orden va cada cosa, la [guía de ciberseguridad para PyMEs de LATAM](/guia/guia-ciberseguridad-pymes-latam-2026) lo ordena, y los términos que aparecen acá están definidos en el [glosario](/guia/glosario-ciberseguridad-pymes).
 

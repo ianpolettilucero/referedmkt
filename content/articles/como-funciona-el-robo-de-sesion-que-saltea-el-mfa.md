@@ -19,17 +19,15 @@ meta_description: "El ataque que saltea el MFA no roba tu contraseña: roba la s
 
 Activaste el MFA en todo Microsoft 365. Hiciste bien. Y aun así, un atacante puede entrar a la cuenta de tu gente sin robar la contraseña y sin que nadie apruebe una notificación falsa en el teléfono.
 
-No es un fallo de tu configuración. Es que el ataque más común de 2026 no ataca la parte que protegiste. Esta nota es la anatomía de cómo funciona, contada desde el lado del que se defiende: qué pasa paso a paso, cómo se detecta, y por qué hay una sola defensa que lo corta de raíz mientras las demás apenas lo demoran.
+No es un fallo de configuración: el ataque más común de 2026 no ataca la parte que protegiste. Es la continuación técnica de [ya tenés MFA y no alcanza](/guia/ya-tenes-mfa-y-no-alcanza), que explica el qué; acá está el cómo.
 
-Es la continuación técnica de [ya tenés MFA y no alcanza](/guia/ya-tenes-mfa-y-no-alcanza): ahí está el qué; acá está el cómo.
-
-Aclaración de entrada, porque marca el tono de todo lo que sigue: **no vas a encontrar acá ninguna instrucción para montar el ataque.** Entender el mecanismo es lo que te permite defenderte; los pasos para ejecutarlo no aportan nada a esa defensa y no van.
+No hay instrucciones para montar el ataque. Entender el mecanismo sirve para defenderse; los pasos para ejecutarlo, no.
 
 ---
 
 ## Lo que el atacante quiere no es tu contraseña
 
-Empecemos por corregir la imagen mental equivocada. Cuando pensás en "robo de cuenta" imaginás a alguien adivinando o robando tu contraseña. El MFA se inventó justamente para que eso no alcance: aunque tengan la clave, les falta el segundo factor.
+Cuando se habla de "robo de cuenta" se piensa en alguien adivinando o robando la contraseña. El MFA se inventó justamente para que eso no alcance: aunque tengan la clave, les falta el segundo factor.
 
 El ataque moderno acepta esa premisa y la esquiva. No pelea contra el MFA: **espera a que vos lo completes y le roba el resultado.**
 
@@ -123,7 +121,7 @@ Hay una sola, y es un cambio en el tipo de segundo factor, no en la contraseña 
 
 La razón por la que funciona es elegante y vale entenderla, porque es lo que separa esta defensa de todas las demás. Según [la documentación de Microsoft](https://www.microsoft.com/en-us/security/business/security-101/what-is-fido2), FIDO2 usa criptografía de clave pública: al registrarte, tu dispositivo genera un par de claves único para **ese dispositivo, esa cuenta y ese servicio**. La clave privada nunca sale del dispositivo; solo se comparte la pública.
 
-Y acá está el punto que rompe el ataque: la credencial queda **atada al dominio exacto** del servicio. Cuando te autenticás, el dispositivo firma un desafío criptográfico, pero **solo firma si el dominio que lo pide es el dominio real para el que se registró la clave**. El servidor intermedio del atacante vive en otro dominio. Cuando le pide a tu llave que firme, la llave mira el dominio, ve que no es el que corresponde, y **se niega a firmar**. No hay nada que reenviar, porque nunca se generó una firma válida. No viaja ningún secreto reutilizable por la red.
+La credencial queda **atada al dominio exacto** del servicio. Cuando te autenticás, el dispositivo firma un desafío criptográfico, pero **solo firma si el dominio que lo pide es el dominio real para el que se registró la clave**. El servidor intermedio del atacante vive en otro dominio. Cuando le pide a tu llave que firme, la llave mira el dominio, ve que no es el que corresponde, y **se niega a firmar**. No hay nada que reenviar, porque nunca se generó una firma válida. No viaja ningún secreto reutilizable por la red.
 
 En criptografía esto se llama **origin binding** —atadura al origen— y es la propiedad que ningún código de seis dígitos puede tener, porque el código no sabe a qué sitio lo estás tecleando. La llave sí lo sabe, y por eso no se deja engañar.
 
@@ -143,7 +141,7 @@ Las opciones concretas:
 4. **Reforzá el correo, que es la puerta.** Sin el mensaje inicial, el ataque no arranca; la [comparativa de seguridad de email](/comparativa/comparativa-seguridad-email-pymes) baja a producto.
 5. **Acortá la vida de las sesiones** de las cuentas sensibles, para que una cookie robada caduque antes. No frena el ataque, pero le reduce la ventana.
 
-Mi lectura, marcada como opinión: los pasos 2 y 3 son los que importan; el resto reduce daño pero no cierra el agujero. Si tuvieras que hacer una sola cosa, es mover a las cuentas de administrador a autenticación resistente a phishing, hoy.
+Los pasos 2 y 3 son los que importan; el resto reduce daño pero no cierra el agujero. Si tuvieras que hacer una sola cosa, es mover a las cuentas de administrador a autenticación resistente a phishing, hoy.
 
 Y si esto te llega porque un cliente te está por auditar, el robo de sesión y su defensa son exactamente lo que hay detrás de la pregunta de MFA en cualquier [cuestionario de seguridad](/guia/cuestionario-seguridad-cliente-como-responder): un evaluador con oficio no pregunta "¿tenés MFA?", pregunta "¿de qué tipo?".
 
