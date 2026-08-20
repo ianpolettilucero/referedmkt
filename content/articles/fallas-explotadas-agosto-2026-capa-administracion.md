@@ -17,7 +17,7 @@ meta_title: "10 fallas explotadas en agosto: el patrón que las une"
 meta_description: "CISA confirmó diez vulnerabilidades explotadas en agosto. La mayoría está en la capa de administración, no en el endpoint. Qué hacer y qué preguntar."
 ---
 
-El [catálogo de vulnerabilidades explotadas de CISA](https://www.cisa.gov/known-exploited-vulnerabilities-catalog) sumó **diez entradas entre el 1 y el 17 de agosto de 2026**. Ese catálogo no lista fallas peligrosas en abstracto: lista las que hay evidencia de que **se están usando ahora mismo** contra sistemas reales.
+El [catálogo de vulnerabilidades explotadas de CISA](https://www.cisa.gov/known-exploited-vulnerabilities-catalog) sumó **diez entradas entre el 1 y el 17 de agosto de 2026**. Ese catálogo no lista fallas peligrosas en abstracto: lista las que hay evidencia de que **se están usando ahora** contra sistemas reales.
 
 Una por una son diez avisos sueltos. Juntas muestran un patrón: **casi ninguna está en la computadora de tu gente**.
 
@@ -34,7 +34,7 @@ Una por una son diez avisos sueltos. Juntas muestran un patrón: **casi ninguna 
 | 11 ago | [CVE-2026-72898](https://nvd.nist.gov/vuln/detail/CVE-2026-72898) | Metabase | Inyección SQL sin autenticar |
 | 17 ago | [CVE-2025-62593](https://nvd.nist.gov/vuln/detail/CVE-2025-62593) | Ray | Inyección de código |
 
-Herramienta de administración remota, servidor de aplicaciones, plataforma de IA, servidor de integración continua, balanceador de carga, firewall de borde, tablero de datos, motor de cómputo distribuido. Y una sola de escritorio: la de Windows, que además es de elevación de privilegios, o sea que **solo sirve si el atacante ya entró**.
+Administración remota, servidor de aplicaciones, plataforma de IA, integración continua, balanceador de carga, firewall de borde, tablero de datos, cómputo distribuido. Una sola de escritorio: la de Windows, que además es de elevación de privilegios y **solo sirve si el atacante ya entró**.
 
 ```svg
 <svg viewBox="0 0 660 240" role="img" aria-label="Diagrama en capas: nueve de las diez vulnerabilidades explotadas en agosto están en la capa de administración e infraestructura, y solo una en el escritorio del usuario">
@@ -61,9 +61,9 @@ Herramienta de administración remota, servidor de aplicaciones, plataforma de I
 
 Es la misma lógica con la que razona cualquier equipo de [red team](/guia/red-teaming-que-es-cuando-contratarlo): no se ataca el objetivo más duro, se ataca el que tiene permiso sobre el objetivo más duro.
 
-Tu notebook tiene antivirus, disco cifrado y un usuario sin privilegios. La consola que administra tu notebook, en cambio, tiene credenciales de administrador sobre todas las notebooks de la empresa, corre en un servidor que nadie mira, y muchas veces está publicada en internet porque el proveedor necesita llegar desde afuera.
+Tu notebook tiene antivirus, disco cifrado y un usuario sin privilegios. La consola que la administra tiene credenciales de administrador sobre todas las notebooks de la empresa, corre en un servidor que nadie mira y suele estar publicada en internet porque el proveedor necesita llegar desde afuera.
 
-Un solo bypass de autenticación ahí vale más que cien equipos comprometidos de a uno. Es exactamente lo que enseña cualquier [curso serio de pentesting](/guia/que-es-pentesting-como-funciona-fases-tipos): el camino corto casi nunca es el frontal.
+Un solo bypass de autenticación ahí vale más que cien equipos comprometidos de a uno. Es lo que enseña cualquier [curso serio de pentesting](/guia/que-es-pentesting-como-funciona-fases-tipos): el camino corto casi nunca es el frontal.
 
 **El caso de N-able es el que mejor lo muestra.** N-central es software de administración remota que usan proveedores de servicios de IT para gestionar los equipos de sus clientes. Las dos entradas del catálogo son de bypass de autenticación, y la segunda tiene un detalle que la descripción de NVD dice con todas las letras: **CVE-2026-18577 es "un parche incompleto de CVE-2026-18556"**.
 
@@ -73,7 +73,7 @@ Traducido: se publicó un arreglo, el arreglo no arreglaba, y las dos terminaron
 
 ## El dato que no aparece en los titulares
 
-Miren las puntuaciones de severidad de estas mismas fallas, según quién las asigne:
+Las puntuaciones de severidad de estas mismas fallas, según quién las asigne:
 
 | CVE | Según el fabricante | Según NVD |
 |---|---|---|
@@ -82,11 +82,11 @@ Miren las puntuaciones de severidad de estas mismas fallas, según quién las as
 | CVE-2026-8037 | 9,6 | 9,8 |
 | CVE-2026-68820 | 7,0 (Microsoft) | sin puntuación propia |
 
-No son errores: son dos organismos evaluando el mismo problema con criterios distintos, y **CVSS mide la falla, no tu riesgo**. Una diferencia de casi un punto entero en CVE-2026-18556 cambia por completo si entra o no en la cola de "parchear esta semana" de una empresa que prioriza por número.
+No son errores: son dos organismos evaluando el mismo problema con criterios distintos. **CVSS mide la falla, no tu riesgo**, y una diferencia de casi un punto cambia si entra o no en la cola de "parchear esta semana" de quien prioriza por número.
 
-Por eso la regla práctica es otra: **si está en el catálogo de CISA, se parchea, sin discutir el número**. Ese catálogo no mide teoría, mide que ya lo están usando. Y los plazos que CISA le fija a los organismos federales lo dejan claro: para siete de estas diez, el plazo fue de **tres días**.
+La regla práctica es otra: **si está en el catálogo de CISA, se parchea, sin discutir el número**. Para siete de estas diez, el plazo que CISA fija a los organismos federales fue de **tres días**.
 
-Si un organismo con equipo de seguridad tiene tres días, la pregunta interesante para una PyME no es cuánto tarda en parchear. Es quién parchea.
+Si un organismo con equipo de seguridad tiene tres días, la pregunta para una PyME no es cuánto tarda en parchear. Es quién parchea.
 
 ---
 
@@ -101,39 +101,39 @@ Si un organismo con equipo de seguridad tiene tres días, la pregunta interesant
 
 **Te toca indirecto, que es peor porque no lo controlás:**
 
-- Si tu soporte de IT es tercerizado, preguntá hoy si usan **N-able N-central** y qué versión. No es una pregunta agresiva: es la misma que te van a hacer a vos tus clientes grandes, y sobre eso escribimos la [guía para responder cuestionarios de seguridad de clientes](/guia/cuestionario-seguridad-cliente-como-responder).
+- Si tu soporte de IT es tercerizado, preguntá hoy si usan **N-able N-central** y qué versión. Es la misma pregunta que te van a hacer tus clientes grandes: cómo responderla está en la [guía de cuestionarios de seguridad](/guia/cuestionario-seguridad-cliente-como-responder).
 
 **No te toca:**
 
-- Si no corrés Langflow, Ray, Tomcat ni LoadMaster —y la mayoría de las PyMEs no—, esas cuatro son ruido para vos. Perseguir cada CVE que sale en las noticias es la forma más rápida de agotar a la única persona que se ocupa de esto.
+- Si no corrés Langflow, Ray, Tomcat ni LoadMaster, esas cuatro son ruido. Perseguir cada CVE que sale en las noticias es la forma más rápida de agotar a la única persona que se ocupa de esto.
 
 ---
 
 ## Cómo comprobar si estás expuesto
 
-Todo lo de acá abajo es verificación desde tu lado, con tus credenciales. Nada de esto es una prueba de concepto.
+Todo esto es verificación desde tu lado, con tus credenciales. Ninguna es una prueba de concepto.
 
-**Firewall de borde.** Entrá al panel y mirá la versión exacta del sistema operativo del equipo, no la del contrato de soporte. Después buscá esa versión en el aviso oficial de Cisco. Si tenés el VPN SSL de acceso remoto habilitado y no lo usa nadie desde que migraron a otra cosa, apagalo: es la mitigación más barata que existe.
+**Firewall de borde.** Mirá en el panel la versión exacta del sistema operativo del equipo, no la del contrato de soporte, y buscala en el aviso oficial de Cisco. Si el VPN SSL de acceso remoto está habilitado y no lo usa nadie, apagalo: es la mitigación más barata que existe.
 
-**Windows.** Que el parche de agosto esté aplicado en todos los equipos, no en el tuyo. Sin una consola central no tenés forma de saberlo, y ese es justamente el argumento de la [guía sobre cuándo se justifica el salto de antivirus a EDR](/guia/edr-o-antivirus-cuando-se-justifica-pyme).
+**Windows.** Que el parche de agosto esté aplicado en todos los equipos, no en el tuyo. Sin consola central no hay forma de saberlo, que es el argumento de la [guía sobre cuándo se justifica el salto a EDR](/guia/edr-o-antivirus-cuando-se-justifica-pyme).
 
-**Servicios publicados.** Hacé el inventario que casi nadie tiene: qué de lo tuyo responde desde internet. Paneles de administración, tableros, servidores de integración continua. Si algo de eso está publicado sin necesidad, sacarlo de internet vale más que parchearlo.
+**Servicios publicados.** Inventariá qué de lo tuyo responde desde internet: paneles de administración, tableros, servidores de integración continua. Lo que esté publicado sin necesidad, sacalo.
 
-**Tu proveedor.** Tres preguntas, por escrito: qué herramienta de administración remota usan, en qué versión, y cuándo la actualizaron por última vez. La respuesta —o la falta de respuesta— te dice bastante.
+**Tu proveedor.** Tres preguntas por escrito: qué herramienta de administración remota usan, en qué versión y cuándo la actualizaron. La falta de respuesta también informa.
 
 ---
 
 ## Qué hacer, en orden
 
-1. **Parcheá lo que esté en la lista y corras.** Sin discutir el CVSS. Que esté en el catálogo de CISA significa que ya lo están usando.
-2. **Sacá de internet lo que no necesita estar.** Un panel de administración accesible desde cualquier IP del mundo es una falla esperando el próximo CVE. Si necesitás acceso remoto, un modelo de acceso por identidad como [Cloudflare Access](/producto/cloudflare-access) o [Twingate](/producto/twingate) reemplaza al VPN publicado; el razonamiento completo está en la guía de [acceso remoto seguro sin VPN](/guia/acceso-remoto-seguro-sin-vpn).
-3. **MFA en las consolas de administración, primero que en ningún otro lado.** Un bypass de autenticación es peor cuando del otro lado solo hay una contraseña. Si todavía no lo tenés, la [guía para configurar MFA en un fin de semana](/guia/configurar-mfa-pyme-fin-de-semana) es el camino corto, y [por qué el MFA solo no alcanza](/guia/ya-tenes-mfa-y-no-alcanza) explica por qué no todos los segundos factores resisten igual.
-4. **Verificá que tus copias sobrevivan a un administrador comprometido.** Si quien controla la consola puede borrar los respaldos, no son respaldos. [Veeam Data Platform](/producto/veeam-data-platform) y el resto de la [categoría de backup y recuperación](/productos/backup-y-recuperacion) cubren el requisito de inmutabilidad.
-5. **Escribí las tres preguntas a tu proveedor de IT.** Hoy, no el mes que viene.
+1. **Parcheá lo que esté en la lista y corras**, sin discutir el CVSS. Estar en el catálogo significa que ya lo están usando.
+2. **Sacá de internet lo que no necesita estar.** Un panel de administración accesible desde cualquier IP es una falla esperando el próximo CVE. Si necesitás acceso remoto, un modelo por identidad como [Cloudflare Access](/producto/cloudflare-access) o [Twingate](/producto/twingate) reemplaza al VPN publicado: el razonamiento está en [acceso remoto seguro sin VPN](/guia/acceso-remoto-seguro-sin-vpn).
+3. **MFA en las consolas de administración antes que en ningún otro lado.** Un bypass de autenticación es peor cuando del otro lado solo hay una contraseña. La [guía para configurar MFA en un fin de semana](/guia/configurar-mfa-pyme-fin-de-semana) es el camino corto, y [por qué el MFA solo no alcanza](/guia/ya-tenes-mfa-y-no-alcanza) explica cuáles resisten.
+4. **Verificá que tus copias sobrevivan a un administrador comprometido.** Si quien controla la consola puede borrar los respaldos, no son respaldos. [Veeam Data Platform](/producto/veeam-data-platform) y la [categoría de backup](/productos/backup-y-recuperacion) cubren la inmutabilidad.
+5. **Escribí las tres preguntas a tu proveedor de IT.** Hoy.
 
-Para la mayoría de las PyMEs de la región, el punto 2 rinde más que el 1. Parchear es una carrera que se corre todos los meses y se pierde algunas veces. Reducir lo que está publicado se hace una vez y baja el piso de riesgo de forma permanente.
+Para la mayoría de las PyMEs de la región, el punto 2 rinde más que el 1: parchear es una carrera mensual que a veces se pierde, mientras que reducir lo publicado se hace una vez y baja el piso de riesgo de forma permanente.
 
-Si estás armando el programa completo y no sabés en qué orden va cada cosa, la [guía de ciberseguridad para PyMEs de LATAM](/guia/guia-ciberseguridad-pymes-latam-2026) ubica todo esto dentro del resto.
+La [guía de ciberseguridad para PyMEs de LATAM](/guia/guia-ciberseguridad-pymes-latam-2026) ubica todo esto dentro del programa completo.
 
 ---
 
@@ -145,7 +145,7 @@ Es la lista de vulnerabilidades sobre las que la agencia de ciberseguridad de Es
 
 ### Si mi proveedor de IT usa N-central, ¿estoy comprometido?
 
-No necesariamente, y no hay que saltar a esa conclusión. Lo que sí corresponde es confirmar la versión y la fecha de actualización, con el detalle de que el primer parche resultó incompleto: NVD describe CVE-2026-18577 como un parche incompleto de CVE-2026-18556. Estar actualizado a principios de agosto no alcanza.
+No necesariamente. Lo que corresponde es confirmar la versión y la fecha de actualización, con un detalle: NVD describe CVE-2026-18577 como un parche incompleto de CVE-2026-18556, así que estar actualizado a principios de agosto no alcanza.
 
 ### ¿Por qué el fabricante y NVD dan puntuaciones distintas de la misma falla?
 
@@ -153,4 +153,4 @@ Porque son evaluaciones independientes con supuestos distintos sobre el contexto
 
 ### Una elevación de privilegios local, ¿es grave si el atacante no puede entrar?
 
-Sola no sirve para entrar, y por eso suele bajar en la lista de prioridades. El problema es que casi nunca viene sola: se encadena con un phishing exitoso o una credencial robada, y es lo que convierte un acceso de usuario común en control total. La cadena completa es lo que importa, no cada eslabón por separado.
+Sola no sirve para entrar, y por eso suele bajar de prioridad. Pero casi nunca viene sola: se encadena con un phishing exitoso o una credencial robada, y convierte un acceso de usuario común en control total. Importa la cadena, no cada eslabón por separado.
