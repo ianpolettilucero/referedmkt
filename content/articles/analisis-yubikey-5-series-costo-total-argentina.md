@@ -11,7 +11,7 @@ updated: 2026-07-26
 products: [yubikey-5-series, microsoft-entra-id, cisco-duo]
 rating: 4.2
 verdict: |
-  Evaluación editorial construida sobre precios de lista de Yubico, el régimen de importación argentino vigente (Decreto 604/2026) y la documentación de producto de Microsoft y Yubico. No hay un despliegue propio detrás de este número y conviene que lo sepas antes de seguir leyendo. La YubiKey 5 Series es, a mi juicio, la referencia de su categoría —no comparé contra otras marcas de llaves y no voy a fingir que sí—, y el número que importa no es el de la etiqueta: modelando 26 personas a tres años, el hardware desembarcado queda en torno al 45% del costo total y el resto es tiempo, logística y adaptadores. Compralas para las identidades con privilegio elevado y para la gente que se niega a instalar una app de la empresa en su teléfono personal. Para el resto del padrón, el propio Microsoft recomienda passkeys sincronizadas, que cuestan cero.
+  Evaluación editorial construida sobre precios de lista de Yubico, el régimen de importación argentino vigente (Decreto 604/2026) y la documentación de producto de Microsoft y Yubico. No hay un despliegue propio detrás de este número. La YubiKey 5 Series es, a mi juicio, la referencia de su categoría —no comparé contra otras marcas de llaves y no voy a fingir que sí—, y el número que importa no es el de la etiqueta: modelando 26 personas a tres años, el hardware desembarcado queda en torno al 45% del costo total y el resto es tiempo, logística y adaptadores. Compralas para las identidades con privilegio elevado y para la gente que se niega a instalar una app de la empresa en su teléfono personal. Para el resto del padrón, el propio Microsoft recomienda passkeys sincronizadas, que cuestan cero.
 pros:
   - Precio de lista publicado y verificable, USD 29 la Security Key C NFC y USD 58 la YubiKey 5C NFC
   - Funciona sin batería, sin datos móviles y sin una app de la empresa en el teléfono personal del empleado
@@ -36,7 +36,7 @@ Una YubiKey 5C NFC cuesta **USD 58** en la [tienda de Yubico](https://www.yubico
 
 Es el número con el que casi todos los análisis empiezan y terminan, y es el que menos se parece a lo que sale la llave puesta sobre un escritorio en Buenos Aires.
 
-Lo que sigue no es una evaluación de criptografía —de FIDO2, PIV y OpenPGP ya habla la [ficha de producto de YubiKey 5 Series](/producto/yubikey-5-series)—. Es lo otro, que es lo que rompe presupuestos: cuánto cuesta la llave desembarcada, cuánto cuesta el resto del proyecto que no es la llave, qué pasa cuando alguien la pierde, y para qué perfil de gente cierra la matemática. Todo sale de precios públicos, del régimen aduanero publicado y de la documentación de Microsoft y Yubico. Cuando algo es opinión mía, lo vas a ver escrito como opinión mía.
+De FIDO2, PIV y OpenPGP ya habla la [ficha de producto de YubiKey 5 Series](/producto/yubikey-5-series). Acá va lo que rompe presupuestos: cuánto cuesta la llave desembarcada, cuánto cuesta el resto del proyecto que no es la llave, qué pasa cuando alguien la pierde, y para qué perfil de gente cierra la matemática. Todo sale de precios públicos, del régimen aduanero publicado y de la documentación de Microsoft y Yubico. Cuando algo es opinión mía, lo vas a ver escrito como opinión mía.
 
 ## Precios de lista, que es de donde arranca todo
 
@@ -73,7 +73,7 @@ Con eso, el cálculo de desembarco por courier es una suma corta:
 | A | 13 × Security Key C NFC | USD 377 | USD 55 | USD 91 | **USD 523** | **USD 40** | 1,39x |
 | B | 6 × YubiKey 5C NFC | USD 348 | USD 55 | USD 85 | **USD 488** | **USD 81** | 1,40x |
 
-Los USD 55 de flete son un supuesto mío para un paquete express de menos de medio kilo, no un dato: cotizalo y reemplazá esa celda. Todo lo demás sale de la lista de Yubico y de la alícuota publicada. Lo robusto es el multiplicador: **alrededor de 1,4 veces la lista**, muy lejos del 2x o 2,5x que se sigue repitiendo de memoria.
+Los USD 55 de flete son un supuesto para un paquete express de menos de medio kilo, no un dato: cotizalo y reemplazá esa celda. Todo lo demás sale de la lista de Yubico y de la alícuota publicada. Lo robusto es el multiplicador: **alrededor de 1,4 veces la lista**, muy lejos del 2x o 2,5x que se sigue repitiendo de memoria.
 
 Dos advertencias cambian la lectura de esa tabla.
 
@@ -113,7 +113,7 @@ Del lado del hardware, el caso mejor documentado sigue siendo Google. [El estudi
 
 ## El disparador que sí justifica el gasto
 
-El disparador que a mi juicio justifica el gasto sin discusión no es un incidente de seguridad. Es la persona que se niega a instalar una app de la empresa en su celular personal. Es un argumento razonable, no hay mucho con qué rebatirlo, y la llave lo resuelve de raíz: no necesita batería, ni datos, ni una app en un dispositivo que no es de la empresa.
+El disparador que justifica el gasto sin discusión no es un incidente de seguridad. Es la persona que se niega a instalar una app de la empresa en su celular personal. Es un argumento razonable, no hay mucho con qué rebatirlo, y la llave lo resuelve de raíz: no necesita batería, ni datos, ni una app en un dispositivo que no es de la empresa.
 
 No conozco una encuesta que mida esa negativa en particular, así que lo que sigue es contexto y no prueba. El [ESET Security Report 2026](https://www.welivesecurity.com/es/informes/eset-security-report-2026-ciberseguridad-empresas-latinoamerica/), sobre 1.563 profesionales de 962 organizaciones en diez países de Latinoamérica, mide que solo el **57% de las empresas de la región implementa MFA** y que entre el personal no técnico la adopción baja al **52,2%**. Agrega un dato que explica bastante: el **26,9% del personal no técnico no aplica ninguna medida de seguridad sobre su teléfono corporativo**. La discusión sobre el teléfono personal cae dentro de ese hueco, y es justamente la parte que ninguna de esas encuestas pregunta de frente. Sobre por qué tener el segundo factor prendido no equivale a tenerlo puesto donde hace falta, está [los once accesos que casi ninguna PyME cubre](/guia/ya-tenes-mfa-y-no-alcanza).
 
@@ -177,7 +177,7 @@ Es la parte que se pierde en cualquier reunión donde alguien presenta llaves co
 
 Para ubicarla en el resto del tablero está la [guía de ciberseguridad para PyMEs de LATAM](/guia/guia-ciberseguridad-pymes-latam-2026), y si el proyecto de MFA todavía no arrancó, el orden de tareas está en [cómo configurar MFA en toda tu PyME en un fin de semana](/guia/configurar-mfa-pyme-fin-de-semana).
 
-## Dónde no me meto
+## Dónde no llega este análisis
 
 Este análisis se apoya en precios de lista, el régimen de importación publicado y documentación de producto. Hay dos zonas donde eso no alcanza.
 

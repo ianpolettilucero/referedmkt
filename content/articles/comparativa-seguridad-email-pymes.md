@@ -23,8 +23,8 @@ verdict: |
   precio verificable, Check Point Harmony es el único de los caros con tarifa
   impresa por usuario. Mimecast entra cuando hay obligación de archivado legal con
   retención larga y presupuesto para pagar una implementación aparte. Abnormal, con
-  su cargo de plataforma fijo, no es un producto para PyME, por más que a mi juicio
-  sea el que mejor apunta al fraude por correo sin adjunto ni enlace. Para todos los
+  su cargo de plataforma fijo, no es un producto para PyME, aunque sea el que mejor
+  apunta al fraude por correo sin adjunto ni enlace. Para todos los
   demás: gastá esa plata en backup y en llaves físicas.
 pros:
   - Microsoft y los partners de Proofpoint Essentials publican tarifa por usuario, y Check Point publica la suya en AWS Marketplace
@@ -83,7 +83,7 @@ La cuenta a 25 buzones con el piso más benévolo: USD 875 de asientos más USD 
 
 Hay además una hipótesis técnica, y la marco como mía porque no tengo medición que la respalde: el producto se apoya en un modelo de comportamiento construido sobre el historial de quién le escribe a quién adentro de la organización, y con 25 buzones ese historial es chico. Si eso diluye o no la ventaja frente a un filtro tradicional, no lo puedo afirmar. Es exactamente la pregunta que le haría al preventa antes de firmar.
 
-Acá está la contradicción que este artículo no puede resolver y prefiero dejar escrita: a mi juicio es el que mejor apunta a lo que más importa —el fraude por correo sin adjunto ni enlace— y es el que menos PyMEs pueden comprar. Es una opinión formada sobre documentación, no sobre una prueba comparativa que yo haya corrido. Y antes de cualquier prueba, verificá dos cosas de las que no tengo dato: en qué idioma están la consola, la documentación y el soporte, y en qué huso horario te atienden. En una PyME de la región con un IT de dos personas eso pesa, y se responde en cinco minutos preguntando.
+Queda una contradicción que este artículo no puede resolver: es el que mejor apunta a lo que más importa —el fraude por correo sin adjunto ni enlace— y es el que menos PyMEs pueden comprar. Es una opinión formada sobre documentación, no sobre una prueba comparativa que yo haya corrido. Y antes de cualquier prueba, verificá dos cosas de las que no tengo dato: en qué idioma están la consola, la documentación y el soporte, y en qué huso horario te atienden. En una PyME de la región con un IT de dos personas eso pesa, y se responde en cinco minutos preguntando.
 
 ## Check Point Harmony: el único de los caros con la tarifa impresa
 
@@ -105,7 +105,7 @@ Mimecast en modo clásico te pide apuntar el MX hacia ellos, y eso arrastra prop
 
 La diferencia que a mí me importa no es el plazo sino la topología, y se ve el día malo. Si el producto está por API y se cae, el correo sigue llegando: perdés detección, no servicio. Si el MX apunta al proveedor y el proveedor se cae, el correo entrante se encola o rebota. Mimecast ofrece continuidad de servicio justamente para ese escenario, como parte de su catálogo: un agujero que el modelo por API nunca abrió. Si vas por SEG, preguntá por escrito si esa continuidad viene incluida en el SKU que te cotizan o se factura aparte.
 
-Un asterisco honesto sobre los "minutos": ese número es del fabricante y describe el caso simple —un tenant, un dominio, modo automático—. El modo manual existe porque hay casos donde el automático no alcanza. Y no hay datos públicos confiables sobre estos despliegues arriba de unos cientos de buzones con coexistencia híbrida: ahí no me meto.
+Un asterisco sobre los "minutos": ese número es del fabricante y describe el caso simple —un tenant, un dominio, modo automático—. El modo manual existe porque hay casos donde el automático no alcanza. Y no hay datos públicos confiables sobre estos despliegues arriba de unos cientos de buzones con coexistencia híbrida: ahí no me meto.
 
 ## Mimecast: qué te cuesta que un fabricante no publique lista
 

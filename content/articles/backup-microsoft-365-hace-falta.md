@@ -13,7 +13,7 @@ products: [veeam-data-platform, acronis-cyber-protect, rubrik-security-cloud]
 
 Microsoft retiene los mails que un usuario borra definitivamente **14 días por defecto** —máximo 30, y solo si un admin lo sube a mano con `Set-Mailbox -RetainDeletedItemsFor`— y los archivos de SharePoint y OneDrive **93 días contados desde el borrado original**, no 93 por cada papelera. Ni siquiera esos 93 están garantizados: la papelera de segunda etapa tiene una cuota fija y, cuando se llena, purga sola lo más viejo. Fuente: documentación de Microsoft Learn y artículos de soporte de Microsoft 365, consultados en julio de 2026.
 
-Esos números sueltos no dicen nada. Puestos en un calendario, dicen todo. Lo que sigue es un **escenario modelo**: una PyME de 60 buzones en Microsoft 365 Business Premium, sin backup de terceros, atravesada por la secuencia de compromiso de identidad que describen los playbooks de Microsoft Defender y los informes de respuesta a incidentes del rubro. No es un caso que yo haya atendido ni uno que me hayan contado. Cada paso está anclado a documentación pública; los volúmenes, las horas y los montos son supuestos explícitos, para que puedas rehacer la cuenta con los tuyos. Lo digo acá y no vuelvo sobre el tema: un patrón le sirve a más gente que una anécdota, y este es el patrón que explica por qué los 93 días se convierten en 33.
+Puestos en un calendario, esos números cambian de significado. Lo que sigue es un **escenario modelo**: una PyME de 60 buzones en Microsoft 365 Business Premium, sin backup de terceros, atravesada por la secuencia de compromiso de identidad que describen los playbooks de Microsoft Defender y los informes de respuesta a incidentes del rubro. No es un caso atendido ni uno que nos hayan contado. Cada paso está anclado a documentación pública; los volúmenes, las horas y los montos son supuestos explícitos, para que puedas rehacer la cuenta con los tuyos. Es el patrón que explica por qué los 93 días se convierten en 33.
 
 ## La cronología del escenario, hora por hora
 
@@ -25,15 +25,15 @@ El registro de inicios de sesión de Entra ID muestra una autenticación exitosa
 
 Nueve minutos antes, a las 09:05, la misma cuenta había iniciado sesión desde la IP de la oficina. En este patrón las dos sesiones conviven durante días: la del usuario y la del atacante, ambas legítimas para el servicio.
 
-Esto es un ataque adversary-in-the-middle de manual: el usuario entra a una página que proxea el login real de Microsoft, completa su MFA de buena fe, y el atacante se queda con la cookie de sesión que Microsoft acaba de emitir. El MFA funcionó. Se lo saltearon igual, y esa distinción —funcionó, no sirvió— es la que se pierde en cada reunión post-incidente. La desarrollo aparte en [por qué tener MFA activado no alcanza](/guia/ya-tenes-mfa-y-no-alcanza). El único factor que rompe este patrón de raíz es uno atado al dominio, que no se puede proxear: es el argumento a favor de [las llaves de seguridad FIDO2 de la línea YubiKey 5](/resena/analisis-yubikey-5-series-costo-total-argentina), y el motivo por el que un [despliegue de MFA de fin de semana](/guia/configurar-mfa-pyme-fin-de-semana) tiene que elegir bien el método, no solo activar la casilla.
+Esto es un ataque adversary-in-the-middle de manual: el usuario entra a una página que proxea el login real de Microsoft, completa su MFA de buena fe, y el atacante se queda con la cookie de sesión que Microsoft acaba de emitir. El MFA funcionó y se lo saltearon igual: funcionó, no sirvió. El desarrollo está en [por qué tener MFA activado no alcanza](/guia/ya-tenes-mfa-y-no-alcanza). El único factor que rompe este patrón de raíz es uno atado al dominio, que no se puede proxear: es el argumento a favor de [las llaves de seguridad FIDO2 de la línea YubiKey 5](/resena/analisis-yubikey-5-series-costo-total-argentina), y el motivo por el que un [despliegue de MFA de fin de semana](/guia/configurar-mfa-pyme-fin-de-semana) tiene que elegir bien el método, no solo activar la casilla.
 
 ### Días 0 a 3 — reglas de bandeja y reenvío
 
-Paso siguiente del patrón: una regla de bandeja de entrada con nombre irrelevante —un punto, tres puntos o directamente vacío— que mueve a una carpeta que nadie mira todo mensaje que contenga "factura", "transferencia", "CBU" o "pago", y lo marca como leído. El destino habitual es Suscripciones RSS o Elementos eliminados. Esto no lo estoy inventando para la ocasión: Microsoft publica un playbook de clasificación de alertas dedicado a reglas de manipulación de bandeja, y la técnica está catalogada en MITRE ATT&CK como *Email Hiding Rules* (T1564.008). Las carpetas concretas que menciono son las que se repiten en los reportes públicos de respuesta a incidentes: tomalas como el caso frecuente, no como una medición.
+Paso siguiente del patrón: una regla de bandeja de entrada con nombre irrelevante —un punto, tres puntos o directamente vacío— que mueve a una carpeta que nadie mira todo mensaje que contenga "factura", "transferencia", "CBU" o "pago", y lo marca como leído. El destino habitual es Suscripciones RSS o Elementos eliminados. Microsoft publica un playbook de clasificación de alertas dedicado a reglas de manipulación de bandeja, y la técnica está catalogada en MITRE ATT&CK como *Email Hiding Rules* (T1564.008). Las carpetas concretas son las que se repiten en los reportes públicos de respuesta a incidentes: son el caso frecuente, no una medición.
 
 El reenvío automático a dominios externos, en el modelo, está bloqueado a nivel de organización. Se saltea con una segunda regla que reenvía mensaje por mensaje a una casilla gratuita: el bloqueo de forwarding externo y el bloqueo de reglas de reenvío son dos controles distintos, y muchas organizaciones tienen uno solo activo. Andá a verificar el tuyo antes de seguir leyendo.
 
-Supongamos 214 mensajes filtrados en tres días, entre ellos tres cadenas de negociación con un cliente grande. Ahí es donde el fraude al CEO deja de ser una anécdota y se vuelve un negocio: el compromiso de correo corporativo fue en 2025 la **segunda categoría de pérdida más alta** de todo el informe anual del IC3 del FBI, con **USD 3.046 millones** reportados, detrás únicamente del fraude de inversión (USD 8.649 millones). Lo que se roba no es un archivo. Es una conversación en curso, con contexto suficiente para pedir un cambio de CBU sin que suene raro. Si tu dominio todavía no está firmado, [configurar SPF, DKIM y DMARC paso a paso](/guia/configurar-spf-dkim-dmarc-paso-a-paso) es la tarde mejor invertida del trimestre.
+Supongamos 214 mensajes filtrados en tres días, entre ellos tres cadenas de negociación con un cliente grande. Ahí el fraude al CEO deja de ser anécdota y se vuelve negocio: el compromiso de correo corporativo fue en 2025 la **segunda categoría de pérdida más alta** de todo el informe anual del IC3 del FBI, con **USD 3.046 millones** reportados, detrás únicamente del fraude de inversión (USD 8.649 millones). Lo que se roba no es un archivo. Es una conversación en curso, con contexto suficiente para pedir un cambio de CBU sin que suene raro. Si tu dominio todavía no está firmado, [configurar SPF, DKIM y DMARC paso a paso](/guia/configurar-spf-dkim-dmarc-paso-a-paso) es la tarde mejor invertida del trimestre.
 
 ### Día 4, 02:40 — borrado
 
@@ -44,23 +44,23 @@ Ochenta y siete minutos de actividad. En orden:
 - Se vacía la papelera de primera etapa desde la interfaz web, en dos tandas.
 - Se purga la carpeta de Elementos eliminados del buzón y después la subcarpeta de recuperables, con la opción de purga que Outlook le ofrece al propio usuario.
 
-No hace falta ransomware. Nada queda encriptado —cifrado, si preferís el término técnicamente correcto— y esa es la parte incómoda del escenario: no hay nota de rescate, no hay proceso raro consumiendo CPU, no hay nada que un EDR pueda marcar. El atacante usa las funciones normales del producto con las credenciales de un empleado real. Es, literalmente, un usuario ordenando su OneDrive.
+No hace falta ransomware. Nada queda cifrado, y ahí está el problema: no hay nota de rescate, no hay proceso raro consumiendo CPU, no hay nada que un EDR pueda marcar. El atacante usa las funciones normales del producto con las credenciales de un empleado real. Es, literalmente, un usuario ordenando su OneDrive.
 
 ### Día 14 — alguien nota
 
-Una administrativa abre el sitio para buscar un pliego de 2023 y la carpeta no está. Pregunta por Teams. Le dicen que pruebe al día siguiente. Ese día perdido no es color narrativo: es el motor de todo lo que viene después, y el modelo lo pone acá a propósito.
+Una administrativa abre el sitio para buscar un pliego de 2023 y la carpeta no está. Pregunta por Teams. Le dicen que pruebe al día siguiente. Ese día perdido es el motor de todo lo que viene después.
 
 Ese mismo día 14 se cumple el plazo por defecto de retención de elementos recuperables del buzón. Los mails purgados el día 4 dejan de ser recuperables por cualquier vía —ni el usuario, ni el admin, ni eDiscovery— porque la cuenta no tenía retención ni litigation hold aplicado. Nadie toma nota de eso el día 14. La cuenta se paga el día 41.
 
 ### Día 33 — la papelera se vacía sola
 
-Acá está el detalle que casi nadie tiene presente y que convierte esto en algo distinto de "se olvidaron de restaurar a tiempo".
+Este es el detalle que convierte el caso en algo distinto de "se olvidaron de restaurar a tiempo".
 
 Los 240 GB borrados del sitio Comercial están en la papelera de segunda etapa, con 93 días de reloj corriendo desde el día 4. Deberían estar disponibles hasta el día 97. Pero el día 33 el área de Marketing sube al mismo site collection un archivo histórico de campañas de 410 GB, y limpia otro tanto. La papelera de segunda etapa de SharePoint Online tiene una cuota fija del **200% de la cuota de almacenamiento del site collection**, no es configurable, y cuando se supera **el servicio empieza a borrar automáticamente los elementos más antiguos** hasta hacer lugar para los más nuevos. Está documentado por Microsoft y repetido en los artículos de soporte de Microsoft 365.
 
 Los elementos más antiguos son las licitaciones.
 
-Los 93 días no son una promesa. Son un techo que solo se alcanza si nadie más en ese site collection borra nada grande mientras tanto. Que ese comportamiento viva en un artículo de soporte y no en la página de producto me parece una decisión de marketing y no de ingeniería, y es la clase de letra chica que conviene leer antes de firmar, no después.
+Los 93 días no son una promesa: son un techo que solo se alcanza si nadie más en ese site collection borra nada grande mientras tanto. Ese comportamiento vive en un artículo de soporte y no en la página de producto, que es la clase de letra chica que conviene leer antes de firmar.
 
 ### Día 41 — el ticket
 
@@ -81,13 +81,13 @@ Qué no vuelve nunca:
 - **Nueve años de historial de versiones** del sitio Comercial. Lo que se recupera vuelve como versión única, sin el rastro de quién cambió qué.
 - **1.140 mensajes recibidos** entre 2019 y el día 0, que solo existían en ese buzón.
 - **Las tres cadenas** con el cliente grande, que además ya están en manos de un tercero.
-- **Once días hábiles** de dos personas reconstruyendo carpetas, más el honorario de un forense externo. En el modelo lo cargo a USD 4.200; poné el número que te cotizarían a vos, la conclusión no cambia.
+- **Once días hábiles** de dos personas reconstruyendo carpetas, más el honorario de un forense externo. En el modelo se carga a USD 4.200; poné el número que te cotizarían a vos, la conclusión no cambia.
 
-Un contrapunto honesto con la cifra grande del rubro: Sophos calculó en 2026 un costo medio de recuperación de **USD 1,7 millones** sin contar rescate, un 11% más que el año anterior. Ese número sale mayormente de organizaciones grandes y me parece inaplicable a una PyME de 60 personas; lo cito por la escala, no para asustar. Lo que sí aplica del mismo informe es el otro dato: **el 66% de los casos con datos cifrados se recuperaron vía backups**, doce puntos más que en 2025.
+Un contrapunto honesto con la cifra grande del rubro: Sophos calculó en 2026 un costo medio de recuperación de **USD 1,7 millones** sin contar rescate, un 11% más que el año anterior. Ese número sale mayormente de organizaciones grandes y no es aplicable a una PyME de 60 personas: sirve por la escala, no como pronóstico. Lo que sí aplica del mismo informe es el otro dato: **el 66% de los casos con datos cifrados se recuperaron vía backups**, doce puntos más que en 2025.
 
-## Acá se termina el escenario y empieza el manual
+## Se termina el escenario, empieza el manual
 
-Cambio de registro a propósito. Lo que viene no son supuestos: son días, tablas y dólares, todos verificables.
+Lo que viene no son supuestos: son días, tablas y dólares verificables.
 
 ## Qué garantiza Microsoft, con los días al lado
 
@@ -150,14 +150,14 @@ Qué implica que no publiquen tarifa: que no tenés contra qué medir la cotizac
 
 **Dónde está el punto de corte**, con números concretos:
 
-- **Hasta 25 buzones y menos de 500 GB.** El backup nativo de Microsoft a USD 0,15/GB/mes son unos USD 75/mes por 500 GB, sin sumar proveedor externo. La contra: los datos siguen dentro del mismo tenant. Contra un borrado accidental sirve; contra un administrador global comprometido —que es exactamente el escenario de arriba— no me convence.
-- **De 25 a 200 buzones.** Acá [Veeam Data Platform](/producto/veeam-data-platform) es la opción por defecto. A USD 3/usuario/mes, 60 buzones son USD 180/mes o USD 2.160/año, con retención propia fuera del tenant. Lo pongo por defecto por la tarifa pública por usuario, que te deja presupuestar sin llamar a nadie: es un criterio mío, no una medición de adopción, que no tengo.
+- **Hasta 25 buzones y menos de 500 GB.** El backup nativo de Microsoft a USD 0,15/GB/mes son unos USD 75/mes por 500 GB, sin sumar proveedor externo. La contra: los datos siguen dentro del mismo tenant. Contra un borrado accidental sirve; contra un administrador global comprometido, que es el escenario de arriba, no.
+- **De 25 a 200 buzones.** Acá [Veeam Data Platform](/producto/veeam-data-platform) es la opción por defecto. A USD 3/usuario/mes, 60 buzones son USD 180/mes o USD 2.160/año, con retención propia fuera del tenant. Va por defecto por la tarifa pública por usuario, que deja presupuestar sin llamar a nadie. Es un criterio de compra, no una medición de adopción.
 - **Más de 200 buzones o mucho volumen de archivos.** El licenciamiento por usuario deja de ser eficiente cuando el problema es capacidad. [Rubrik Security Cloud](/producto/rubrik-security-cloud) licencia por capacidad y su documentación describe la inmutabilidad como parte del diseño del producto y no como una casilla que alguien se olvida de prender. Como no publica precio de entrada, no puedo ponerle número; lo que sí digo, y es una opinión, es que un licenciamiento por capacidad con mínimo de tres años difícilmente cierre para 60 buzones.
-- **Si querés consolidar antimalware y backup en un agente.** [Acronis Cyber Protect](/producto/acronis-cyber-protect), que los agregadores ubican desde USD 85/año por workload, es la opción de MSP y de empresas sin equipo de IT, y su argumento de venta es la consolidación: un solo agente para backup y antimalware. Mi objeción, como opinión y no como medición: si ya tenés un EDR que te gusta —hay tres comparados en [Bitdefender vs Kaspersky vs ESET](/comparativa/bitdefender-vs-kaspersky-vs-eset)— la consolidación deja de ser un argumento.
+- **Si querés consolidar antimalware y backup en un agente.** [Acronis Cyber Protect](/producto/acronis-cyber-protect), que los agregadores ubican desde USD 85/año por workload, es la opción de MSP y de empresas sin equipo de IT, y su argumento de venta es la consolidación: un solo agente para backup y antimalware. La objeción: si ya tenés un EDR que te gusta —hay tres comparados en [Bitdefender vs Kaspersky vs ESET](/comparativa/bitdefender-vs-kaspersky-vs-eset)— la consolidación deja de ser un argumento.
 
 El resto del catálogo, con fichas y precios, está en el [directorio de backup y recuperación](/productos/backup-y-recuperacion).
 
-Un dato regional que va contra el reflejo de esta guía y lo pongo igual: según el ESET Security Report 2026, el **82%** de las organizaciones latinoamericanas declara tener backup. Es el segundo control más extendido de la región, apenas debajo del firewall (85%) y muy por encima del MFA (57%). O sea que el control no falta. Lo que falta es que alguien lo haya restaurado alguna vez, y eso no se compra.
+Un dato regional que va contra el reflejo de esta guía: según el ESET Security Report 2026, el **82%** de las organizaciones latinoamericanas declara tener backup. Es el segundo control más extendido de la región, apenas debajo del firewall (85%) y muy por encima del MFA (57%). O sea que el control no falta. Lo que falta es que alguien lo haya restaurado alguna vez, y eso no se compra.
 
 ## El ensayo de restauración trimestral, en seis pasos
 
@@ -167,12 +167,12 @@ Un backup que nunca restauraste es una hipótesis. Este es el ejercicio que corr
 2. **Restaurá un ítem único a su ubicación original.** Un mail de hace más de 60 días, con adjunto. Si tardás más de esto, el problema es la interfaz, no el backup. *Objetivo: 10 minutos.*
 3. **Restaurá una carpeta completa a una ubicación alternativa.** Nunca sobre la original en un ensayo. Verificá que el historial de versiones haya vuelto, no solo la última versión. *Objetivo: 30 minutos.*
 4. **Restaurá un buzón entero a un buzón nuevo** y contá los ítems contra el original. Un delta del 2% ya amerita un ticket con el proveedor. *Objetivo: 90 minutos para un buzón de 40 GB.*
-5. **Probá el borrado desde una cuenta de administrador comprometida simulada.** Intentá borrar un punto de restauración con la cuenta de admin del backup. Si podés, la inmutabilidad no está activa. Sospecho que es el paso que más gente saltea, y no por casualidad. *Objetivo: 15 minutos.*
+5. **Probá el borrado desde una cuenta de administrador comprometida simulada.** Intentá borrar un punto de restauración con la cuenta de admin del backup. Si podés, la inmutabilidad no está activa. Es el paso que más se saltea. *Objetivo: 15 minutos.*
 6. **Escribí el número.** Tiempo de restauración por buzón y por 100 GB. Ese es tu RTO real, y el único dato que vas a poder darle a la dirección durante un incidente. *Objetivo: 10 minutos.*
 
 Si querés meterlo en un plan más amplio de controles, el orden de implementación por capas está en la [guía de ciberseguridad para PyMEs en LATAM](/guia/guia-ciberseguridad-pymes-latam-2026), y el control que habría cortado la parte del fraude está desarrollado en la [comparativa de seguridad de email para PyMEs](/comparativa/comparativa-seguridad-email-pymes).
 
-Un límite explícito antes de las preguntas: todo lo de arriba se apoya en documentación de producto, precios de lista y estadística publicada. Por encima de los 200 buzones, o con volúmenes de decenas de TB, el cálculo por usuario deja de describir la realidad y no hay tarifas públicas confiables para reemplazarlo. Ahí no me meto: pedí cotización antes de creerle a cualquier regla general, incluidas las de esta guía.
+Un límite explícito: todo lo de arriba se apoya en documentación de producto, precios de lista y estadística publicada. Por encima de los 200 buzones, o con decenas de TB, el cálculo por usuario deja de describir la realidad y no hay tarifas públicas confiables para reemplazarlo. Pedí cotización antes de creerle a cualquier regla general, incluidas las de esta guía.
 
 ## Preguntas frecuentes
 

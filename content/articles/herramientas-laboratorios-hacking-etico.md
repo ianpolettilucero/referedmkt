@@ -258,7 +258,7 @@ Un punto que merece énfasis específico: **las herramientas solas no hacen pent
 
 Las mismas herramientas en manos de un pentester OSCP con 5 años de experiencia producen resultados radicalmente distintos que en manos de alguien que nunca usó esos términos antes. Es similar a la diferencia entre un médico con un estetoscopio y cualquier otra persona con el mismo estetoscopio — el instrumento es idéntico, la capacidad de interpretar la información que genera es completamente distinta.
 
-Esta realidad es importante cuando se evalúan propuestas de "pentesting automatizado" o servicios muy económicos que prometen resultados rápidos. Si el servicio es literalmente correr herramientas automáticas y entregar el output crudo con maquillaje, el valor es limitado — los resultados crudos de nmap o Burp requieren análisis profesional para ser útiles.
+Esto pesa cuando se evalúan propuestas de "pentesting automatizado" o servicios muy económicos que prometen resultados rápidos. Si el servicio es literalmente correr herramientas automáticas y entregar el output crudo con maquillaje, el valor es limitado — los resultados crudos de nmap o Burp requieren análisis profesional para ser útiles.
 
 ---
 

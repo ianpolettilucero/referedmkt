@@ -137,7 +137,7 @@ Sin un mail a mano, probá los estándar: Microsoft 365 usa `selector1` y `selec
 
 Contá los caracteres del valor `p=`. Una clave RSA de **1024 bits** produce una `p=` de unos 216 caracteres; una de **2048 bits**, de unos 392. Es aritmética de base64 sobre el DER de la clave pública, no una estimación: sirve como regla de bolsillo sin herramientas.
 
-¿Es grave estar en 1024? Amarillo, no rojo. Es mi lectura y la asumo: nadie va a factorizar tu clave para mandar facturas falsas cuando comprar una credencial robada cuesta dos órdenes de magnitud menos. Pero 2048 es el default desde hace años y Microsoft 365 lo rota desde el portal de Defender. Hacelo cuando toques DNS por otra cosa.
+¿Es grave estar en 1024? Amarillo, no rojo: nadie va a factorizar tu clave para mandar facturas falsas cuando comprar una credencial robada cuesta dos órdenes de magnitud menos. Pero 2048 es el default desde hace años y Microsoft 365 lo rota desde el portal de Defender. Hacelo cuando toques DNS por otra cosa.
 
 ### El error de rotación silenciosa
 

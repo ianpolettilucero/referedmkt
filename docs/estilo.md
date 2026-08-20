@@ -59,9 +59,13 @@ leyendo un artículo.
 
 ## Palabras que no se usan
 
-panorama, robusto, sumergirse, aprovechar el poder de, solución integral,
-en la era digital, cabe destacar, es importante mencionar, sin lugar a dudas,
-en resumen, a modo de conclusión.
+sumergirse, aprovechar el poder de, solución integral, en la era digital,
+cabe destacar, es importante mencionar, sin lugar a dudas, a modo de conclusión.
+
+Ojo con las listas de palabras prohibidas: "panorama" es relleno en "el panorama
+de la ciberseguridad actual" y es la palabra correcta en "panorama de las
+herramientas de pentesting". Lo mismo con "robusto" o "en resumen". La regla es
+el uso, no la palabra: si aporta precisión, se queda.
 
 ## Largo
 
