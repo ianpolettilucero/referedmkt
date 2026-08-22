@@ -18,9 +18,9 @@ meta_description: "Los cuatro comandos dig, cómo leer cada registro, y el calen
 
 Tenés SPF. Tenés DKIM. Te siguen suplantando el dominio. La razón es una: sin un registro DMARC en `p=reject`, ningún servidor del mundo está obligado a hacer nada con esos dos registros. SPF y DKIM son evidencia, DMARC es la sentencia. Si no publicaste la sentencia, el peritaje se archiva.
 
-Esto no es un tutorial de sintaxis: es una **checklist de auditoría para que la corras vos, contra tu dominio, hoy**. Cada bloque de acá abajo es un comando, una salida anotada y un veredicto en tres estados: **verde** (dejalo), **amarillo** (funciona pero te rompe en tres meses) y **rojo** (arreglalo hoy).
+Es una **checklist de auditoría para correr contra tu dominio hoy**. Cada bloque es un comando, una salida anotada y un veredicto en tres estados: **verde** (dejalo), **amarillo** (funciona pero te rompe en tres meses) y **rojo** (arreglalo hoy).
 
-Un aviso de entrada, porque cambia cómo se lee todo lo que sigue: **las salidas son ejemplos construidos**, armados a propósito para que cada caso de fallo aparezca una vez y se pueda comparar. El dominio `distribuidora-ejemplo.com.ar` no existe. Los comandos sí son reales y el criterio de lectura también. Corré los cuatro contra tu dominio y compará contra las tablas. Lo que sigue se apoya en el [RFC 7208](https://datatracker.ietf.org/doc/html/rfc7208) (SPF), el [RFC 7489](https://datatracker.ietf.org/doc/html/rfc7489) (DMARC), la documentación de Microsoft y los requisitos publicados por Google y Microsoft para remitentes de alto volumen. Cada número tiene su fuente.
+**Las salidas son ejemplos construidos**, armados a propósito para que cada caso de fallo aparezca una vez y se pueda comparar. El dominio `distribuidora-ejemplo.com.ar` no existe. Los comandos sí son reales y el criterio de lectura también. Corré los cuatro contra tu dominio y compará contra las tablas. Lo que sigue se apoya en el [RFC 7208](https://datatracker.ietf.org/doc/html/rfc7208) (SPF), el [RFC 7489](https://datatracker.ietf.org/doc/html/rfc7489) (DMARC), la documentación de Microsoft y los requisitos publicados por Google y Microsoft para remitentes de alto volumen. Cada número tiene su fuente.
 
 ---
 
@@ -63,7 +63,7 @@ Veredicto, en orden de gravedad:
 | DKIM | Amarillo | Selector válido, pero la clave es de 1024 bits |
 | MX | Verde | Un solo MX a Exchange Online, sin restos de servidores viejos |
 
-Fijate en la asimetría: SPF de sobra —tanto que está roto por exceso—, DKIM presente, y `_dmarc` vacío. Esa asimetría tiene una explicación estructural, no un misterio: SPF y DKIM te los pide el proveedor cuando contratás la plataforma de mailing, porque sin eso no te entrega. DMARC no te lo pide nadie. Se hicieron los deberes que alguien reclamó y nadie cerró el círculo.
+La asimetría es la de siempre: SPF de sobra —tanto que está roto por exceso—, DKIM presente, `_dmarc` vacío. SPF y DKIM te los pide el proveedor cuando contratás la plataforma de mailing, porque sin eso no te entrega. DMARC no te lo pide nadie. Se hicieron los deberes que alguien reclamó y nadie cerró el círculo.
 
 ---
 
