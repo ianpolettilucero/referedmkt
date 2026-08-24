@@ -57,7 +57,7 @@ Administración remota, servidor de aplicaciones, plataforma de IA, integración
 
 ---
 
-## Por qué el atacante mira ahí
+## Por qué el atacante apunta a la capa de administración
 
 Es la misma lógica con la que razona cualquier equipo de [red team](/guia/red-teaming-que-es-cuando-contratarlo): no se ataca el objetivo más duro, se ataca el que tiene permiso sobre el objetivo más duro.
 
@@ -84,13 +84,47 @@ Las puntuaciones de severidad de estas mismas fallas, según quién las asigne:
 
 No son errores: son dos organismos evaluando el mismo problema con criterios distintos. **CVSS mide la falla, no tu riesgo**, y una diferencia de casi un punto cambia si entra o no en la cola de "parchear esta semana" de quien prioriza por número.
 
+Las dos fallas de N-able muestran hasta qué punto la brecha es arbitraria: mismo producto, mismo tipo de falla, misma semana, y en una los evaluadores coinciden casi exacto mientras en la otra se separan ocho décimas.
+
+```svg
+<svg viewBox="0 0 660 205" role="img" aria-label="Divergencia de puntajes en las dos fallas de N-able: en CVE-2026-18556 el fabricante puntúa 8,2 y NVD 7,4, una diferencia de ocho décimas; en CVE-2026-18577 el fabricante puntúa 8,2 y NVD 8,1, prácticamente lo mismo. Escala de 7,0 a 8,5">
+  <text x="20" y="24" font-size="12.5" font-weight="700" fill="currentColor">El mismo producto, evaluado por dos</text>
+  <circle cx="330" cy="44" r="4.5" fill="currentColor"/>
+  <text x="342" y="48" font-size="10.5" fill="currentColor" opacity="0.85">NVD</text>
+  <circle cx="410" cy="44" r="4.5" fill="#e23a3a"/>
+  <text x="422" y="48" font-size="10.5" fill="#e23a3a">Fabricante</text>
+
+  <text x="110" y="94" text-anchor="end" font-size="10.5" font-weight="700" fill="currentColor">CVE-2026-18556</text>
+  <path d="M253 90 L520 90" stroke="#e23a3a" stroke-width="1.5" opacity="0.4"/>
+  <circle cx="253" cy="90" r="5" fill="currentColor"/>
+  <text x="245" y="94" text-anchor="end" font-size="10.5" font-weight="700" fill="currentColor">7,4</text>
+  <circle cx="520" cy="90" r="5" fill="#e23a3a"/>
+  <text x="530" y="94" font-size="10.5" font-weight="700" fill="#e23a3a">8,2</text>
+
+  <text x="110" y="134" text-anchor="end" font-size="10.5" font-weight="700" fill="currentColor">CVE-2026-18577</text>
+  <path d="M486 130 L520 130" stroke="#e23a3a" stroke-width="1.5" opacity="0.4"/>
+  <circle cx="486" cy="130" r="5" fill="currentColor"/>
+  <text x="478" y="134" text-anchor="end" font-size="10.5" font-weight="700" fill="currentColor">8,1</text>
+  <circle cx="520" cy="130" r="5" fill="#e23a3a"/>
+  <text x="530" y="134" font-size="10.5" font-weight="700" fill="#e23a3a">8,2</text>
+
+  <path d="M120 158 L620 158" stroke="currentColor" stroke-width="1" opacity="0.3"/>
+  <text x="120" y="174" text-anchor="middle" font-size="10" fill="currentColor" opacity="0.6">7,0</text>
+  <text x="287" y="174" text-anchor="middle" font-size="10" fill="currentColor" opacity="0.6">7,5</text>
+  <text x="453" y="174" text-anchor="middle" font-size="10" fill="currentColor" opacity="0.6">8,0</text>
+  <text x="620" y="174" text-anchor="middle" font-size="10" fill="currentColor" opacity="0.6">8,5</text>
+
+  <text x="20" y="198" font-size="11.5" font-weight="600" fill="currentColor">Priorizar por el número deja la decisión en manos de quién lo asignó</text>
+</svg>
+```
+
 La regla práctica es otra: **si está en el catálogo de CISA, se parchea, sin discutir el número**. Para siete de estas diez, el plazo que CISA fija a los organismos federales fue de **tres días**.
 
 Si un organismo con equipo de seguridad tiene tres días, la pregunta para una PyME no es cuánto tarda en parchear. Es quién parchea.
 
 ---
 
-## A quién le toca de verdad
+## ¿A quién afectan estas diez fallas de agosto?
 
 **Te toca directo si:**
 
@@ -109,7 +143,7 @@ Si un organismo con equipo de seguridad tiene tres días, la pregunta para una P
 
 ---
 
-## Cómo comprobar si estás expuesto
+## ¿Cómo sé si mi panel de administración está expuesto?
 
 Todo esto es verificación desde tu lado, con tus credenciales. Ninguna es una prueba de concepto.
 
@@ -123,7 +157,7 @@ Todo esto es verificación desde tu lado, con tus credenciales. Ninguna es una p
 
 ---
 
-## Qué hacer, en orden
+## ¿Qué hago para cerrar mi capa de administración?
 
 1. **Parcheá lo que esté en la lista y corras**, sin discutir el CVSS. Estar en el catálogo significa que ya lo están usando.
 2. **Sacá de internet lo que no necesita estar.** Un panel de administración accesible desde cualquier IP es una falla esperando el próximo CVE. Si necesitás acceso remoto, un modelo por identidad como [Cloudflare Access](/producto/cloudflare-access) o [Twingate](/producto/twingate) reemplaza al VPN publicado: el razonamiento está en [acceso remoto seguro sin VPN](/guia/acceso-remoto-seguro-sin-vpn).

@@ -32,7 +32,7 @@ Los puntajes salen de NVD, con quién los asignó anotado en cada caso: son eval
 
 ---
 
-## Por qué este lote es distinto
+## Por qué estas fallas están en el escritorio y no en el servidor
 
 SharePoint no es infraestructura: es donde el equipo guarda los documentos. Si tenés Microsoft 365 tenés SharePoint, lo uses conscientemente o no, porque es lo que hay debajo de Teams y de los archivos compartidos. Una falla de autenticación débil ahí, explotable por red y sin credenciales, alcanza a cualquier empresa con un tenant.
 
@@ -64,11 +64,36 @@ La lección no es que ahora el riesgo esté en el escritorio, sino que **el patr
 
 ---
 
-## Una falla de abril que recién ahora es urgente
+## CVE-2026-33824: una falla de abril que recién ahora es urgente
 
 [CVE-2026-33824](https://nvd.nist.gov/vuln/detail/CVE-2026-33824), la de la extensión IKE, se publicó el **14 de abril de 2026** y entró al catálogo de explotación activa el **18 de agosto**.
 
 Cuatro meses con parche disponible y una falla de 9,8 que no era urgente porque nadie la estaba explotando. El 18 de agosto pasó a estarlo y el plazo se volvió de tres días.
+
+```svg
+<svg viewBox="0 0 660 195" role="img" aria-label="CVE-2026-33824 se publicó el 14 de abril de 2026 con parche disponible y sin urgencia, y estuvo así cuatro meses hasta que el 18 de agosto entró al catálogo de explotación activa y el plazo pasó a ser de tres días">
+  <text x="20" y="24" font-size="12.5" font-weight="700" fill="currentColor">CVE-2026-33824: cuatro meses de calma, tres días de plazo</text>
+
+  <text x="325" y="60" text-anchor="middle" font-size="11" font-weight="600" fill="currentColor" opacity="0.85">Cuatro meses con parche disponible y sin urgencia</text>
+  <path d="M90 72 L90 80 M90 76 L560 76 M560 72 L560 80" stroke="currentColor" stroke-width="1.2" opacity="0.5"/>
+
+  <rect x="90" y="96" width="470" height="28" fill="currentColor" opacity="0.1"/>
+  <rect x="560" y="96" width="60" height="28" fill="#e23a3a" opacity="0.2"/>
+  <path d="M40 110 L630 110" stroke="currentColor" stroke-width="1.4" opacity="0.45"/>
+
+  <circle cx="90" cy="110" r="5.5" fill="currentColor"/>
+  <path d="M90 118 L90 134" stroke="currentColor" stroke-width="1" opacity="0.4"/>
+  <text x="90" y="148" text-anchor="middle" font-size="10.5" font-weight="700" fill="currentColor">14 de abril</text>
+  <text x="90" y="164" text-anchor="middle" font-size="10.5" fill="currentColor" opacity="0.85">se publica, con parche</text>
+
+  <circle cx="560" cy="110" r="5.5" fill="#e23a3a"/>
+  <path d="M560 118 L560 134" stroke="#e23a3a" stroke-width="1" opacity="0.6"/>
+  <text x="560" y="148" text-anchor="middle" font-size="10.5" font-weight="700" fill="#e23a3a">18 de agosto</text>
+  <text x="560" y="164" text-anchor="middle" font-size="10.5" fill="currentColor" opacity="0.85">al catálogo: 3 días</text>
+
+  <text x="20" y="188" font-size="11.5" font-weight="600" fill="currentColor">El parche existía desde abril. Lo que cambió fue la urgencia, no la falla.</text>
+</svg>
+```
 
 Esa es la trampa de priorizar solo por lo que está bajo ataque hoy: **esa lista cambia sin aviso, y cuando cambia ya no hay tiempo.** Una falla vieja no es una falla segura.
 
@@ -76,7 +101,7 @@ Los plazos que CISA fija a los organismos federales para estas cuatro vencen el 
 
 ---
 
-## A quién le toca
+## ¿A quién afectan SharePoint, macOS, la VPN de Windows y vCenter?
 
 **Casi seguro:**
 
@@ -92,7 +117,7 @@ Los plazos que CISA fija a los organismos federales para estas cuatro vencen el 
 
 ---
 
-## Qué hacer, en orden
+## ¿Qué hago si uso Microsoft 365, Macs o VMware?
 
 1. **SharePoint primero**, por alcance. En Microsoft 365 la corrección la aplica Microsoft del lado del servicio; lo que te toca es revisar que no tengas una instalación propia de SharePoint Server sin parchear.
 2. **Actualizá los Macs** a las versiones de arriba. Es una tarde y cierra una falla de 9,8.

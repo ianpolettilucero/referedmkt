@@ -57,6 +57,54 @@ leyendo un artículo.
   publicado por el fabricante".
 - Nada de listas de tres adjetivos.
 
+## Títulos y encabezados: intención de búsqueda
+
+La prueba que decide: **leído solo, fuera del artículo, ¿se entiende de qué
+habla?** Un encabezado aparece sin contexto en el fragmento destacado de Google,
+en el bloque de "Otras preguntas" y en la respuesta de un modelo de lenguaje.
+Si ahí no se sostiene, no sirve, por bien escrito que esté.
+
+### El título
+
+Lleva el **nombre completo del producto, como lo escribe la gente al buscar**, y
+el hecho concreto. Nada de la mitad literaria.
+
+- ✗ *Defender dejó de escanear y no avisó* → no dice qué Defender, y nadie busca
+  "dejó de escanear".
+- ✓ *Microsoft Defender falló los escaneos sin avisar: cómo verificarlo*
+- ✗ *Zimbra y TrueConf: cuando el parche depende de vos*
+- ✓ *Zimbra, TrueConf y MLflow: cuatro fallas explotadas sin parche automático*
+- ✗ *El 10.0 de Entra ID no fue explotado* → falta el CVE, que es lo que se pega
+  en el buscador.
+
+Se escribe el nombre como figura en el producto: "Microsoft Defender", no
+"Defender"; "Elementor Pro", no "Elementor". Si hay CVE, va el CVE, porque
+pegarlo en el buscador es el primer reflejo de quien lo vio en un aviso.
+
+### Los encabezados
+
+Los que corresponden a **algo que el lector quiere hacer** van en forma de
+pregunta, porque es la forma en que lo busca. Y llevan la entidad adentro.
+
+| ✗ Genérico | ✓ Con intención |
+|---|---|
+| Cómo comprobar cada equipo | ¿Cómo verifico si Microsoft Defender escaneó mis equipos? |
+| A quién le toca | ¿A quién afecta la falla de Elementor Pro? |
+| A quién NO le toca | ¿Quién puede ignorar este aviso? |
+| Qué hacer, en orden | ¿Qué hago si tengo Zimbra en mi servidor? |
+| Cómo comprobar exposición | ¿Cómo sé si mi TrueConf está expuesto a internet? |
+
+Los de **análisis o argumento** no se fuerzan a pregunta —queda cargoso tener
+ocho seguidas— pero igual llevan la entidad y dicen algo concreto.
+
+- ✗ *Por qué este lote es distinto* → ✓ *Por qué estas cuatro fallas están en el
+  escritorio y no en el servidor*
+- ✗ *El mecanismo: dos reglas para el mismo envío* → ✓ *Cómo funciona la falla de
+  Elementor Pro: dos reglas para el mismo envío*
+
+La regla práctica: si el encabezado sirve igual para cualquier otra nota del
+sitio, es genérico y hay que reescribirlo.
+
 ## Palabras que no se usan
 
 sumergirse, aprovechar el poder de, solución integral, en la era digital,

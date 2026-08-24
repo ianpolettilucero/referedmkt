@@ -1,5 +1,5 @@
 ---
-title: "El 10.0 de Entra ID no fue explotado"
+title: "CVE-2026-69836: el 10.0 de Entra ID no fue explotado"
 subtitle: Microsoft publicó CVE-2026-69836 marcada como explotada el 20 de agosto y corrigió esa marca al día siguiente. La corrección viajó menos que el titular.
 excerpt: Un CVSS 10.0 en el sistema de identidad de Microsoft 365, sin nada que parchear y sin explotación confirmada. Cómo verificarlo vos mismo.
 type: news
@@ -13,7 +13,7 @@ products:
   - okta-workforce-identity
   - cisco-duo
   - yubikey-5-series
-meta_title: "El 10.0 de Entra ID no fue explotado"
+meta_title: "CVE-2026-69836: el 10.0 de Entra ID no fue explotado"
 meta_description: "CVE-2026-69836 salió con CVSS 10.0 y marca de explotación activa. Microsoft la corrigió a las 24 horas. Qué hace una PyME con Microsoft 365."
 ---
 
@@ -34,6 +34,36 @@ Entra ID es el sistema de identidad detrás de Microsoft 365 y Azure. Es la puer
 | En el catálogo de CISA | No | Catálogo KEV, versión 2026.08.21 |
 
 El 10.0 lo asignó Microsoft, no NVD. Al 22 de agosto la entrada en NVD sigue en estado *Undergoing Analysis*, que significa que NVD todavía no publicó su propia evaluación. Cuando el número lo pone el fabricante y no NVD, los puntajes de fallas distintas no son estrictamente comparables.
+
+Un 10.0 llama la atención porque es el techo de la escala. Pero el puntaje mide el peor caso teórico, y nada de lo que convierte ese número en urgencia está presente acá:
+
+```svg
+<svg viewBox="0 0 660 195" role="img" aria-label="CVE-2026-69836 tiene puntaje base 10.0, el techo de la escala, pero no fue explotado, quedó corregido el 21 de agosto y no requiere ninguna acción del cliente según Microsoft">
+  <text x="20" y="24" font-size="12.5" font-weight="700" fill="currentColor">El puntaje alto, y lo que no lo acompaña</text>
+
+  <rect x="20" y="46" width="196" height="96" rx="6" fill="#e23a3a" opacity="0.13"/>
+  <rect x="20" y="46" width="196" height="96" rx="6" fill="none" stroke="#e23a3a" stroke-width="1.6"/>
+  <text x="118" y="70" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.85">Puntaje base</text>
+  <text x="118" y="103" text-anchor="middle" font-size="27" font-weight="700" fill="#e23a3a">10.0</text>
+  <text x="118" y="125" text-anchor="middle" font-size="10.5" fill="currentColor" opacity="0.8">el techo de la escala</text>
+
+  <rect x="232" y="46" width="196" height="96" rx="6" fill="currentColor" opacity="0.07"/>
+  <rect x="232" y="46" width="196" height="96" rx="6" fill="none" stroke="currentColor" stroke-width="1.3" opacity="0.5"/>
+  <text x="330" y="70" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.85">¿Fue explotado?</text>
+  <text x="330" y="103" text-anchor="middle" font-size="27" font-weight="700" fill="currentColor">No</text>
+  <text x="330" y="125" text-anchor="middle" font-size="10.5" fill="currentColor" opacity="0.8">corregido el 21 de agosto</text>
+
+  <rect x="444" y="46" width="196" height="96" rx="6" fill="currentColor" opacity="0.07"/>
+  <rect x="444" y="46" width="196" height="96" rx="6" fill="none" stroke="currentColor" stroke-width="1.3" opacity="0.5"/>
+  <text x="542" y="70" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.85">¿Acción del cliente?</text>
+  <text x="542" y="103" text-anchor="middle" font-size="21" font-weight="700" fill="currentColor">Ninguna</text>
+  <text x="542" y="125" text-anchor="middle" font-size="10.5" fill="currentColor" opacity="0.8">según MSRC</text>
+
+  <text x="20" y="176" font-size="11.5" font-weight="600" fill="currentColor">El puntaje mide el peor caso posible, no lo que está pasando</text>
+</svg>
+```
+
+La marca de explotación es el factor que más pesa de los tres, y estuvo mal puesta durante un día:
 
 ```svg
 <svg viewBox="0 0 660 250" role="img" aria-label="Línea de tiempo de 48 horas: el 20 de agosto Microsoft publica el aviso marcado como explotado, ese día y el siguiente se replica en la prensa, y el 21 de agosto Microsoft corrige la marca a no explotado">
@@ -62,7 +92,7 @@ El 10.0 lo asignó Microsoft, no NVD. Al 22 de agosto la entrada en NVD sigue en
 
 ---
 
-## Por qué no hay nada que parchear
+## ¿Por qué Microsoft no pide ninguna acción por CVE-2026-69836?
 
 Entra ID es un servicio que corre en la infraestructura de Microsoft. La falla se corrigió del lado de Microsoft antes de que se publicara el aviso. No hay paquete de actualización, no hay artículo de KB y no hay opción de configuración que cambiar.
 
@@ -81,7 +111,7 @@ Un CVE de servicio en la nube no es una alerta: es un informe de algo ya cerrado
 
 ---
 
-## A quién NO le toca
+## ¿Quién puede ignorar este aviso?
 
 A ninguna PyME que use Microsoft 365, que es lo mismo que decir a nadie que esté leyendo esto. No hay versión afectada que revisar, porque no corrés vos ninguna versión de Entra ID. No hay indicadores de compromiso que buscar, porque Microsoft no publicó ninguno. Y no hay nada que cerrar.
 
@@ -89,7 +119,7 @@ Hay un límite en lo que se puede verificar. Que la falla no fue explotada es la
 
 ---
 
-## Cómo comprobar el estado real de un CVE de Microsoft
+## ¿Cómo verifico el estado real de un CVE de Microsoft?
 
 Son cuatro chequeos, sirven para cualquier CVE de Microsoft y no dependen de que nadie haya actualizado un titular.
 
@@ -117,7 +147,7 @@ Los cuatro juntos llevan menos tiempo que leer la nota que los resume.
 
 ---
 
-## Qué hacer, en orden
+## ¿Qué hago si uso Microsoft 365 o Entra ID?
 
 1. **Con esta falla, nada.** Cerrala como leída.
 2. **Guardá el procedimiento de los cuatro chequeos.** Es lo que convierte el próximo titular con puntaje máximo en una decisión de dos minutos.

@@ -1,5 +1,5 @@
 ---
-title: "Zimbra y TrueConf: cuando el parche depende de vos"
+title: "Zimbra, TrueConf y MLflow: cuatro fallas ya explotadas"
 subtitle: Las cuatro entradas del catálogo entre el 19 y el 21 de agosto son software autoalojado. Nadie las corrige del otro lado: si lo corrés, lo parcheás.
 excerpt: Zimbra, TrueConf y MLflow entraron al catálogo de explotación activa. Las cuatro fallas están en servidores propios, y dos vencen en tres días.
 type: news
@@ -13,7 +13,7 @@ products:
   - mimecast-email-security
   - proofpoint-email-protection
   - cloudflare-access
-meta_title: "Zimbra y TrueConf: cuando el parche depende de vos"
+meta_title: "Zimbra, TrueConf y MLflow: cuatro fallas explotadas"
 meta_description: "Zimbra, TrueConf y MLflow entraron al catálogo de explotación activa de CISA. Las cuatro fallas están en software autoalojado y dos vencen en tres días."
 ---
 
@@ -29,6 +29,34 @@ Hace tres días publicamos que [tres de cuatro fallas estaban en SharePoint, mac
 | [CVE-2026-64849](https://nvd.nist.gov/vuln/detail/CVE-2026-64849) | MLflow | Falsificación de petición del lado del servidor | 9,3 (GitHub) | 2 sep |
 
 Los puntajes salen de NVD, con quién los asignó anotado: ninguno fue evaluado por NVD.
+
+Lo que ordena la semana no es el puntaje, que va de 8,9 a 9,5 y casi no distingue, sino el plazo:
+
+```svg
+<svg viewBox="0 0 660 215" role="img" aria-label="Plazo de cada falla contado desde el 21 de agosto: TrueConf CVE-2026-72529 vence en 2 días con puntaje 9,3, Zimbra CVE-2026-73570 en 3 días con 8,9, MLflow CVE-2026-64849 en 12 días con 9,3 y TrueConf CVE-2026-72530 en 13 días con 9,5. Las dos primeras son las urgentes">
+  <text x="20" y="24" font-size="12.5" font-weight="700" fill="currentColor">Días de plazo, contados desde el 21 de agosto</text>
+
+  <text x="192" y="63" text-anchor="end" font-size="10.5" font-weight="700" fill="#e23a3a">TrueConf (72529)</text>
+  <rect x="200" y="48" width="52" height="22" rx="3" fill="#e23a3a" opacity="0.7"/>
+  <text x="260" y="63" font-size="10.5" font-weight="700" fill="#e23a3a">2 días · 9,3</text>
+
+  <text x="192" y="97" text-anchor="end" font-size="10.5" font-weight="700" fill="#e23a3a">Zimbra (73570)</text>
+  <rect x="200" y="82" width="78" height="22" rx="3" fill="#e23a3a" opacity="0.7"/>
+  <text x="286" y="97" font-size="10.5" font-weight="700" fill="#e23a3a">3 días · 8,9</text>
+
+  <text x="192" y="131" text-anchor="end" font-size="10.5" fill="currentColor">MLflow (64849)</text>
+  <rect x="200" y="116" width="312" height="22" rx="3" fill="currentColor" opacity="0.3"/>
+  <text x="520" y="131" font-size="10.5" font-weight="700" fill="currentColor">12 días · 9,3</text>
+
+  <text x="192" y="165" text-anchor="end" font-size="10.5" fill="currentColor">TrueConf (72530)</text>
+  <rect x="200" y="150" width="338" height="22" rx="3" fill="currentColor" opacity="0.3"/>
+  <text x="546" y="165" font-size="10.5" font-weight="700" fill="currentColor">13 días · 9,5</text>
+
+  <text x="20" y="205" font-size="11.5" font-weight="600" fill="currentColor">La de menor puntaje vence primero: el plazo manda, no el número</text>
+</svg>
+```
+
+Y hay una diferencia de fondo con la tanda anterior, que cambia quién tiene que hacer el trabajo:
 
 ```svg
 <svg viewBox="0 0 660 210" role="img" aria-label="Comparación entre el lote del 18 de agosto, donde el fabricante aplica la corrección, y el del 19 al 21, donde el parche depende del que aloja el servidor">
@@ -48,7 +76,7 @@ Los puntajes salen de NVD, con quién los asignó anotado: ninguno fue evaluado 
 
 ---
 
-## Zimbra es el que más pesa en la región
+## CVE-2026-73570: por qué Zimbra es el que más pesa en la región
 
 Zimbra Collaboration es correo y calendario autoalojado, y en LATAM lo corren PyMEs, universidades y organismos que buscaron una alternativa propia a Microsoft 365 o Google Workspace. Un servidor de correo comprometido no es una máquina más: es el archivo de todas las conversaciones de la empresa.
 
@@ -58,7 +86,7 @@ Esa condición es la primera que hay que comprobar, porque decide si esto es urg
 
 ---
 
-## TrueConf: dos fallas, dos plazos distintos
+## TrueConf Server: dos fallas críticas con plazos distintos
 
 TrueConf Server es videoconferencia autoalojada. Las dos entradas llegaron el mismo día, afectan a las **versiones 5.3.x hasta 5.3.9, 5.4.x hasta 5.4.9, 5.5.x hasta 5.5.5 y anteriores**, y las dos se explotan sin autenticarse por el **puerto 4307/TCP**.
 
@@ -68,7 +96,7 @@ El detalle a mirar es el plazo: la primera vence el **23 de agosto** y la segund
 
 ---
 
-## MLflow: la superficie que casi nadie inventarió
+## MLflow: la superficie de IA que casi nadie inventarió
 
 MLflow es una plataforma de código abierto para modelos de aprendizaje automático. La falla afecta a **versiones anteriores a la 3.15.0** y está en un endpoint que acepta peticiones **sin autenticación**.
 
@@ -76,7 +104,7 @@ Para la mayoría de las PyMEs esto no aplica. Vale nombrarlo por otra razón: es
 
 ---
 
-## A quién le toca
+## ¿A quién afectan estas cuatro fallas?
 
 **Comprobalo hoy si:**
 
@@ -88,7 +116,7 @@ Para la mayoría de las PyMEs esto no aplica. Vale nombrarlo por otra razón: es
 
 ---
 
-## Cómo comprobar exposición
+## ¿Cómo sé si mi Zimbra o mi TrueConf están expuestos?
 
 Todo esto se verifica desde tu lado, con tus credenciales.
 
@@ -100,7 +128,7 @@ Todo esto se verifica desde tu lado, con tus credenciales.
 
 ---
 
-## Qué hacer, en orden
+## ¿Qué hago si corro alguno de estos servidores?
 
 1. **Actualizá Zimbra a 10.1.20 o posterior.** Si no podés hoy y tenés `zimbra-snmp` instalado sin usarlo, desactivar las notificaciones SNMP corta la condición que habilita la falla.
 2. **Actualizá TrueConf** por encima de las versiones afectadas, y cerrá el 4307 al exterior si no necesita estar publicado.

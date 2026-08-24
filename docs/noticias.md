@@ -141,27 +141,86 @@ quién le toca y a quién no, y qué hacer en orden.
 
 ## Diagramas
 
-Cuando el mecanismo se entiende mejor dibujado que descrito —una cadena de
-ataque, un flujo entre sistemas, una línea de tiempo—, va un diagrama. Se
-escribe como un bloque cercado con lenguaje `svg` y el sitio lo emite como
-dibujo:
+**Mínimo dos por nota**, y tres cuando el tema los pide. Un dato que se puede
+dibujar entra mucho mejor dibujado, y son propios: se escriben a mano en un
+bloque cercado con lenguaje `svg`, sin librerías ni imágenes externas.
+
+Reglas que no cambian:
+
+- **`currentColor` para trazos y texto**, así funciona en tema claro y oscuro.
+  Un color fijo oscuro desaparece en modo oscuro. Para acentos, `#e23a3a`.
+- **Siempre `viewBox` y `aria-label`.** La etiqueta describe el diagrama **con
+  sus datos**, no "gráfico de barras": es lo que oye un lector de pantalla y es
+  también lo único que llega a `llms-full.txt`, donde el SVG se aplana a esa
+  etiqueta.
+- **El ancho útil es 660-680.** Nada de texto más allá de x=650 ni por debajo
+  del alto del `viewBox`, o se recorta.
+- **`text-anchor="middle"` centra sobre el punto**, así que una etiqueta larga
+  cerca del borde izquierdo se sale. Cerca de los bordes, anclar al inicio.
+- El SVG pasa por la lista blanca de `core/Svg.php`. Si algo no se puede
+  sanear, el bloque sale como código escapado en vez de romper la página.
+- **Un diagrama que no aclara nada, no va.** Es para mostrar el mecanismo o el
+  dato, nunca para decorar.
+
+### Qué dibujar según el dato
+
+| Si la nota tiene… | Va este diagrama |
+|---|---|
+| Porcentajes o magnitudes comparables | Barras horizontales |
+| Una cronología: cuándo entró, cuándo lo detectaron | Línea de tiempo |
+| Pasos encadenados de un ataque o un flujo | Cadena de cajas con flechas |
+| Dos situaciones enfrentadas: con y sin, antes y después | Dos bloques apilados |
+| Varios CVE con severidad y plazo distintos | Barras de severidad con la fecha de vencimiento |
+
+### Plantillas
+
+Están probadas y no se desbordan. Se cambian los textos y los valores.
+
+**Barras horizontales.** Ancho de barra = porcentaje × 10.
 
 ````markdown
 ```svg
-<svg viewBox="0 0 400 100" role="img" aria-label="Qué muestra el diagrama">
-  <line x1="10" y1="50" x2="380" y2="50" stroke="currentColor" stroke-width="2"/>
-  <text x="195" y="30" text-anchor="middle" fill="currentColor">Etiqueta</text>
+<svg viewBox="0 0 660 180" role="img" aria-label="Qué muestra, con los números">
+  <text x="20" y="24" font-size="12.5" font-weight="700" fill="currentColor">Título</text>
+  <text x="192" y="61" text-anchor="end" font-size="10.5" fill="currentColor">Etiqueta larga</text>
+  <rect x="200" y="46" width="380" height="20" rx="3" fill="currentColor" opacity="0.3"/>
+  <text x="588" y="61" font-size="10.5" font-weight="700" fill="currentColor">38%</text>
+  <text x="192" y="93" text-anchor="end" font-size="10.5" font-weight="700" fill="#e23a3a">La que importa</text>
+  <rect x="200" y="78" width="210" height="20" rx="3" fill="#e23a3a" opacity="0.65"/>
+  <text x="418" y="93" font-size="10.5" font-weight="700" fill="#e23a3a">21%</text>
+  <text x="20" y="150" font-size="11.5" font-weight="600" fill="#e23a3a">La conclusión, en una línea</text>
 </svg>
 ```
 ````
 
-- **`currentColor` para trazos y texto**, así funciona en tema claro y oscuro.
-  Un color fijo oscuro desaparece en modo oscuro. Para acentos, `#e23a3a`.
-- **Siempre `viewBox` y `aria-label`** describiendo qué muestra.
-- El SVG pasa por la lista blanca de `core/Svg.php`. Si algo no se puede
-  sanear, el bloque sale como código escapado en vez de romper la página.
-- **Un diagrama que no aclara nada, no va.** Es para el mecanismo, no para
-  decorar la nota.
+**Cadena de pasos.** Cinco cajas de 118 de ancho en x = 16, 146, 276, 406, 536.
+
+````markdown
+```svg
+<svg viewBox="0 0 680 190" role="img" aria-label="Qué muestra, paso por paso">
+  <text x="340" y="26" text-anchor="middle" font-size="12.5" font-weight="700" fill="currentColor">Título</text>
+  <rect x="16" y="48" width="118" height="76" rx="6" fill="currentColor" opacity="0.08"/>
+  <rect x="16" y="48" width="118" height="76" rx="6" fill="none" stroke="currentColor" stroke-width="1.3" opacity="0.55"/>
+  <text x="75" y="74" text-anchor="middle" font-size="11.5" font-weight="700" fill="currentColor">Paso 1</text>
+  <text x="75" y="95" text-anchor="middle" font-size="10.5" fill="currentColor" opacity="0.8">qué deja</text>
+  <path d="M136 86 L144 86" stroke="currentColor" stroke-width="1.4" opacity="0.6"/>
+  <text x="340" y="160" text-anchor="middle" font-size="11.5" font-weight="600" fill="currentColor">Lo que el lector se lleva</text>
+</svg>
+```
+````
+
+**Línea de tiempo.** Eje en y=120; los hitos, círculos sobre el eje con la
+etiqueta arriba o abajo alternada para que no choquen. Una banda `rect` detrás
+marca el intervalo que importa.
+
+**Dos bloques enfrentados.** Dos `rect` de 600×66 en y=26 e y=112, el segundo
+con `stroke="#e23a3a"`, y una línea de cierre abajo con la diferencia.
+
+### Antes de publicar el diagrama
+
+Que ningún texto se salga del `viewBox`. Se mira a ojo comparando la `x` más
+grande contra el ancho, y recordando que `text-anchor="middle"` reparte el
+ancho del texto a los dos lados del punto.
 
 El detalle completo está en el README, sección Diagramas.
 
@@ -178,6 +237,26 @@ Lo que distingue una nota de Capa Cero de un titular reciclado:
   y el que más confianza genera.
 - **Cómo comprobar exposición**, con el comando o el lugar del panel.
 - **Qué hacer, en orden**, primero lo que frena el sangrado.
+
+### Título y encabezados
+
+La regla completa está en `docs/estilo.md`, sección "Títulos y encabezados", y
+es de las que más pesan porque decide si la nota aparece en una búsqueda.
+
+El título lleva **el nombre del producto como lo escribe la gente** —"Microsoft
+Defender", no "Defender"— y el CVE si lo hay. Los encabezados tienen que
+sostenerse leídos solos, porque así aparecen en el fragmento destacado de Google
+y en la respuesta de un modelo. Los cuatro bloques de arriba **no se titulan con
+su nombre genérico**:
+
+| ✗ Nunca así | ✓ Así |
+|---|---|
+| A quién le toca | ¿A quién afecta la falla de Elementor Pro? |
+| A quién NO le toca | ¿Quién puede ignorar este aviso? |
+| Cómo comprobar exposición | ¿Cómo sé si mi TrueConf está expuesto a internet? |
+| Qué hacer, en orden | ¿Qué hago si tengo Zimbra en mi servidor? |
+
+Si el encabezado sirve igual para cualquier otra nota del sitio, está mal.
 - Segunda persona, frases de largo desparejo, opinión marcada como opinión.
 - 1.200 a 1.900 palabras. Es una nota, no una guía.
 - 6 a 12 enlaces internos con anchor descriptivo, todos verificados contra

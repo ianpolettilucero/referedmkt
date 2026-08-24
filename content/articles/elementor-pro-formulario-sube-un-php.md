@@ -34,7 +34,7 @@ El 9.0 lo asignó Patchstack, no NVD: la entrada en NVD figura como *Deferred*, 
 
 ---
 
-## El mecanismo: dos reglas para el mismo envío
+## Cómo funciona CVE-2026-32475: dos reglas para el mismo envío
 
 La falla no está en el filtro de extensiones. Está en que el código que valida y el código que guarda recorren la misma lista de archivos con reglas distintas.
 
@@ -70,13 +70,47 @@ Patchstack lo describe como un desfase entre las dos rutinas. La corrección de 
 
 ---
 
-## A quién le toca
+## ¿A quién afecta la falla de Elementor Pro?
 
 Comprobalo hoy si tenés un sitio en WordPress con **Elementor Pro en 4.2.1 o anterior** y al menos una página publicada con un formulario que acepte archivos adjuntos. El caso típico es el formulario de "trabajá con nosotros" que recibe currículums, o el de soporte que pide adjuntar una captura.
 
 No hace falta ninguna configuración rara. El campo de carga con sus opciones por defecto ya alcanza: Patchstack anota que el interruptor de campo obligatorio viene desactivado de fábrica y que ese es justamente el estado que sirve para el ataque.
 
-## A quién NO le toca
+Las tres condiciones tienen que darse a la vez, y por eso vale mirarlas antes de dar por hecho que te toca:
+
+```svg
+<svg viewBox="0 0 660 205" role="img" aria-label="Las tres condiciones que tienen que darse juntas para que el sitio sea explotable: Elementor Pro en versión 4.2.1 o anterior, una página publicada con formulario, y que ese formulario acepte carga de archivos. Si falta una sola, la falla no aplica">
+  <text x="20" y="24" font-size="12.5" font-weight="700" fill="currentColor">Las tres condiciones tienen que darse juntas</text>
+
+  <rect x="20" y="44" width="180" height="62" rx="6" fill="currentColor" opacity="0.07"/>
+  <rect x="20" y="44" width="180" height="62" rx="6" fill="none" stroke="currentColor" stroke-width="1.3" opacity="0.55"/>
+  <text x="110" y="70" text-anchor="middle" font-size="11" font-weight="700" fill="currentColor">Elementor Pro</text>
+  <text x="110" y="88" text-anchor="middle" font-size="10.5" fill="currentColor" opacity="0.85">4.2.1 o anterior</text>
+
+  <text x="220" y="80" text-anchor="middle" font-size="12" font-weight="700" fill="currentColor" opacity="0.6">y</text>
+
+  <rect x="240" y="44" width="180" height="62" rx="6" fill="currentColor" opacity="0.07"/>
+  <rect x="240" y="44" width="180" height="62" rx="6" fill="none" stroke="currentColor" stroke-width="1.3" opacity="0.55"/>
+  <text x="330" y="70" text-anchor="middle" font-size="11" font-weight="700" fill="currentColor">Una página publicada</text>
+  <text x="330" y="88" text-anchor="middle" font-size="10.5" fill="currentColor" opacity="0.85">con formulario</text>
+
+  <text x="440" y="80" text-anchor="middle" font-size="12" font-weight="700" fill="currentColor" opacity="0.6">y</text>
+
+  <rect x="460" y="44" width="180" height="62" rx="6" fill="currentColor" opacity="0.07"/>
+  <rect x="460" y="44" width="180" height="62" rx="6" fill="none" stroke="currentColor" stroke-width="1.3" opacity="0.55"/>
+  <text x="550" y="70" text-anchor="middle" font-size="11" font-weight="700" fill="currentColor">Ese formulario acepta</text>
+  <text x="550" y="88" text-anchor="middle" font-size="10.5" fill="currentColor" opacity="0.85">carga de archivos</text>
+
+  <path d="M330 108 L330 128" stroke="#e23a3a" stroke-width="1.4" opacity="0.7"/>
+  <rect x="180" y="130" width="300" height="34" rx="6" fill="#e23a3a" opacity="0.16"/>
+  <rect x="180" y="130" width="300" height="34" rx="6" fill="none" stroke="#e23a3a" stroke-width="1.6"/>
+  <text x="330" y="152" text-anchor="middle" font-size="11.5" font-weight="700" fill="#e23a3a">Explotable sin autenticarse</text>
+
+  <text x="20" y="194" font-size="11.5" font-weight="600" fill="currentColor">Si falta una sola de las tres, la falla no aplica a tu sitio</text>
+</svg>
+```
+
+## ¿Quién puede ignorar este aviso?
 
 Si usás **Elementor gratuito** y no la versión Pro, esto no aplica: el módulo de formularios es una función de pago y la falla está ahí. Tampoco te toca si tenés Elementor Pro pero ningún formulario publicado con campo de carga de archivos, que es el caso de la mayoría de los sitios institucionales de una PyME, donde el formulario pide nombre, correo y mensaje.
 
@@ -84,7 +118,7 @@ Y no te toca si ya estás en 4.2.2 o posterior.
 
 ---
 
-## Cómo comprobar si te tocó
+## ¿Cómo sé si mi sitio WordPress está afectado?
 
 **La versión.** En el panel, *Plugins* muestra el número. Con WP-CLI, desde el servidor:
 
@@ -104,7 +138,7 @@ Los archivos subidos por esta vía reciben un nombre generado, así que no esper
 
 ---
 
-## Qué hacer, en orden
+## ¿Qué hago si tengo Elementor Pro 4.2.1 o anterior?
 
 1. **Actualizá a 4.2.2 o posterior.** Es el paso que cierra la puerta y no admite postergación, porque el detalle técnico ya es público desde el 19 de agosto.
 2. **Si no podés actualizar hoy, despublicá el formulario con carga de archivos.** Sin página publicada con ese campo, el requisito del ataque no se cumple. Es una medida temporal, no un reemplazo del parche.

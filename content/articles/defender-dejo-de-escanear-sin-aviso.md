@@ -1,5 +1,5 @@
 ---
-title: "Defender dejó de escanear y no avisó"
+title: "Microsoft Defender falló los escaneos sin avisar"
 subtitle: Entre el 18 y el 19 de agosto una actualización de firmas abortaba los escaneos de Microsoft Defender. Se corrigió sin boletín numerado, y el único lugar donde se ve es tu propia máquina.
 excerpt: Los escaneos de Defender abortaban por una actualización de firmas. Ya está corregido, pero comprobarlo sigue dependiendo de mirar cada equipo.
 type: news
@@ -13,13 +13,13 @@ products:
   - bitdefender-gravityzone-business-security-premium
   - eset-protect-enterprise
   - kaspersky-next-edr-optimum
-meta_title: "Defender dejó de escanear y no avisó"
+meta_title: "Microsoft Defender falló los escaneos sin avisar"
 meta_description: "Una actualización de firmas del 18 de agosto abortaba los escaneos de Microsoft Defender. Cómo comprobar en cada equipo que volvió a escanear."
 ---
 
 El 18 de agosto una tanda de actualizaciones de firmas de Microsoft Defender empezó a abortar los escaneos. Los rápidos y los completos arrancaban y se cortaban con el mensaje de que el servicio de amenazas se detuvo, y reiniciar el servicio no lo arreglaba. Microsoft corrigió el problema al día siguiente con un paquete de firmas nuevo.
 
-Lo que hace que esto valga una nota cinco días después no es la falla, que ya está cerrada. Es cómo se enteró la gente: **no hubo boletín numerado**. No hay un CVE, ni una entrada en el catálogo de CISA, ni una página de aviso del fabricante a la que suscribirse. Un antivirus que deja de escanear no genera una alerta: se queda en silencio, con el escudo verde en pantalla.
+La falla ya está cerrada. Lo que importa es cómo se enteró la gente: **no hubo boletín numerado**. No hay CVE, ni entrada en el catálogo de CISA, ni página de aviso a la que suscribirse. Un antivirus que deja de escanear no dispara ninguna alerta: se queda en silencio, con el escudo verde en pantalla.
 
 | Dato | Valor | Fuente |
 |---|---|---|
@@ -35,9 +35,35 @@ Sobre el número exacto que corrige hay que ser preciso: la versión que Microso
 
 Lo que sí está verificado hoy es el estado actual. La página de actualizaciones de Microsoft publica, con fecha del 24 de agosto a las 09:28 UTC, la versión de firmas 1.457.318.0. Cualquier equipo que se esté actualizando con normalidad está muy por encima del paquete corregido.
 
+```svg
+<svg viewBox="0 0 660 200" role="img" aria-label="Cronología del incidente: el 18 de agosto las firmas defectuosas abortan los escaneos, el 19 Microsoft corrige con la versión 1.457.236.0, y al 24 de agosto la versión publicada es 1.457.318.0. La ventana sin escaneo duró alrededor de un día">
+  <text x="20" y="24" font-size="12.5" font-weight="700" fill="currentColor">Cronología del incidente</text>
+
+  <rect x="90" y="96" width="83" height="28" fill="#e23a3a" opacity="0.14"/>
+  <path d="M40 110 L620 110" stroke="currentColor" stroke-width="1.4" opacity="0.45"/>
+
+  <text x="90" y="56" text-anchor="middle" font-size="10.5" font-weight="700" fill="#e23a3a">18 de agosto</text>
+  <text x="90" y="72" text-anchor="middle" font-size="10.5" fill="currentColor" opacity="0.85">los escaneos abortan</text>
+  <path d="M90 78 L90 102" stroke="#e23a3a" stroke-width="1" opacity="0.5"/>
+  <circle cx="90" cy="110" r="5" fill="#e23a3a"/>
+
+  <circle cx="173" cy="110" r="5" fill="currentColor"/>
+  <path d="M173 118 L173 138" stroke="currentColor" stroke-width="1" opacity="0.4"/>
+  <text x="173" y="152" text-anchor="middle" font-size="10.5" font-weight="700" fill="currentColor">19 de agosto</text>
+  <text x="173" y="168" text-anchor="middle" font-size="10.5" fill="currentColor" opacity="0.85">Microsoft corrige: 1.457.236.0</text>
+
+  <text x="590" y="56" text-anchor="middle" font-size="10.5" font-weight="700" fill="currentColor">24 de agosto</text>
+  <text x="590" y="72" text-anchor="middle" font-size="10.5" fill="currentColor" opacity="0.85">hoy: 1.457.318.0</text>
+  <path d="M590 78 L590 102" stroke="currentColor" stroke-width="1" opacity="0.4"/>
+  <circle cx="590" cy="110" r="5" fill="currentColor"/>
+
+  <text x="20" y="194" font-size="11.5" font-weight="600" fill="currentColor">La ventana duró un día. Confirmar que cada equipo ya la dejó atrás, no.</text>
+</svg>
+```
+
 ---
 
-## Por qué importa que no haya habido aviso
+## Por qué Microsoft no publicó un boletín por esta falla
 
 Una vulnerabilidad tiene identificador, fecha y lugar donde mirar. Esto no. La cadena fue: se rompe el martes, se arregla el miércoles, se repone solo por Windows Update.
 
@@ -63,7 +89,7 @@ Para el que administra tres o quince equipos, la diferencia es concreta. Con un 
 
 ---
 
-## A quién le toca
+## ¿A quién afecta la falla de escaneo de Microsoft Defender?
 
 A cualquier equipo con Windows que use Microsoft Defender como antivirus, que en una PyME suele ser el parque entero. Y le toca de verdad, aunque el arreglo ya esté publicado, a tres grupos:
 
@@ -71,7 +97,7 @@ A cualquier equipo con Windows que use Microsoft Defender como antivirus, que en
 - **Los que reciben actualizaciones con demora**, por WSUS, por una política de despliegue escalonado o por una conexión mala en una sucursal.
 - **Las notebooks que nadie administra**, las del contador externo o el vendedor que se conecta de vez en cuando. Son las que más tardan en salir de una versión rota y las que menos figuran en un inventario.
 
-## A quién NO le toca
+## ¿Quién puede ignorar este aviso?
 
 Si tu antivirus es otro producto —[Bitdefender, Kaspersky, ESET](/comparativa/bitdefender-vs-kaspersky-vs-eset) o cualquier otro de los [del catálogo](/productos/antivirus-y-edr)— este episodio no te alcanza, porque la falla estaba en las firmas de Defender. Tampoco alcanza a los equipos que se actualizan solos por Windows Update sin restricciones y estuvieron encendidos esta semana: esos ya pasaron por varios paquetes posteriores al corregido.
 
@@ -79,7 +105,7 @@ Y no cambió nada en la protección en tiempo real, que es la que ataja un archi
 
 ---
 
-## Cómo comprobar cada equipo
+## ¿Cómo verifico si Microsoft Defender escaneó mis equipos?
 
 Todo esto se mira desde tu lado. En PowerShell como administrador:
 
@@ -107,7 +133,7 @@ Si el escaneo vuelve a cortarse después de actualizar las firmas, ahí sí hay 
 
 ---
 
-## Qué hacer, en orden
+## ¿Qué hago si mis equipos no escanearon desde el 18 de agosto?
 
 1. **Pasá la consulta por el parque**, empezando por los equipos que estuvieron apagados la semana pasada.
 2. **Donde el último escaneo sea anterior al 18 de agosto, actualizá firmas y corré uno completo.** No porque haya indicios de infección, sino porque hubo una ventana sin esa capa y conviene cerrarla con una pasada, no con una suposición.
