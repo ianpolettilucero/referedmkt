@@ -151,7 +151,7 @@ final class LlmsController
             if (!empty($a['excerpt'])) {
                 echo "> " . $this->oneLine($a['excerpt']) . "\n\n";
             }
-            echo $a['content'] . "\n\n";
+            echo $this->flattenDiagrams($a['content']) . "\n\n";
             echo "---\n\n";
         }
 
@@ -179,6 +179,37 @@ final class LlmsController
                 echo "---\n\n";
             }
         }
+    }
+
+    /**
+     * Reemplaza cada bloque ```svg por una linea de texto con su aria-label.
+     *
+     * Este archivo lo consumen modelos de lenguaje, y hasta ahora recibian el
+     * Markdown crudo: cada diagrama entraba entero, con sus coordenadas,
+     * rellenos y anchos de trazo. Con diez diagramas publicados eso son cientos
+     * de lineas de markup que no aportan nada y compiten por la ventana de
+     * contexto del que lee.
+     *
+     * El aria-label no es un resumen aproximado: la convencion del sitio es que
+     * describa el contenido del diagrama con sus datos, porque es lo que oye
+     * quien usa lector de pantalla. Asi que aplanar a esa etiqueta conserva la
+     * informacion y tira el andamiaje. Sin aria-label se deja la marca sola,
+     * para que el lector sepa que ahi habia una figura.
+     */
+    private function flattenDiagrams(string $md): string
+    {
+        return preg_replace_callback(
+            '/^```svg\s*\n(.*?)\n?^```[ \t]*$/ms',
+            function (array $m): string {
+                if (!preg_match('/\baria-label\s*=\s*"([^"]*)"/', $m[1], $lab)) {
+                    return '[Diagrama]';
+                }
+                $texto = html_entity_decode($lab[1], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                $texto = trim(preg_replace('/\s+/', ' ', $texto));
+                return $texto === '' ? '[Diagrama]' : '[Diagrama: ' . $texto . ']';
+            },
+            $md
+        );
     }
 
     /**

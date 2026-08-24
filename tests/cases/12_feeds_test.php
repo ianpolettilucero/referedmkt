@@ -1,6 +1,7 @@
 <?php
 use Controllers\LlmsController;
 use Controllers\SitemapController;
+use Core\Content;
 
 /**
  * sitemap.xml y llms.txt son los dos archivos por los que el sitio se explica
@@ -71,6 +72,52 @@ TestRunner::group('Feeds (sitemap y llms)', function () {
             'quedo un encabezado markdown dentro de una descripcion'
         );
         assert_not_contains('**', $txt);
+    });
+
+    // llms-full.txt publicaba el Markdown crudo, y con el entraba cada diagrama
+    // entero: coordenadas, rellenos y anchos de trazo. Son cientos de lineas de
+    // markup compitiendo por la ventana de contexto del modelo que lo lee. Se
+    // aplanan al aria-label, que por convencion del sitio describe el diagrama
+    // con sus datos porque es lo que oye un lector de pantalla.
+    $conDiagrama = function (string $md): string {
+        seed_content();
+        $datos = Content::load();
+        $datos['articles']['vieja']['content'] = $md;
+        Content::seed($datos);
+        return $md;
+    };
+
+    TestRunner::run('llms-full.txt aplana el svg a su aria-label', function () use ($render, $conDiagrama) {
+        $conDiagrama(
+            "Antes.\n\n```svg\n<svg viewBox=\"0 0 10 10\" role=\"img\" "
+            . "aria-label=\"Firewalls 21 por ciento y VPNs 8 por ciento\">\n"
+            . "  <rect x=\"1\" y=\"2\" width=\"3\" height=\"4\" fill=\"currentColor\"/>\n"
+            . "</svg>\n```\n\nDespues."
+        );
+        $txt = $render(fn () => (new LlmsController())->full());
+
+        assert_contains('[Diagrama: Firewalls 21 por ciento y VPNs 8 por ciento]', $txt);
+        assert_not_contains('<rect', $txt);
+        assert_not_contains('viewBox', $txt);
+        assert_contains('Antes.', $txt);
+        assert_contains('Despues.', $txt);
+    });
+
+    TestRunner::run('un svg sin aria-label deja la marca de diagrama', function () use ($render, $conDiagrama) {
+        $conDiagrama("Texto.\n\n```svg\n<svg viewBox=\"0 0 10 10\"><rect x=\"1\"/></svg>\n```");
+        $txt = $render(fn () => (new LlmsController())->full());
+
+        assert_contains('[Diagrama]', $txt);
+        assert_not_contains('<rect', $txt);
+    });
+
+    // Un bloque de codigo comun no se toca: solo se aplana el lenguaje svg.
+    TestRunner::run('llms-full.txt no toca los bloques de codigo normales', function () use ($render, $conDiagrama) {
+        $conDiagrama("```powershell\nGet-MpComputerStatus\n```");
+        $txt = $render(fn () => (new LlmsController())->full());
+
+        assert_contains('Get-MpComputerStatus', $txt);
+        assert_not_contains('[Diagrama', $txt);
     });
 
     // El esquema se deducia del request. En produccion daba bien, pero si el
