@@ -166,6 +166,65 @@ final class SitemapController
         echo "  </url>\n";
     }
 
+    /**
+     * Sitemap de Google News: solo las notas de las ultimas 48 horas.
+     *
+     * Es un archivo aparte del sitemap general y con reglas propias, todas de
+     * Google: como maximo 1.000 entradas, y solo articulos creados en los
+     * ultimos dos dias —pasado ese plazo hay que sacarlos—. Sirve para que una
+     * nota del dia se descubra en horas en vez de esperar el rastreo normal,
+     * que es justo lo que necesita una nota sobre una falla con plazo de tres
+     * dias.
+     *
+     * Con una nota por dia esto va a tener una o dos entradas, y algunos dias
+     * ninguna. Un sitemap de noticias vacio es el estado correcto cuando no se
+     * publico nada en 48 horas, no un error: Search Console puede avisarlo y se
+     * ignora.
+     *
+     * Solo entran las de type=news. Una guia o una comparativa no son noticias
+     * y meterlas seria declarar como novedad algo que no lo es.
+     *
+     * https://developers.google.com/search/docs/crawling-indexing/sitemaps/news-sitemap
+     */
+    public function news(): void
+    {
+        $site = Site::current();
+        $base = 'https://' . $site->domain;
+
+        $corte = time() - 2 * 86400;
+        $notas = [];
+        foreach (Content::publishedArticles() as $a) {
+            if (($a['article_type'] ?? '') !== 'news') { continue; }
+            $ts = !empty($a['published_at']) ? strtotime($a['published_at']) : false;
+            if ($ts === false || $ts < $corte) { continue; }
+            $notas[] = $a;
+            if (count($notas) >= 1000) { break; }
+        }
+
+        header('Content-Type: application/xml; charset=utf-8');
+        header('Cache-Control: public, max-age=900');
+
+        echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+        echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"' . "\n";
+        echo '        xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">' . "\n";
+
+        foreach ($notas as $a) {
+            echo "  <url>\n";
+            echo "    <loc>" . $this->xml($base . article_url($a)) . "</loc>\n";
+            echo "    <news:news>\n";
+            echo "      <news:publication>\n";
+            echo "        <news:name>" . $this->xml($site->name) . "</news:name>\n";
+            echo "        <news:language>" . $this->xml($site->defaultLanguage) . "</news:language>\n";
+            echo "      </news:publication>\n";
+            echo "      <news:publication_date>" . date('c', strtotime($a['published_at'])) . "</news:publication_date>\n";
+            echo "      <news:title>" . $this->xml((string)$a['title']) . "</news:title>\n";
+            echo "    </news:news>\n";
+            echo "  </url>\n";
+        }
+
+        echo "</urlset>\n";
+    }
+
     private function xml(string $s): string
     {
         return htmlspecialchars($s, ENT_XML1 | ENT_QUOTES, 'UTF-8');

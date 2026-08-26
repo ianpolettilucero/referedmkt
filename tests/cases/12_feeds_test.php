@@ -120,6 +120,79 @@ TestRunner::group('Feeds (sitemap y llms)', function () {
         assert_not_contains('[Diagrama', $txt);
     });
 
+    // El sitemap de noticias tiene reglas propias de Google: solo articulos de
+    // las ultimas 48 horas y solo notas. Las tres cosas que pueden degradarse
+    // en silencio son que se cuele una guia, que quede una nota vieja, o que el
+    // XML deje de parsear por un titulo con un caracter especial.
+    $conNota = function (array $rows) {
+        seed_content();
+        $datos = Content::load();
+        foreach ($rows as $slug => $r) { $datos['articles'][$slug] = array_merge([
+            'site_id' => 1, 'status' => 'published', 'article_type' => 'news',
+            'subtitle' => null, 'excerpt' => null, 'content' => '', 'content_html' => '',
+            'category_id' => null, 'author_id' => null, 'related_product_ids' => [],
+            'rating' => null, 'verdict' => null, 'pros' => null, 'cons' => null,
+            'updated_at' => date('Y-m-d H:i:s'), 'slug' => $slug,
+        ], $r); }
+        Content::seed($datos);
+    };
+
+    TestRunner::run('el sitemap de noticias solo trae las ultimas 48 horas', function () use ($render, $conNota) {
+        $conNota([
+            'hoy'   => ['id' => 90, 'title' => 'De hoy',  'published_at' => date('Y-m-d H:i:s', time() - 3600)],
+            'vieja' => ['id' => 91, 'title' => 'De hace una semana', 'published_at' => date('Y-m-d H:i:s', time() - 7 * 86400)],
+        ]);
+        $xml = $render(fn () => (new SitemapController())->news());
+
+        assert_contains('/noticia/hoy', $xml);
+        assert_not_contains('/noticia/vieja', $xml);
+    });
+
+    TestRunner::run('el sitemap de noticias excluye lo que no es nota', function () use ($render, $conNota) {
+        $conNota([
+            'nota' => ['id' => 92, 'title' => 'Una nota', 'published_at' => date('Y-m-d H:i:s', time() - 3600)],
+            'guia' => ['id' => 93, 'title' => 'Una guia', 'article_type' => 'guide',
+                       'published_at' => date('Y-m-d H:i:s', time() - 3600)],
+        ]);
+        $xml = $render(fn () => (new SitemapController())->news());
+
+        assert_contains('/noticia/nota', $xml);
+        assert_not_contains('/guia/guia', $xml);
+    });
+
+    TestRunner::run('el sitemap de noticias es XML bien formado', function () use ($render, $conNota) {
+        // Un titulo con & y comillas: si no se escapa, el feed entero no parsea.
+        $conNota(['rara' => ['id' => 94, 'title' => 'Fallas en A & B: "criticas" <hoy>',
+                             'published_at' => date('Y-m-d H:i:s', time() - 3600)]]);
+        $xml = $render(fn () => (new SitemapController())->news());
+
+        $prev = libxml_use_internal_errors(true);
+        $doc  = simplexml_load_string($xml);
+        $errs = libxml_get_errors();
+        libxml_clear_errors();
+        libxml_use_internal_errors($prev);
+
+        assert_true($doc !== false, 'no parsea: ' . ($errs[0]->message ?? 'sin detalle'));
+        assert_contains('news:publication_date', $xml);
+        assert_contains('news:language', $xml);
+    });
+
+    // Sin notas recientes el archivo tiene que seguir siendo XML valido y
+    // vacio. Es el estado correcto de un dia sin publicar, no un error.
+    TestRunner::run('sin notas recientes el sitemap queda vacio pero valido', function () use ($render, $conNota) {
+        $conNota(['antigua' => ['id' => 95, 'title' => 'Vieja',
+                                'published_at' => date('Y-m-d H:i:s', time() - 30 * 86400)]]);
+        $xml = $render(fn () => (new SitemapController())->news());
+
+        $prev = libxml_use_internal_errors(true);
+        $doc  = simplexml_load_string($xml);
+        libxml_clear_errors();
+        libxml_use_internal_errors($prev);
+
+        assert_true($doc !== false, 'un sitemap vacio tiene que seguir parseando');
+        assert_not_contains('<url>', $xml);
+    });
+
     // El esquema se deducia del request. En produccion daba bien, pero si el
     // proxy dejaba de mandar X-Forwarded-Proto el archivo empezaba a publicar
     // URLs http en silencio, justo el que consumen los crawlers de LLM.

@@ -76,6 +76,7 @@ $router->get('/comparar', [CompareController::class, 'index']);
 // Afiliados + SEO infra
 $router->get('/go/{slug}',    [RedirectController::class, 'affiliate']);
 $router->get('/sitemap.xml',     [SitemapController::class, 'index']);
+$router->get('/news-sitemap.xml',[SitemapController::class, 'news']);
 $router->get('/robots.txt',      [RobotsController::class,  'index']);
 $router->get('/feed.xml',        [FeedController::class,    'index']);
 $router->get('/llms.txt',        [LlmsController::class,    'index']);

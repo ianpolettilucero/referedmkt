@@ -73,6 +73,8 @@ final class RobotsController
         echo "\n";
 
         echo "Sitemap: {$base}/sitemap.xml\n";
+        // El de noticias va aparte: reglas propias y solo las ultimas 48 horas.
+        echo "Sitemap: {$base}/news-sitemap.xml\n";
         // Hint no estandar, pero varios crawlers de LLMs ya lo miran.
         echo "LLMs-Txt: {$base}/llms.txt\n";
         echo "LLMs-Full-Txt: {$base}/llms-full.txt\n";
