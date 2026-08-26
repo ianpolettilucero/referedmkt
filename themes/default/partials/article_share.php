@@ -80,4 +80,29 @@ $redes = [
             </a>
         <?php endforeach; ?>
     </div>
+<?php if (!$compacto): ?>
+    <?php
+    /**
+     * Boton de "fuente preferida" de Google.
+     *
+     * Marca el sitio en https://google.com/preferences/source, y el contenido
+     * pasa a mostrarse con distintivo en Top Stories, en AI Overviews y en AI
+     * Mode. No requiere aprobacion previa ni estar en Publisher Center: alcanza
+     * con ser un dominio. Documentado en
+     * developers.google.com/search/docs/appearance/preferred-sources
+     *
+     * Arranca oculto a proposito. El script que lo hace funcionar es de Google
+     * y pesa 251 KB, asi que no se carga con la pagina: theme.js lo trae recien
+     * cuando este bloque se acerca al viewport, y muestra el boton solo si
+     * cargo bien. Si el lector nunca llega al final, o si un bloqueador corta
+     * el pedido, no se descarga nada y no queda un boton muerto en pantalla.
+     */
+    ?>
+    <div class="article-preferred" hidden>
+        <button type="button" class="article-share-btn article-preferred-btn">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 2l2.9 6.26 6.85.74-5.1 4.6 1.44 6.73L12 17.1l-6.09 3.23L7.35 13.6l-5.1-4.6 6.85-.74L12 2z"/></svg>
+            <span>Marcar Capa Cero como fuente preferida en Google</span>
+        </button>
+    </div>
+<?php endif; ?>
 <?= $compacto ? '</div>' : '</section>' ?>

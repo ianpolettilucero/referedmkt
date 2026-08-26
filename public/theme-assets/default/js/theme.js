@@ -88,3 +88,70 @@
     sync(wide);
     if (wide.addEventListener) { wide.addEventListener('change', sync); }
 })();
+
+/**
+ * Boton de "fuente preferida" de Google, con carga diferida.
+ *
+ * El script publisher.js de Google pesa 251 KB. Cargarlo en cada articulo
+ * seria mas que todo el CSS y el JS propios del sitio juntos, y lo pagaria el
+ * 99% de los lectores que nunca van a tocar el boton. Asi que se trae recien
+ * cuando el bloque de compartir del final se acerca al viewport: quien no
+ * termina el articulo no descarga nada.
+ *
+ * Se usa el modo manual (`preferred-sources-control="manual"`) para que Google
+ * no dibuje su propio boton y podamos usar uno con el estilo del sitio.
+ *
+ * El boton empieza oculto y solo se muestra cuando el script confirmo que
+ * inicializo. Un bloqueador de rastreadores corta el pedido, y en ese caso lo
+ * correcto es que el boton no aparezca en vez de quedar muerto.
+ *
+ * Se carga 600px antes de que el bloque entre en pantalla para que al momento
+ * del click el script ya este listo y el boton no tarde en responder. Google
+ * abre un iframe propio y no una ventana nueva, asi que no hay riesgo de que
+ * un bloqueador de popups corte la accion; es solo latencia.
+ *
+ * El patron de encolar en el array antes de que cargue el script es el que
+ * publisher.js espera: al inicializarse recorre lo que haya en
+ * self.PREFERRED_SOURCE, ejecuta cada callback con su API, y recien despues
+ * reemplaza el array por un objeto con push().
+ */
+(function () {
+    var wrap = document.querySelector('.article-preferred');
+    var caja = document.querySelector('section.article-share');
+    if (!wrap || !caja || !('IntersectionObserver' in window)) { return; }
+
+    var pedido = false;
+
+    function cargar() {
+        if (pedido) { return; }
+        pedido = true;
+
+        // El tema del widget sigue al del sitio; el sitio arranca en oscuro.
+        var tema = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+
+        self.PREFERRED_SOURCE = self.PREFERRED_SOURCE || [];
+        self.PREFERRED_SOURCE.push(function (ps) {
+            try {
+                ps.init({ theme: tema, lang: 'es' });
+                wrap.querySelector('button').addEventListener('click', function () {
+                    ps.addPreferredSource();
+                });
+                wrap.hidden = false;
+            } catch (e) { /* si Google cambia la API, el boton simplemente no aparece */ }
+        });
+
+        var s = document.createElement('script');
+        s.async = true;
+        s.src = 'https://news.google.com/swg/js/v1/publisher.js';
+        s.setAttribute('preferred-sources-control', 'manual');
+        document.head.appendChild(s);
+    }
+
+    var io = new IntersectionObserver(function (entradas) {
+        for (var i = 0; i < entradas.length; i++) {
+            if (entradas[i].isIntersecting) { cargar(); io.disconnect(); return; }
+        }
+    }, { rootMargin: '600px 0px' });
+
+    io.observe(caja);
+})();
