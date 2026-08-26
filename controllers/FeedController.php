@@ -49,6 +49,12 @@ final class FeedController
             if (!empty($a['excerpt'])) {
                 echo "      <description>" . self::xml($a['excerpt']) . "</description>\n";
             }
+            // Los agregadores usan <category> para agrupar y filtrar. Sin esto
+            // todo el feed llega como una sola bolsa, y un lector que solo
+            // quiere lo de correo o lo de backup no puede separarlo.
+            if (!empty($a['category_name'])) {
+                echo "      <category>" . self::xml($a['category_name']) . "</category>\n";
+            }
             echo "      <content:encoded><![CDATA[" . str_replace(']]>', ']]&gt;', $html) . "]]></content:encoded>\n";
             echo "    </item>\n";
         }
