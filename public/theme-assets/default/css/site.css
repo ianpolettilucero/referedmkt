@@ -1870,6 +1870,50 @@ html { scroll-behavior: smooth; }
 .article-share-x:hover         { border-color: var(--text); color: var(--text); }
 .article-share-email:hover     { border-color: var(--primary); color: var(--primary); }
 
+/* Variante de arriba, debajo del titulo. Sin caja ni fondo: ahi el lector
+   todavia no leyo nada, y un bloque con relleno le empuja el texto hacia
+   abajo. Queda como una fila discreta de iconos, separada de la meta por una
+   linea fina. */
+.article-share--compacto {
+    margin: var(--s-3) 0 0;
+    padding: var(--s-2) 0 0;
+    background: none;
+    border: none;
+    border-top: 1px solid var(--border);
+    border-radius: 0;
+    gap: 0.6rem;
+}
+.article-share--compacto .article-share-label {
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+.article-share--compacto .article-share-buttons { gap: 0.4rem; }
+.article-share--compacto .article-share-btn {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.82rem;
+    background: none;
+}
+.article-share--compacto .article-share-btn svg { width: 15px; height: 15px; }
+.article-share--compacto .article-share-btn:hover { background: var(--surface-hover); }
+
+/* Abajo de 560px el nombre de cada red sobra: los cuatro iconos entran en una
+   fila y el rotulo "Compartir" ya dice de que se trata. Se oculta con
+   clip-path y no con display:none para que el lector de pantalla lo siga
+   leyendo — el aria-label del enlace tambien lo cubre, pero el texto visible
+   es lo que anuncia un lector braille. */
+@media (max-width: 559px) {
+    .article-share--compacto .article-share-btn span {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+    }
+    .article-share--compacto .article-share-btn { padding: 0.35rem 0.5rem; }
+}
+
 /* Mobile: mantener fila pero ocultar labels cuando queda muy ajustado */
 @media (max-width: 479px) {
     .article-share {
