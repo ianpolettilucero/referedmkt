@@ -104,7 +104,7 @@ Para la mayoría de las PyMEs esto no aplica. Vale nombrarlo por otra razón: es
 
 ---
 
-## ¿A quién afectan estas cuatro fallas?
+## ¿A quién afectan las fallas de Zimbra, TrueConf y MLflow?
 
 **Comprobalo hoy si:**
 
@@ -128,7 +128,7 @@ Todo esto se verifica desde tu lado, con tus credenciales.
 
 ---
 
-## ¿Qué hago si corro alguno de estos servidores?
+## ¿Qué hago si corro Zimbra, TrueConf o MLflow?
 
 1. **Actualizá Zimbra a 10.1.20 o posterior.** Si no podés hoy y tenés `zimbra-snmp` instalado sin usarlo, desactivar las notificaciones SNMP corta la condición que habilita la falla.
 2. **Actualizá TrueConf** por encima de las versiones afectadas, y cerrá el 4307 al exterior si no necesita estar publicado.
@@ -142,7 +142,7 @@ Los términos de esta nota están definidos en el [glosario](/guia/glosario-cibe
 
 ---
 
-## Preguntas frecuentes
+## Preguntas frecuentes sobre Zimbra, TrueConf y MLflow
 
 ### Tengo Zimbra pero no uso SNMP. ¿Me afecta?
 

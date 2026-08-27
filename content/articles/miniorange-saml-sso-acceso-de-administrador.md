@@ -169,7 +169,7 @@ A cualquier sitio en WordPress que tenga el plugin instalado y activo, en cualqu
 
 El impacto es total: una sesión de administrador de WordPress permite instalar plugins, y un plugin permite ejecutar código en el servidor. Es el mismo destino al que llegaba, por otro camino, [la falla de Elementor Pro de la semana pasada](/noticia/elementor-pro-formulario-sube-un-php): en WordPress, la ruta al servidor casi siempre pasa por un plugin.
 
-## ¿Quién puede ignorar este aviso?
+## ¿Quién puede ignorar el aviso de miniOrange SAML SSO?
 
 Quien no use inicio de sesión único en su WordPress, que es la enorme mayoría de los sitios de una PyME: si entrás con usuario y contraseña del propio WordPress, este plugin no está instalado y nada de esto aplica.
 
@@ -201,7 +201,7 @@ Los términos están en el [glosario](/guia/glosario-ciberseguridad-pymes) y el 
 
 ---
 
-## Preguntas frecuentes
+## Preguntas frecuentes sobre miniOrange SAML SSO
 
 ### Tengo el segundo factor activado en mi proveedor de identidad. ¿Me protege?
 

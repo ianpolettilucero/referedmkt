@@ -63,7 +63,7 @@ Lo que sí está verificado hoy es el estado actual. La página de actualizacion
 
 ---
 
-## Por qué Microsoft no publicó un boletín por esta falla
+## Por qué Microsoft no publicó un boletín por el fallo de escaneo
 
 Una vulnerabilidad tiene identificador, fecha y lugar donde mirar. Esto no. La cadena fue: se rompe el martes, se arregla el miércoles, se repone solo por Windows Update.
 
@@ -97,7 +97,7 @@ A cualquier equipo con Windows que use Microsoft Defender como antivirus, que en
 - **Los que reciben actualizaciones con demora**, por WSUS, por una política de despliegue escalonado o por una conexión mala en una sucursal.
 - **Las notebooks que nadie administra**, las del contador externo o el vendedor que se conecta de vez en cuando. Son las que más tardan en salir de una versión rota y las que menos figuran en un inventario.
 
-## ¿Quién puede ignorar este aviso?
+## ¿Quién puede ignorar el aviso de Microsoft Defender?
 
 Si tu antivirus es otro producto —[Bitdefender, Kaspersky, ESET](/comparativa/bitdefender-vs-kaspersky-vs-eset) o cualquier otro de los [del catálogo](/productos/antivirus-y-edr)— este episodio no te alcanza, porque la falla estaba en las firmas de Defender. Tampoco alcanza a los equipos que se actualizan solos por Windows Update sin restricciones y estuvieron encendidos esta semana: esos ya pasaron por varios paquetes posteriores al corregido.
 
@@ -145,7 +145,7 @@ Los términos están en el [glosario](/guia/glosario-ciberseguridad-pymes) y el 
 
 ---
 
-## Preguntas frecuentes
+## Preguntas frecuentes sobre el fallo de escaneo de Microsoft Defender
 
 ### ¿Estuve desprotegido esos días?
 

@@ -112,6 +112,35 @@ $headings = function (string $html): array {
     return $out;
 };
 
+/**
+ * Solo el cuerpo escrito por el autor: <div class="article-body">.
+ *
+ * El resto del <main> tambien tiene H2 ("Productos mencionados", "Segui
+ * leyendo", "Veredicto") y ademas rinde los titulos de las notas relacionadas.
+ * Nada de eso lo escribe quien redacta la nota, asi que auditarlo como si
+ * fuera suyo da ruido y esconde los hallazgos reales.
+ *
+ * Se cuentan los <div> anidados porque el markdown genera algunos propios
+ * (tablas con scroll, por ejemplo) y cortar en el primer </div> mutila el
+ * cuerpo.
+ */
+$articleBody = function (string $html): string {
+    $ini = strpos($html, '<div class="article-body">');
+    if ($ini === false) { return ''; }
+    $pos   = $ini + strlen('<div class="article-body">');
+    $nivel = 1;
+    $len   = strlen($html);
+    while ($pos < $len && $nivel > 0) {
+        $abre  = strpos($html, '<div', $pos);
+        $cierra = strpos($html, '</div>', $pos);
+        if ($cierra === false) { break; }
+        if ($abre !== false && $abre < $cierra) { $nivel++; $pos = $abre + 4; continue; }
+        $nivel--;
+        $pos = $cierra + 6;
+    }
+    return substr($html, $ini, $pos - $ini);
+};
+
 $jsonLd = function (string $html): array {
     $blocks = [];
     if (preg_match_all('#<script type="application/ld\+json">(.*?)</script>#si', $html, $m)) {
@@ -150,6 +179,7 @@ $internalLinks = function (string $html, bool $onlyMain = false): array {
 
 $titles = [];
 $descs  = [];
+$newsH2 = [];
 
 foreach ($pages as $url => $html) {
     $t = $title($html);
@@ -196,6 +226,47 @@ foreach ($pages as $url => $html) {
             break;
         }
         $prev = $h['level'];
+    }
+
+    // --- Encabezados de noticias: tienen que sostenerse leidos solos ---
+    //
+    // Un H2 aparece aislado en el fragmento destacado de Google, en "Otras
+    // preguntas" y en la respuesta de un modelo. Ahi no hay articulo alrededor,
+    // asi que un encabezado que remite hacia atras ("estas fallas", "la unica")
+    // no dice nada. La regla completa esta en docs/estilo.md, seccion "Titulos
+    // y encabezados".
+    //
+    // Solo se aplica a /noticia/: las guias tienen otra estructura, con
+    // secciones que sí se leen en orden.
+    if (preg_match('~^/noticia/~', $url)) {
+        $cuerpo = $articleBody($html);
+        preg_match_all('#<h2[^>]*>(.*?)</h2>#si', $cuerpo, $h2s);
+        foreach ($h2s[1] as $crudo) {
+            $txt = trim(strip_tags($crudo));
+            if ($txt === '') { continue; }
+
+            // Anafora: demostrativos y determinantes que remiten al texto
+            // anterior. En un encabezado no tienen antecedente posible.
+            if (preg_match('/\b(est[ae]|est[ao]s|dich[ao]s?)\b/iu', $txt, $mm)) {
+                $add('warn', 'seo', $url, "Encabezado anaforico (\"{$mm[1]}\" no tiene antecedente leido solo): \"$txt\"");
+            }
+
+            // Sin entidad: ni CVE, ni cifra, ni nombre propio despues de la
+            // primera palabra. Suele ser el sintoma de un encabezado generico.
+            $sinCve   = !preg_match('/CVE-\d{4}-\d{4,}/', $txt);
+            $sinCifra = !preg_match('/\d/', $txt);
+            // Cualquier mayuscula pasada la primera palabra: en castellano
+            // solo aparece en nombres propios. Se busca la mayuscula suelta y
+            // no el inicio de palabra, porque marcas como "miniOrange" o
+            // "WordPress" la llevan adentro.
+            $resto     = preg_replace('/^[¿¡]?\S+\s*/u', '', $txt);
+            $sinNombre = !preg_match('/\p{Lu}/u', $resto);
+            if ($sinCve && $sinCifra && $sinNombre) {
+                $add('info', 'seo', $url, "Encabezado sin entidad concreta (producto, CVE o cifra): \"$txt\"");
+            }
+
+            $newsH2[$txt][] = $url;
+        }
     }
 
     // --- Canonical ---
@@ -274,6 +345,19 @@ foreach ($pages as $url => $html) {
         if (!preg_match('/Actualizado el/i', $html)) {
             $add('info', 'geo', $url, 'Sin fecha de actualizacion visible. La frescura pesa en los motores de respuesta.');
         }
+    }
+}
+
+// --- Encabezados de noticias repetidos entre notas ---
+//
+// Si el mismo H2 sirve palabra por palabra en dos notas distintas, no esta
+// describiendo ninguna de las dos. Ademas compiten entre si por la misma
+// consulta.
+foreach ($newsH2 as $t => $us) {
+    $us = array_values(array_unique($us));
+    if (count($us) > 1) {
+        $add('warn', 'seo', implode(', ', array_slice($us, 0, 3)),
+            'Encabezado repetido en ' . count($us) . ' notas: "' . $t . '"');
     }
 }
 

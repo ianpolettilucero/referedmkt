@@ -32,7 +32,7 @@ Los puntajes salen de NVD, con quién los asignó anotado en cada caso: son eval
 
 ---
 
-## Por qué estas fallas están en el escritorio y no en el servidor
+## Por qué SharePoint, macOS y la VPN de Windows le pegan al escritorio
 
 SharePoint no es infraestructura: es donde el equipo guarda los documentos. Si tenés Microsoft 365 tenés SharePoint, lo uses conscientemente o no, porque es lo que hay debajo de Teams y de los archivos compartidos. Una falla de autenticación débil ahí, explotable por red y sin credenciales, alcanza a cualquier empresa con un tenant.
 
@@ -131,7 +131,7 @@ La [guía de ciberseguridad para PyMEs de LATAM](/guia/guia-ciberseguridad-pymes
 
 ---
 
-## Preguntas frecuentes
+## Preguntas frecuentes sobre SharePoint, macOS, VPN y vCenter
 
 ### Tengo Microsoft 365, ¿tengo que hacer algo con lo de SharePoint?
 

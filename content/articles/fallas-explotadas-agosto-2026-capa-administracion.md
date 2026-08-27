@@ -57,7 +57,7 @@ Administración remota, servidor de aplicaciones, plataforma de IA, integración
 
 ---
 
-## Por qué el atacante apunta a la capa de administración
+## Por qué los atacantes apuntan a consolas como N-able N-central
 
 Es la misma lógica con la que razona cualquier equipo de [red team](/guia/red-teaming-que-es-cuando-contratarlo): no se ataca el objetivo más duro, se ataca el que tiene permiso sobre el objetivo más duro.
 
@@ -71,7 +71,7 @@ Traducido: se publicó un arreglo, el arreglo no arreglaba, y las dos terminaron
 
 ---
 
-## El dato que no aparece en los titulares
+## Por qué el CVSS del fabricante y el de NVD no coinciden
 
 Las puntuaciones de severidad de estas mismas fallas, según quién las asigne:
 
@@ -124,7 +124,7 @@ Si un organismo con equipo de seguridad tiene tres días, la pregunta para una P
 
 ---
 
-## ¿A quién afectan estas diez fallas de agosto?
+## ¿A quién afectan las diez fallas explotadas en agosto de 2026?
 
 **Te toca directo si:**
 
@@ -143,7 +143,7 @@ Si un organismo con equipo de seguridad tiene tres días, la pregunta para una P
 
 ---
 
-## ¿Cómo sé si mi panel de administración está expuesto?
+## ¿Cómo sé si mi panel de administración está expuesto a internet?
 
 Todo esto es verificación desde tu lado, con tus credenciales. Ninguna es una prueba de concepto.
 
@@ -157,7 +157,7 @@ Todo esto es verificación desde tu lado, con tus credenciales. Ninguna es una p
 
 ---
 
-## ¿Qué hago para cerrar mi capa de administración?
+## ¿Qué hago para cerrar el acceso a mis paneles de administración?
 
 1. **Parcheá lo que esté en la lista y corras**, sin discutir el CVSS. Estar en el catálogo significa que ya lo están usando.
 2. **Sacá de internet lo que no necesita estar.** Un panel de administración accesible desde cualquier IP es una falla esperando el próximo CVE. Si necesitás acceso remoto, un modelo por identidad como [Cloudflare Access](/producto/cloudflare-access) o [Twingate](/producto/twingate) reemplaza al VPN publicado: el razonamiento está en [acceso remoto seguro sin VPN](/guia/acceso-remoto-seguro-sin-vpn).
@@ -171,7 +171,7 @@ La [guía de ciberseguridad para PyMEs de LATAM](/guia/guia-ciberseguridad-pymes
 
 ---
 
-## Preguntas frecuentes
+## Preguntas frecuentes sobre las diez fallas de agosto de 2026
 
 ### ¿Qué es el catálogo KEV de CISA y por qué importa más que un CVSS alto?
 

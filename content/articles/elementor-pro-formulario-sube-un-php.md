@@ -110,7 +110,7 @@ Las tres condiciones tienen que darse a la vez, y por eso vale mirarlas antes de
 </svg>
 ```
 
-## ¿Quién puede ignorar este aviso?
+## ¿Quién puede ignorar el aviso de Elementor Pro?
 
 Si usás **Elementor gratuito** y no la versión Pro, esto no aplica: el módulo de formularios es una función de pago y la falla está ahí. Tampoco te toca si tenés Elementor Pro pero ningún formulario publicado con campo de carga de archivos, que es el caso de la mayoría de los sitios institucionales de una PyME, donde el formulario pide nombre, correo y mensaje.
 
@@ -152,7 +152,7 @@ Los términos están en el [glosario](/guia/glosario-ciberseguridad-pymes) y el 
 
 ---
 
-## Preguntas frecuentes
+## Preguntas frecuentes sobre CVE-2026-32475 en Elementor Pro
 
 ### Leí que solo aplica si tenés activada la carga de varios archivos. ¿Es así?
 

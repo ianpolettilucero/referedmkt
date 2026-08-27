@@ -83,27 +83,73 @@ pegarlo en el buscador es el primer reflejo de quien lo vio en un aviso.
 
 ### Los encabezados
 
-Los que corresponden a **algo que el lector quiere hacer** van en forma de
-pregunta, porque es la forma en que lo busca. Y llevan la entidad adentro.
+Un encabezado tiene que nombrar su propio sujeto. No puede depender de
+ninguna otra línea del artículo para entenderse, porque en la mitad de los
+lugares donde aparece no hay artículo alrededor.
 
-| ✗ Genérico | ✓ Con intención |
+**El error que más se repite es la anáfora**: escribir el encabezado como si
+el lector viniera leyendo desde arriba. Fuera de contexto no significa nada.
+
+| ✗ Anafórico | Por qué falla |
+|---|---|
+| Citrix NetScaler: la única de este año y la que vence antes | ¿La única *qué*? |
+| Por qué cinco de las seis tienen entre 4 y 11 años | Cinco de las seis *qué* |
+| ¿Quién puede ignorar este aviso? | *Cuál* aviso |
+| Qué la separa de RoguePlanet | *Qué* cosa la separa |
+| ¿A quién afectan estas cuatro fallas? | *Cuáles* cuatro fallas |
+| El dato que no aparece en los titulares | Sirve para cualquier nota del sitio |
+
+Lo prohibido, en concreto:
+
+- **Demostrativos que remiten hacia atrás**: "estas fallas", "este aviso",
+  "estos servidores", "esta tanda", "dicha versión".
+- **Artículos que reemplazan al sujeto**: "la única", "el dato", "la que
+  vence antes", "lo que cambió".
+- **Pronombres sin referente propio**: "qué la separa", "por qué importa".
+
+### Cómo se escribe bien
+
+Los encabezados de **algo que el lector quiere hacer** van en forma de
+pregunta, porque es la forma en que lo busca, con la entidad adentro.
+
+| ✗ Genérico o anafórico | ✓ Se sostiene solo |
 |---|---|
 | Cómo comprobar cada equipo | ¿Cómo verifico si Microsoft Defender escaneó mis equipos? |
 | A quién le toca | ¿A quién afecta la falla de Elementor Pro? |
-| A quién NO le toca | ¿Quién puede ignorar este aviso? |
+| A quién NO le toca | ¿Quién puede ignorar el aviso de Elementor Pro? |
 | Qué hacer, en orden | ¿Qué hago si tengo Zimbra en mi servidor? |
 | Cómo comprobar exposición | ¿Cómo sé si mi TrueConf está expuesto a internet? |
 
 Los de **análisis o argumento** no se fuerzan a pregunta —queda cargoso tener
-ocho seguidas— pero igual llevan la entidad y dicen algo concreto.
+ocho seguidas— pero igual nombran su sujeto y dicen algo concreto.
 
-- ✗ *Por qué este lote es distinto* → ✓ *Por qué estas cuatro fallas están en el
-  escritorio y no en el servidor*
-- ✗ *El mecanismo: dos reglas para el mismo envío* → ✓ *Cómo funciona la falla de
-  Elementor Pro: dos reglas para el mismo envío*
+- ✗ *Por qué este lote es distinto*
+  → ✓ *Por qué SharePoint, macOS y vCenter se parchean solos y Zimbra no*
+- ✗ *Por qué estas cuatro fallas están en el escritorio y no en el servidor*
+  → ✓ *Por qué las fallas de agosto apuntan al escritorio y no al servidor*
+- ✗ *El mecanismo: dos reglas para el mismo envío*
+  → ✓ *Cómo funciona CVE-2026-32475: dos reglas para el mismo envío*
 
-La regla práctica: si el encabezado sirve igual para cualquier otra nota del
-sitio, es genérico y hay que reescribirlo.
+### La prueba, antes de publicar
+
+Tapá el artículo entero y leé la lista de encabezados sola, como la leería
+alguien que llega desde un buscador. Cada uno tiene que pasar las tres:
+
+1. **¿Se entiende de qué habla?** Sin mirar nada más.
+2. **¿Nombra su sujeto?** Producto como lo escribe la gente al buscar
+   —"Microsoft Defender", no "Defender"—, CVE completo, o la entidad de la
+   que trata esa sección.
+3. **¿Serviría igual en otra nota del sitio?** Si la respuesta es sí, está
+   mal. Dos notas no pueden compartir un encabezado palabra por palabra.
+
+Esto no es cosmética: `bin/audit.php` marca los encabezados de `/noticia/`
+que traen anáfora, que se repiten entre notas o que no nombran ninguna
+entidad. Las advertencias se leen.
+
+**Excepción de una sola línea.** El encabezado de preguntas frecuentes tiene
+que empezar con las palabras "Preguntas frecuentes", porque `core/Faq.php`
+ancla ahí el `FAQPage`. Se lo hace específico agregando texto después:
+*Preguntas frecuentes sobre Elementor Pro*, no *Dudas sobre Elementor Pro*.
 
 ## Palabras que no se usan
 

@@ -247,14 +247,20 @@ El título lleva **el nombre del producto como lo escribe la gente** —"Microso
 Defender", no "Defender"— y el CVE si lo hay. Los encabezados tienen que
 sostenerse leídos solos, porque así aparecen en el fragmento destacado de Google
 y en la respuesta de un modelo. Los cuatro bloques de arriba **no se titulan con
-su nombre genérico**:
+su nombre genérico**, y **ninguno puede remitir al texto de más arriba**:
 
 | ✗ Nunca así | ✓ Así |
 |---|---|
 | A quién le toca | ¿A quién afecta la falla de Elementor Pro? |
-| A quién NO le toca | ¿Quién puede ignorar este aviso? |
+| A quién NO le toca | ¿Quién puede ignorar el aviso de Elementor Pro? |
 | Cómo comprobar exposición | ¿Cómo sé si mi TrueConf está expuesto a internet? |
 | Qué hacer, en orden | ¿Qué hago si tengo Zimbra en mi servidor? |
+| ¿A quién afectan estas cuatro fallas? | ¿A quién afectan las fallas de Zimbra, TrueConf y MLflow? |
+
+Las dos últimas filas son la misma regla vista de dos maneras: "A quién NO le
+toca" es genérico, y "estas cuatro fallas" es anafórico. Los dos fallan la
+misma prueba, porque los dos necesitan el artículo alrededor para significar
+algo. `bin/audit.php` marca los dos casos en las notas publicadas.
 
 Si el encabezado sirve igual para cualquier otra nota del sitio, está mal.
 - Segunda persona, frases de largo desparejo, opinión marcada como opinión.

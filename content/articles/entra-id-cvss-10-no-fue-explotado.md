@@ -111,7 +111,7 @@ Un CVE de servicio en la nube no es una alerta: es un informe de algo ya cerrado
 
 ---
 
-## ¿Quién puede ignorar este aviso?
+## ¿Quién puede ignorar el aviso de CVE-2026-69836?
 
 A ninguna PyME que use Microsoft 365, que es lo mismo que decir a nadie que esté leyendo esto. No hay versión afectada que revisar, porque no corrés vos ninguna versión de Entra ID. No hay indicadores de compromiso que buscar, porque Microsoft no publicó ninguno. Y no hay nada que cerrar.
 
@@ -159,7 +159,7 @@ Los términos están definidos en el [glosario](/guia/glosario-ciberseguridad-py
 
 ---
 
-## Preguntas frecuentes
+## Preguntas frecuentes sobre CVE-2026-69836 en Entra ID
 
 ### Entonces, ¿el 10.0 era falso?
 

@@ -63,7 +63,7 @@ Los plazos son los que CISA fija a los organismos federales de Estados Unidos. P
 
 ---
 
-## Citrix NetScaler: la única de este año y la que vence antes
+## Citrix NetScaler CVE-2026-8452: qué versiones corregir y en qué plazo
 
 CVE-2026-8452 está en NetScaler ADC y NetScaler Gateway, el equipo que muchas empresas ponen en el borde para publicar acceso remoto. Citrix la corrigió en su [boletín CTX696604](https://support.citrix.com/external/article/CTX696604/netscaler-adc-and-netscaler-gateway-secu.html), publicado el 30 de junio y actualizado el 20 de julio.
 
@@ -82,7 +82,7 @@ Los dos puntajes tampoco se comparan directamente: el 8.8 de Citrix está en la 
 
 ---
 
-## Por qué cinco de las seis tienen entre 4 y 11 años
+## Por qué cinco de las seis fallas del catálogo de CISA son de 2015 a 2022
 
 El catálogo no registra cuándo se descubrió una falla, sino cuándo se confirmó que alguien la está usando contra organizaciones reales. Una falla de 2015 que aparece hoy significa que en 2026 todavía hay suficientes sistemas sin parchear como para que a un atacante le rinda apuntarles.
 
@@ -144,7 +144,7 @@ Los plazos que fijó CISA separan la tanda en dos grupos, y esa división sirve 
 
 ---
 
-## ¿A quién afecta esta tanda del catálogo de CISA?
+## ¿A quién afectan las seis fallas que CISA sumó en agosto de 2026?
 
 Comprobalo hoy si estás en alguno de estos casos:
 
@@ -153,7 +153,7 @@ Comprobalo hoy si estás en alguno de estos casos:
 - **Tenés servidores con Red Hat Enterprise Linux o derivados** de la época en que se instalaron y nunca migraron.
 - **Alguien mantiene una aplicación .NET interna vieja.** Ajax.NET Professional es una biblioteca de las que quedan enterradas en un proyecto que compila y nadie revisa.
 
-## ¿Quién puede ignorar este aviso?
+## ¿Quién puede ignorar el aviso de Citrix NetScaler y SQL Server?
 
 Una PyME cuya infraestructura sea Microsoft 365 o Google Workspace, con las computadoras al día y sin servidores propios, no tiene ninguno de estos seis productos. Ese es el caso más común y el aviso no le aplica.
 
@@ -161,7 +161,7 @@ Tampoco aplica si tu NetScaler solo hace balanceo de carga sin Gateway ni servid
 
 Y las cuatro fallas viejas no se disparan desde internet. Si un servidor Linux no tiene usuarios locales además de quien lo administra, el escenario de escalada de privilegios pierde casi todo su sentido.
 
-## ¿Cómo sé si corro alguno de estos seis productos?
+## ¿Cómo sé si tengo Citrix NetScaler, SQL Server o Red Hat sin parchear?
 
 **Citrix NetScaler.** La versión está en la consola de administración, en *System* → *Licenses* o en el encabezado. Compará contra la tabla de arriba, y revisá en la configuración si hay un servidor virtual de tipo Gateway o AAA.
 
@@ -195,7 +195,7 @@ La tanda anterior del catálogo, del 18 al 21 de agosto, está en [las cuatro fa
 
 ---
 
-## Preguntas frecuentes
+## Preguntas frecuentes sobre las seis fallas del catálogo de CISA
 
 ### Si la falla es de 2015, ¿no debería estar parcheada hace años?
 
