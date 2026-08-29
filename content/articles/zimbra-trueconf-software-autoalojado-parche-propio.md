@@ -7,7 +7,7 @@ status: published
 category: email-y-antiphishing
 author: ian-poletti-lucero
 published: 2026-08-22
-updated: 2026-08-22
+updated: 2026-08-27
 products:
   - microsoft-defender-for-office-365
   - mimecast-email-security

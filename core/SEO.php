@@ -170,6 +170,27 @@ final class SEO
         return $this;
     }
 
+    /**
+     * Absolutiza una URL solo si viene relativa.
+     *
+     * Google exige que las imagenes referenciadas desde datos estructurados
+     * sean rastreables, y un "/uploads/x.png" suelto adentro de un JSON-LD no
+     * se resuelve de forma confiable: quien lo consume fuera del documento
+     * —agregadores, crawlers de modelos— no tiene contra que resolverlo.
+     * site_url() no sirve sola porque antepone el dominio siempre, y un valor
+     * ya absoluto quedaria duplicado.
+     */
+    private function absUrl(?string $url): ?string
+    {
+        if ($url === null || $url === '') {
+            return null;
+        }
+        if (preg_match('#^(https?:)?//#i', $url)) {
+            return $url;
+        }
+        return site_url($url);
+    }
+
     public function schemaOrganization(): self
     {
         $this->jsonLd[] = [
@@ -177,7 +198,7 @@ final class SEO
             '@type'    => 'Organization',
             'name'     => $this->site->name,
             'url'      => site_url('/'),
-            'logo'     => $this->site->logoUrl,
+            'logo'     => $this->absUrl($this->site->logoUrl),
         ];
         return $this;
     }
@@ -356,7 +377,7 @@ final class SEO
             'brand' => !empty($product['brand'])
                 ? ['@type' => 'Brand', 'name' => $product['brand']]
                 : null,
-            'image' => $product['logo_url'] ?? null,
+            'image' => $this->absUrl($product['logo_url'] ?? null),
             'url'   => site_url(product_url($product)),
         ];
 
@@ -387,9 +408,10 @@ final class SEO
             'publisher'     => [
                 '@type' => 'Organization',
                 'name'  => $this->site->name,
+                'url'   => site_url('/'),
                 'logo'  => $this->site->logoUrl ? [
                     '@type' => 'ImageObject',
-                    'url'   => $this->site->logoUrl,
+                    'url'   => $this->absUrl($this->site->logoUrl),
                 ] : null,
             ],
             'url' => site_url(article_url($a)),
@@ -412,7 +434,7 @@ final class SEO
             '@type'         => ($a['article_type'] ?? '') === 'news' ? 'NewsArticle' : 'Article',
             'headline'      => $a['title'],
             'description'   => $a['excerpt'] ?? null,
-            'image'         => $a['featured_image'] ?? null,
+            'image'         => $this->absUrl($a['featured_image'] ?? null),
             'datePublished' => $a['published_at'] ? date('c', strtotime($a['published_at'])) : null,
             'dateModified'  => $a['updated_at']   ? date('c', strtotime($a['updated_at']))   : null,
             'author'        => !empty($a['author_name']) ? [
@@ -423,9 +445,10 @@ final class SEO
             'publisher'     => [
                 '@type' => 'Organization',
                 'name'  => $this->site->name,
+                'url'   => site_url('/'),
                 'logo'  => $this->site->logoUrl ? [
                     '@type' => 'ImageObject',
-                    'url'   => $this->site->logoUrl,
+                    'url'   => $this->absUrl($this->site->logoUrl),
                 ] : null,
             ],
             'mainEntityOfPage' => site_url(article_url($a)),
@@ -479,9 +502,14 @@ final class SEO
         if ($desc) {
             $out[] = '<meta name="description" content="' . e($desc) . '">';
         }
-        if ($this->robots) {
-            $out[] = '<meta name="robots" content="' . e($this->robots) . '">';
-        }
+        // Sin robots explicito va el permisivo. Por defecto Google recorta la
+        // vista previa de imagen a miniatura y el fragmento a ~160 caracteres,
+        // que es justo el formato que deja una nota afuera de Discover y de
+        // Noticias destacadas. Una pagina que necesite noindex lo pisa con
+        // robots().
+        $out[] = '<meta name="robots" content="'
+            . e($this->robots ?: 'max-image-preview:large, max-snippet:-1, max-video-preview:-1')
+            . '">';
         $out[] = '<link rel="canonical" href="' . e($canonical) . '">';
 
         // Open Graph
@@ -500,8 +528,11 @@ final class SEO
             $out[] = '<meta property="og:image" content="' . e($this->ogImage) . '">';
         }
 
-        // Twitter
-        $out[] = '<meta name="twitter:card" content="summary_large_image">';
+        // Twitter. La tarjeta grande solo se anuncia si hay imagen: prometer
+        // summary_large_image sin og:image hace que X, LinkedIn y WhatsApp
+        // degraden la vista previa a texto pelado.
+        $out[] = '<meta name="twitter:card" content="'
+            . ($this->ogImage ? 'summary_large_image' : 'summary') . '">';
         $out[] = '<meta name="twitter:title" content="' . e($title) . '">';
         if ($desc) {
             $out[] = '<meta name="twitter:description" content="' . e($desc) . '">';

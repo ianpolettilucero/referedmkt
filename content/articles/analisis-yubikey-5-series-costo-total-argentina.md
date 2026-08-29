@@ -7,7 +7,7 @@ status: published
 category: mfa-y-autenticacion
 author: ian-poletti-lucero
 published: 2026-07-26
-updated: 2026-07-26
+updated: 2026-08-20
 products: [yubikey-5-series, microsoft-entra-id, cisco-duo]
 rating: 4.2
 verdict: |

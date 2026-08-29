@@ -7,7 +7,7 @@ status: published
 category: email-y-antiphishing
 author: ian-poletti-lucero
 published: 2026-07-26
-updated: 2026-07-26
+updated: 2026-08-22
 products:
   - microsoft-defender-for-office-365
   - proofpoint-email-protection

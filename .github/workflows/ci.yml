@@ -14,7 +14,12 @@ jobs:
       matrix:
         php: ['8.1', '8.2', '8.3']
     steps:
+      # fetch-depth 0: el chequeo de frescura del lastmod compara el diff del
+      # push contra la fecha `updated:` de cada articulo, y para eso necesita
+      # historia, no un checkout superficial.
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup PHP ${{ matrix.php }}
         uses: shivammathur/setup-php@v2
@@ -41,6 +46,21 @@ jobs:
       # sitio no levantaria en produccion.
       - name: Validar content/
         run: php bin/build-content.php --check
+
+      # El <lastmod> del sitemap sale del campo `updated:` del front-matter. Si
+      # se edita el cuerpo de un articulo y la fecha no se mueve, Google no se
+      # entera del cambio, y una senal que miente en parte del sitio se
+      # descarta para todo el sitio. Un commit reescribio 29 encabezados en 9
+      # notas sin mover una sola fecha: esto lo hubiera atajado.
+      - name: Frescura del lastmod
+        if: github.event_name == 'push'
+        run: |
+          BASE="${{ github.event.before }}"
+          if [ -z "$BASE" ] || [ "$BASE" = "0000000000000000000000000000000000000000" ]; then
+            BASE="HEAD~1"
+          fi
+          git fetch --depth=50 origin "${{ github.sha }}" 2>/dev/null || true
+          php bin/check-updated.php "$BASE" "${{ github.sha }}"
 
   smoke:
     name: Smoke test de rutas

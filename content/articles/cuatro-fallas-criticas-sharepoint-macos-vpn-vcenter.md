@@ -7,7 +7,7 @@ status: published
 category: fundamentos-y-educacion
 author: ian-poletti-lucero
 published: 2026-08-19
-updated: 2026-08-20
+updated: 2026-08-27
 products:
   - microsoft-defender-for-office-365
   - microsoft-defender-for-endpoint-p2

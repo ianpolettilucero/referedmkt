@@ -229,5 +229,37 @@ TestRunner::group('SEO', function () {
         $seo->noindex();
         $head = $seo->renderHead();
         assert_contains('content="noindex, nofollow"', $head);
+        // El default permisivo no puede pisar un noindex explicito.
+        assert_not_contains('max-image-preview', $head);
+    });
+
+    // Sin robots explicito va el permisivo: por defecto Google recorta la vista
+    // previa de imagen a miniatura y el fragmento a ~160 caracteres, que es el
+    // formato que deja una nota afuera de Discover y de Noticias destacadas.
+    TestRunner::run('sin robots explicito se emite el permisivo', function () {
+        $head = (new SEO(make_fake_site()))->renderHead();
+        assert_contains('max-image-preview:large', $head);
+        assert_contains('max-snippet:-1', $head);
+        assert_not_contains('noindex', $head);
+    });
+
+    // Anunciar summary_large_image sin og:image hace que X, LinkedIn y WhatsApp
+    // degraden la vista previa a texto pelado.
+    TestRunner::run('la tarjeta grande solo se anuncia si hay imagen', function () {
+        $sin = (new SEO(make_fake_site()))->renderHead();
+        assert_contains('name="twitter:card" content="summary"', $sin);
+        assert_not_contains('summary_large_image', $sin);
+
+        $con = (new SEO(make_fake_site()))->ogImage('/uploads/x.png')->renderHead();
+        assert_contains('summary_large_image', $con);
+    });
+
+    // Google exige que las imagenes referenciadas desde datos estructurados
+    // sean rastreables: una ruta relativa suelta dentro de un JSON-LD no se
+    // resuelve de forma confiable fuera del documento.
+    TestRunner::run('el logo del JSON-LD sale absoluto', function () {
+        $head = (new SEO(make_fake_site()))->schemaOrganization()->renderHead();
+        assert_not_contains('"logo":"/uploads', $head);
+        assert_contains('"logo":"http', $head);
     });
 });

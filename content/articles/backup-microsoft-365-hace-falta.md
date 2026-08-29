@@ -7,7 +7,7 @@ status: published
 category: backup-y-recuperacion
 author: ian-poletti-lucero
 published: 2026-07-26
-updated: 2026-07-26
+updated: 2026-08-20
 products: [veeam-data-platform, acronis-cyber-protect, rubrik-security-cloud]
 ---
 

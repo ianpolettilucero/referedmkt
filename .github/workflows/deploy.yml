@@ -40,7 +40,12 @@ jobs:
       github.event_name == 'workflow_dispatch' ||
       github.event.workflow_run.conclusion == 'success'
     steps:
+      # fetch-depth 2 para tener HEAD~1: el aviso a IndexNow necesita el diff
+      # del ultimo commit para saber que URLs cambiaron. El deploy en si no usa
+      # estos archivos (el servidor hace su propio git fetch), solo se leen.
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
 
       - name: Elegir mecanismo
         id: pick
@@ -144,3 +149,21 @@ jobs:
           echo "::error::Produccion no llego al commit $SHORT despues de 3 minutos."
           echo "Ultimo /healthz: $body"
           exit 1
+
+      # Aviso a los buscadores que hablan IndexNow (Bing, Yandex, Seznam,
+      # Naver). Va DESPUES de confirmar el commit en produccion a proposito:
+      # avisar de una URL que todavia no sirve el contenido nuevo es peor que
+      # no avisar, porque el buscador la rastrea, no encuentra nada y no
+      # vuelve enseguida.
+      #
+      # Google no entra aca: dio de baja el ping de sitemaps en junio de 2023 y
+      # no tiene reemplazo abierto. Para Google la senal sigue siendo el
+      # sitemap con su lastmod, que es justamente lo que verifica en CI
+      # bin/check-updated.php.
+      #
+      # continue-on-error: el sitio ya esta publicado y andando. Que un aviso
+      # opcional falle no puede pintar de rojo un deploy que salio bien.
+      - name: Avisar a IndexNow
+        if: steps.pick.outputs.mode != 'none'
+        continue-on-error: true
+        run: php bin/indexnow.php HEAD~1 HEAD

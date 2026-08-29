@@ -7,7 +7,7 @@ status: published
 category: gestion-contrasenas
 author: ian-poletti-lucero
 published: 2026-08-18
-updated: 2026-08-18
+updated: 2026-08-20
 products:
   - 1password-business
   - bitwarden-business

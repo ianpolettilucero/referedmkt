@@ -7,7 +7,7 @@ status: published
 category: antivirus-y-edr
 author: ian-poletti-lucero
 published: 2026-08-24
-updated: 2026-08-24
+updated: 2026-08-27
 products:
   - microsoft-defender-for-endpoint-p2
   - bitdefender-gravityzone-business-security-premium

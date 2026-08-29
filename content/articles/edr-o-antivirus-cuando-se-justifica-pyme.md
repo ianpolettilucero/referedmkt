@@ -7,7 +7,7 @@ status: published
 category: antivirus-y-edr
 author: ian-poletti-lucero
 published: 2026-07-26
-updated: 2026-07-26
+updated: 2026-08-20
 products:
   - microsoft-defender-for-endpoint-p2
   - eset-protect-enterprise

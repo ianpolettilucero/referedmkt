@@ -7,7 +7,7 @@ status: published
 category: hostings-y-cloud
 author: ian-poletti-lucero
 published: 2026-07-26
-updated: 2026-07-26
+updated: 2026-08-20
 products:
   - hostinger-business
   - acronis-cyber-protect

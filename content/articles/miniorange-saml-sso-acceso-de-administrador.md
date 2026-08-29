@@ -7,7 +7,7 @@ status: published
 category: mfa-y-autenticacion
 author: ian-poletti-lucero
 published: 2026-08-26
-updated: 2026-08-26
+updated: 2026-08-27
 products:
   - microsoft-entra-id
   - okta-workforce-identity

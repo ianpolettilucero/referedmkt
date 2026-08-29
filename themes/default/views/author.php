@@ -25,8 +25,23 @@ $social = is_array($author['social_links'] ?? null) ? $author['social_links'] : 
             <?php endif; ?>
             <?php if ($social): ?>
                 <p>
-                    <?php foreach ($social as $net => $url): ?>
-                        <a href="<?= e($url) ?>" rel="nofollow noopener" target="_blank"><?= e(ucfirst($net)) ?></a>&nbsp;
+                    <?php
+                    // social_links es una lista, no un mapa: iterar por clave
+                    // sacaba el indice numerico como texto del enlace ("0", "1").
+                    // La etiqueta se deriva del host. rel="me" en vez de
+                    // "nofollow": el enlace a la identidad externa del autor es
+                    // justo la senal que queremos que los buscadores sigan.
+                    $redes = [
+                        'linkedin.com' => 'LinkedIn', 'github.com' => 'GitHub',
+                        'x.com' => 'X', 'twitter.com' => 'X',
+                        'mastodon.social' => 'Mastodon', 'youtube.com' => 'YouTube',
+                    ];
+                    foreach ((array)$social as $url):
+                        if (!is_string($url) || $url === '') { continue; }
+                        $host = preg_replace('/^www\./', '', (string)parse_url($url, PHP_URL_HOST));
+                        $label = $redes[$host] ?? ($host !== '' ? $host : $url);
+                    ?>
+                        <a href="<?= e($url) ?>" rel="me noopener" target="_blank"><?= e($label) ?></a>&nbsp;
                     <?php endforeach; ?>
                 </p>
             <?php endif; ?>

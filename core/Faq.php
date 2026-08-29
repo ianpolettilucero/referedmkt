@@ -65,18 +65,17 @@ final class Faq
         };
 
         foreach ($lines as $line) {
-            // Los fences alternan estado; adentro no interpretamos headings.
+            // Los fences alternan estado; adentro no interpretamos headings, y
+            // el contenido no entra a la respuesta. Un bloque cercado es un
+            // diagrama SVG o un comando: como texto de una Answer no aporta, y
+            // ademas se come el limite de MAX_ANSWER_CHARS. Una nota con un
+            // diagrama dentro de la seccion de preguntas llegaba a emitir el
+            // <svg> entero, cortado a la mitad de un atributo.
             if (preg_match('/^```/', $line)) {
                 $inFence = !$inFence;
-                if ($inFaq && $question !== null) {
-                    $buffer[] = $line;
-                }
                 continue;
             }
             if ($inFence) {
-                if ($inFaq && $question !== null) {
-                    $buffer[] = $line;
-                }
                 continue;
             }
 
@@ -114,6 +113,7 @@ final class Faq
      */
     private static function stripInline(string $s): string
     {
+        $s = strip_tags($s);                                      // HTML inline suelto
         $s = preg_replace('/!\[([^\]]*)\]\([^)]*\)/u', '$1', $s); // imagenes -> alt
         $s = preg_replace('/\[([^\]]*)\]\([^)]*\)/u', '$1', $s);  // links -> texto
         $s = preg_replace('/[*_`~]+/u', '', $s);                  // enfasis / code

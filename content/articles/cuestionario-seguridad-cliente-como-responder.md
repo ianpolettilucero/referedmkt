@@ -7,7 +7,7 @@ status: published
 category: fundamentos-y-educacion
 author: ian-poletti-lucero
 published: 2026-07-27
-updated: 2026-07-27
+updated: 2026-08-20
 products:
   - microsoft-entra-id
   - 1password-business

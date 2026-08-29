@@ -7,7 +7,7 @@ status: published
 category: mfa-y-autenticacion
 author: ian-poletti-lucero
 published: 2026-08-18
-updated: 2026-08-18
+updated: 2026-08-20
 products:
   - yubikey-5-series
   - microsoft-entra-id

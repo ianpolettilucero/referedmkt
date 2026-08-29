@@ -7,7 +7,7 @@ status: published
 category: fundamentos-y-educacion
 author: ian-poletti-lucero
 published: 2026-08-17
-updated: 2026-08-17
+updated: 2026-08-27
 products:
   - microsoft-defender-for-endpoint-p2
   - cloudflare-access

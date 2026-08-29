@@ -81,4 +81,39 @@ TestRunner::group('Faq', function () {
         assert_true(mb_strlen($faqs[0]['answer']) <= 1000, 'respuesta no truncada');
         assert_contains('…', $faqs[0]['answer']);
     });
+
+    // Una nota metio un diagrama dentro de la seccion de preguntas y el <svg>
+    // entero se fue al campo `text` de la Answer, cortado a la mitad de un
+    // atributo XML por el tope de 1000 caracteres. El docblock ya decia que el
+    // contenido de los fences se ignora; el codigo hacia lo contrario.
+    TestRunner::run('el contenido de un bloque cercado no entra a la respuesta', function () {
+        $md = "## Preguntas frecuentes\n"
+            . "### ¿Es la primera vez?\n"
+            . "No, y por eso conviene mirarlo.\n\n"
+            . "```svg\n"
+            . '<svg viewBox="0 0 660 190" role="img" aria-label="Tres entradas previas">' . "\n"
+            . '  <text x="20" y="24" font-size="12.5">PaperCut</text>' . "\n"
+            . "</svg>\n"
+            . "```\n\n"
+            . "Un servidor publicado es un objetivo conocido.\n";
+        $faqs = Faq::extract($md);
+        assert_eq(1, count($faqs));
+        $r = $faqs[0]['answer'];
+        assert_not_contains('<svg', $r);
+        assert_not_contains('viewBox', $r);
+        assert_not_contains('font-size', $r);
+        // La prosa de los dos lados del diagrama si tiene que sobrevivir.
+        assert_contains('conviene mirarlo', $r);
+        assert_contains('objetivo conocido', $r);
+    });
+
+    // Red de contencion para HTML inline suelto, fuera de un fence.
+    TestRunner::run('el HTML inline no llega al texto de la respuesta', function () {
+        $faqs = Faq::extract(
+            "## Preguntas frecuentes\n### ¿Y esto?\nTexto con <span class=\"x\">marcado</span> adentro.\n"
+        );
+        assert_eq(1, count($faqs));
+        assert_not_contains('<span', $faqs[0]['answer']);
+        assert_contains('marcado', $faqs[0]['answer']);
+    });
 });
