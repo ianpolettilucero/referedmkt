@@ -28,6 +28,36 @@ require dirname(__DIR__) . '/core/bootstrap.php';
 
 use Core\Content;
 
+/**
+ * Encabezados que no describen ninguna pagina en particular.
+ *
+ * La prueba de docs/estilo.md es "¿serviria igual en otra nota del sitio?".
+ * Estos la fallan siempre, escritos asi de pelados. Se arreglan agregandoles
+ * el sujeto: "Conclusion" -> "Veredicto: 1Password para equipos de 20 a 100";
+ * "Preguntas frecuentes" -> "Preguntas frecuentes sobre 1Password Business",
+ * que ademas es lo que core/Faq.php necesita para anclar el FAQPage.
+ */
+const GENERICOS = [
+    'introduccion', 'conclusion', 'conclusiones', 'consideraciones finales',
+    'resumen', 'resumen final', 'tabla resumen', 'en resumen',
+    'preguntas frecuentes', 'preguntas comunes', 'faq', 'faqs',
+    'recomendacion final', 'veredicto', 'veredicto final', 'nuestra recomendacion',
+    'ventajas', 'desventajas', 'ventajas y desventajas', 'pros y contras',
+    'alternativas', 'otras alternativas', 'metodologia',
+    'que hacer', 'que sigue', 'proximos pasos', 'siguientes pasos',
+    'a quien le sirve', 'para quien es', 'a quien no le sirve',
+    'como funciona', 'por que importa', 'que es',
+];
+
+/** Minusculas sin acentos ni puntuacion, para comparar contra GENERICOS. */
+$normalizar = function (string $s): string {
+    $s = html_entity_decode($s, ENT_QUOTES, 'UTF-8');
+    $s = mb_strtolower(trim($s), 'UTF-8');
+    $s = strtr($s, ['á' => 'a', 'é' => 'e', 'í' => 'i', 'ó' => 'o', 'ú' => 'u', 'ü' => 'u', 'ñ' => 'n']);
+    $s = preg_replace('/[^a-z0-9 ]+/', '', $s);
+    return trim(preg_replace('/\s+/', ' ', $s));
+};
+
 $argv = $_SERVER['argv'] ?? [];
 $jsonOut = in_array('--json', $argv, true);
 $base = null;
@@ -228,7 +258,7 @@ foreach ($pages as $url => $html) {
         $prev = $h['level'];
     }
 
-    // --- Encabezados de noticias: tienen que sostenerse leidos solos ---
+    // --- Encabezados: tienen que sostenerse leidos solos ---
     //
     // Un H2 aparece aislado en el fragmento destacado de Google, en "Otras
     // preguntas" y en la respuesta de un modelo. Ahi no hay articulo alrededor,
@@ -236,9 +266,10 @@ foreach ($pages as $url => $html) {
     // no dice nada. La regla completa esta en docs/estilo.md, seccion "Titulos
     // y encabezados".
     //
-    // Solo se aplica a /noticia/: las guias tienen otra estructura, con
-    // secciones que sí se leen en orden.
-    if (preg_match('~^/noticia/~', $url)) {
+    // Aplica a las cuatro secciones editoriales. El argumento es el mismo en
+    // todas: el encabezado de una guia aparece igual de solo en un fragmento
+    // destacado que el de una noticia.
+    if (preg_match('~^/(guia|resena|comparativa|noticia)/~', $url)) {
         $cuerpo = $articleBody($html);
         preg_match_all('#<h2[^>]*>(.*?)</h2>#si', $cuerpo, $h2s);
         foreach ($h2s[1] as $crudo) {
@@ -251,18 +282,32 @@ foreach ($pages as $url => $html) {
                 $add('warn', 'seo', $url, "Encabezado anaforico (\"{$mm[1]}\" no tiene antecedente leido solo): \"$txt\"");
             }
 
+            // Generico: el encabezado serviria palabra por palabra en
+            // cualquier otra pagina del sitio, asi que no describe esta. Es la
+            // tercera prueba de docs/estilo.md. Se compara contra una lista
+            // cerrada en vez de inferirlo, porque inferir "no nombra ninguna
+            // entidad" marca como sospechosos encabezados correctos de una
+            // guia, donde el sujeto ya lo fija el titulo.
+            if (in_array($normalizar($txt), GENERICOS, true)) {
+                $add('warn', 'seo', $url, "Encabezado generico, sirve igual en cualquier pagina: \"$txt\"");
+            }
+
             // Sin entidad: ni CVE, ni cifra, ni nombre propio despues de la
-            // primera palabra. Suele ser el sintoma de un encabezado generico.
-            $sinCve   = !preg_match('/CVE-\d{4}-\d{4,}/', $txt);
-            $sinCifra = !preg_match('/\d/', $txt);
-            // Cualquier mayuscula pasada la primera palabra: en castellano
-            // solo aparece en nombres propios. Se busca la mayuscula suelta y
-            // no el inicio de palabra, porque marcas como "miniOrange" o
-            // "WordPress" la llevan adentro.
-            $resto     = preg_replace('/^[¿¡]?\S+\s*/u', '', $txt);
-            $sinNombre = !preg_match('/\p{Lu}/u', $resto);
-            if ($sinCve && $sinCifra && $sinNombre) {
-                $add('info', 'seo', $url, "Encabezado sin entidad concreta (producto, CVE o cifra): \"$txt\"");
+            // primera palabra. Solo se mide en noticias, que es donde nombrar
+            // el producto o el CVE es la funcion del encabezado; en una guia
+            // el sujeto viene del titulo y esta prueba da falsos positivos.
+            if (preg_match('~^/noticia/~', $url)) {
+                $sinCve   = !preg_match('/CVE-\d{4}-\d{4,}/', $txt);
+                $sinCifra = !preg_match('/\d/', $txt);
+                // Cualquier mayuscula pasada la primera palabra: en castellano
+                // solo aparece en nombres propios. Se busca la mayuscula suelta
+                // y no el inicio de palabra, porque marcas como "miniOrange" o
+                // "WordPress" la llevan adentro.
+                $resto     = preg_replace('/^[¿¡]?\S+\s*/u', '', $txt);
+                $sinNombre = !preg_match('/\p{Lu}/u', $resto);
+                if ($sinCve && $sinCifra && $sinNombre) {
+                    $add('info', 'seo', $url, "Encabezado sin entidad concreta (producto, CVE o cifra): \"$txt\"");
+                }
             }
 
             $newsH2[$txt][] = $url;
@@ -348,16 +393,16 @@ foreach ($pages as $url => $html) {
     }
 }
 
-// --- Encabezados de noticias repetidos entre notas ---
+// --- Encabezados repetidos entre paginas ---
 //
-// Si el mismo H2 sirve palabra por palabra en dos notas distintas, no esta
+// Si el mismo H2 sirve palabra por palabra en dos paginas distintas, no esta
 // describiendo ninguna de las dos. Ademas compiten entre si por la misma
 // consulta.
 foreach ($newsH2 as $t => $us) {
     $us = array_values(array_unique($us));
     if (count($us) > 1) {
         $add('warn', 'seo', implode(', ', array_slice($us, 0, 3)),
-            'Encabezado repetido en ' . count($us) . ' notas: "' . $t . '"');
+            'Encabezado repetido en ' . count($us) . ' paginas: "' . $t . '"');
     }
 }
 

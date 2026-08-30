@@ -142,14 +142,22 @@ alguien que llega desde un buscador. Cada uno tiene que pasar las tres:
 3. **¿Serviría igual en otra nota del sitio?** Si la respuesta es sí, está
    mal. Dos notas no pueden compartir un encabezado palabra por palabra.
 
-Esto no es cosmética: `bin/audit.php` marca los encabezados de `/noticia/`
-que traen anáfora, que se repiten entre notas o que no nombran ninguna
-entidad. Las advertencias se leen.
+Esto no es cosmética: `bin/audit.php` marca, en **guías, reseñas,
+comparativas y noticias**, los encabezados con anáfora, los que se repiten
+palabra por palabra entre páginas y los genéricos que servirían igual en
+cualquier otra —"Conclusión", "Próximos pasos", "Preguntas frecuentes"
+pelado—. En noticias mide además que el encabezado nombre el producto, el CVE
+o la cifra. Las advertencias se leen.
+
+`php bin/staleness.php` los reporta también por página, junto con el resto de
+lo que le falta a cada una.
 
 **Excepción de una sola línea.** El encabezado de preguntas frecuentes tiene
 que empezar con las palabras "Preguntas frecuentes", porque `core/Faq.php`
 ancla ahí el `FAQPage`. Se lo hace específico agregando texto después:
 *Preguntas frecuentes sobre Elementor Pro*, no *Dudas sobre Elementor Pro*.
+"Preguntas frecuentes" a secas cumple el ancla pero falla la tercera prueba,
+y el auditor lo marca: el texto que va después es obligatorio.
 
 ## Palabras que no se usan
 

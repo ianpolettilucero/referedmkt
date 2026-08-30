@@ -262,4 +262,34 @@ TestRunner::group('SEO', function () {
         assert_not_contains('"logo":"/uploads', $head);
         assert_contains('"logo":"http', $head);
     });
+
+    // Un hub de categoria sin ItemList no declara que es un listado ni de que
+    // productos: queda como una pagina suelta con una grilla adentro.
+    TestRunner::run('el hub de categoria declara CollectionPage con su ItemList', function () {
+        $cat  = ['slug' => 'mfa', 'name' => 'MFA', 'meta_description' => 'Autenticacion multifactor.'];
+        $prods = [
+            ['slug' => 'duo',  'name' => 'Cisco Duo'],
+            ['slug' => 'yubi', 'name' => 'YubiKey 5'],
+        ];
+        $head = (new SEO(make_fake_site()))->schemaCollection($cat, $prods)->renderHead();
+
+        assert_contains('"@type":"CollectionPage"', $head);
+        assert_contains('"@type":"ItemList"', $head);
+        assert_contains('"numberOfItems":2', $head);
+        assert_contains('"position":1', $head);
+        assert_contains('Cisco Duo', $head);
+        // Las URLs de los items tienen que ser absolutas para resolverse fuera
+        // del documento.
+        assert_not_contains('"url":"/producto/', $head);
+    });
+
+    // Una categoria todavia sin productos cargados no puede anunciar una lista
+    // vacia: un ItemList con cero items es peor que no declararlo.
+    TestRunner::run('sin productos no se emite ItemList', function () {
+        $head = (new SEO(make_fake_site()))
+            ->schemaCollection(['slug' => 'x', 'name' => 'X', 'meta_description' => 'Y'], [])
+            ->renderHead();
+        assert_contains('"@type":"CollectionPage"', $head);
+        assert_not_contains('ItemList', $head);
+    });
 });

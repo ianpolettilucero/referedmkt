@@ -118,6 +118,10 @@ final class CategoryController extends Controller
 
         if ($hasExtraFilters) {
             $this->seo->noindex(true);
+        } else {
+            // Solo en la vista canonica: una variante filtrada ya va noindex y
+            // su ItemList seria un subconjunto que contradice al canonical.
+            $this->seo->schemaCollection($cat, $data['items']);
         }
 
         $this->render('category', [

@@ -227,6 +227,54 @@ final class SEO
     }
 
     /**
+     * CollectionPage + ItemList para los hubs de categoria (/productos/{slug}).
+     *
+     * Sin esto la pagina no declara que es un listado ni que los productos que
+     * muestra son sus items, y queda como una pagina suelta. El ItemList le da
+     * a un buscador —y a un modelo— la lista ordenada de que trata el hub.
+     *
+     * Solo se emite en la vista canonica: una variante con filtros ya va
+     * noindex, y declarar un ItemList parcial ahi contradiria al canonical.
+     *
+     * @param array<string, mixed>              $cat      row de categoria
+     * @param list<array<string, mixed>>         $products productos de la categoria
+     */
+    public function schemaCollection(array $cat, array $products): self
+    {
+        $items = [];
+        foreach (array_values($products) as $i => $p) {
+            if (empty($p['name'])) {
+                continue;
+            }
+            $items[] = [
+                '@type'    => 'ListItem',
+                'position' => $i + 1,
+                'name'     => $p['name'],
+                'url'      => site_url(product_url($p)),
+            ];
+        }
+
+        $data = [
+            '@context'    => 'https://schema.org',
+            '@type'       => 'CollectionPage',
+            'name'        => $cat['name'],
+            'description' => $cat['meta_description']
+                ?: $this->oneLine((string)($cat['description'] ?? '')),
+            'url'         => site_url(category_url($cat)),
+        ];
+        if ($items) {
+            $data['mainEntity'] = [
+                '@type'           => 'ItemList',
+                'numberOfItems'   => count($items),
+                'itemListElement' => $items,
+            ];
+        }
+
+        $this->jsonLd[] = array_filter($data, fn($v) => $v !== null && $v !== '');
+        return $this;
+    }
+
+    /**
      * Person schema para paginas de autor. Mejora E-E-A-T.
      * @param array<string, mixed> $author row con name, slug, bio, avatar_url, social_links, expertise
      */
