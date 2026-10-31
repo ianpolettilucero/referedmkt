@@ -23,6 +23,13 @@ final class ContentBuilder
     private const ARTICLE_STATES = ['draft', 'published', 'archived'];
     private const PRICING_MODELS = ['one_time', 'monthly', 'yearly', 'free', 'custom'];
 
+    /**
+     * Secciones dentro de Noticias. Una nota sin `section` es de la seccion
+     * general (vulnerabilidades y avisos); "mundo" agrupa lo que no es un CVE:
+     * brechas, robos, operaciones policiales, regulacion, industria.
+     */
+    private const NEWS_SECTIONS = ['mundo'];
+
     /** Un unico tenant. site_id se mantiene en el modelo por compatibilidad. */
     private const SITE_ID = 1;
 
@@ -303,6 +310,18 @@ final class ContentBuilder
                 );
             }
 
+            $section = isset($d['section']) && $d['section'] !== '' ? (string)$d['section'] : null;
+            if ($section !== null) {
+                if ($type !== 'news') {
+                    throw new \InvalidArgumentException("$where: 'section' solo aplica a type: news");
+                }
+                if (!in_array($section, self::NEWS_SECTIONS, true)) {
+                    throw new \InvalidArgumentException(
+                        "$where: section '$section' invalida (validas: " . implode(', ', self::NEWS_SECTIONS) . ')'
+                    );
+                }
+            }
+
             $cat    = self::resolveRef($d['category'] ?? null, $categories, $where, 'category');
             $author = self::resolveRef($d['author'] ?? null, $authors, $where, 'author');
 
@@ -334,6 +353,7 @@ final class ContentBuilder
                 'content_html'        => $contentHtml,
                 'featured_image'      => $d['featured_image'] ?? null,
                 'article_type'        => $type,
+                'news_section'        => $section,
                 'related_product_ids' => $relatedIds,
                 'rating'              => self::rating($d['rating'] ?? null, $where),
                 'verdict'             => $d['verdict'] ?? null,

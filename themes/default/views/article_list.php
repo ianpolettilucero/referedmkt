@@ -13,12 +13,14 @@
  */
 $view->layout('default');
 $pages = (int)ceil($total / max(1, $per_page));
-$basePath = match ($type) {
+$basePath = $base_path ?? match ($type) {
     'review'     => '/resenas',
     'comparison' => '/comparativas',
     'news'       => '/noticias',
     default      => '/guias',
 };
+$subnav = $subnav ?? [];
+$intro  = $intro ?? null;
 $buildUrl = function (array $override = []) use ($basePath, $filters) {
     $params = [];
     if (!empty($filters['sort']) && $filters['sort'] !== 'recent') { $params['sort'] = $filters['sort']; }
@@ -29,8 +31,19 @@ $buildUrl = function (array $override = []) use ($basePath, $filters) {
 <section class="article-list-page">
     <header>
         <h1><?= e($label) ?></h1>
-        <p class="muted"><?= e($total) ?> publicados</p>
+        <?php if ($intro): ?>
+            <p class="article-list-intro"><?= e($intro) ?></p>
+        <?php endif; ?>
+        <p class="muted"><?= e($total) ?> <?= (int)$total === 1 ? 'publicado' : 'publicados' ?></p>
     </header>
+
+    <?php if ($subnav): ?>
+        <nav class="section-tabs" aria-label="Secciones de Noticias">
+            <?php foreach ($subnav as $tab): ?>
+                <a href="<?= e($tab['path']) ?>"<?= $tab['active'] ? ' aria-current="page"' : '' ?>><?= e($tab['label']) ?></a>
+            <?php endforeach; ?>
+        </nav>
+    <?php endif; ?>
 
     <form method="get" action="<?= e($basePath) ?>" class="filters-bar" aria-label="Filtros">
         <?php if ($categories): ?>

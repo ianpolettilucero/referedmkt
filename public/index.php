@@ -64,6 +64,7 @@ $router->get('/resenas',          fn($p) => (new ArticleController())->indexByTy
 $router->get('/resena/{slug}',    fn($p) => (new ArticleController())->show(array_merge($p, ['__type' => 'review'])));
 
 $router->get('/noticias',         fn($p) => (new ArticleController())->indexByType(['__type' => 'news']));
+$router->get('/noticias/mundo',   fn($p) => (new ArticleController())->indexByType(['__type' => 'news', '__section' => 'mundo']));
 $router->get('/noticia/{slug}',   fn($p) => (new ArticleController())->show(array_merge($p, ['__type' => 'news'])));
 
 // Autores

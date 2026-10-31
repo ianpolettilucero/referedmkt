@@ -891,6 +891,63 @@ code, pre { font-family: var(--font-mono); font-size: 0.92em; }
     text-align: center;
 }
 
+/* ==== GRAFICOS: vocabulario de clases ====
+   Un diagrama que use estas clases toma los colores del tema en vez de
+   currentColor con opacidades, y se ve igual de bien en claro y en oscuro.
+   Cada elemento trae ademas su fill/stroke como atributo: es el respaldo para
+   donde no llega esta hoja (lectores de RSS, llms-full.txt). Una regla CSS
+   pisa al atributo de presentacion, asi que el respaldo no molesta aca.
+
+   Paleta validada con el script de la guia de visualizacion: el rojo resalta
+   el dato que importa y el gris es "el resto". Separacion para daltonismo
+   ΔE 10,2 en oscuro y 14,5 en claro; los dos colores superan 3:1 contra la
+   superficie. El gris falla a proposito el piso de croma: no es una
+   categoria, es lo que queda en segundo plano. */
+.article-diagram {
+    --ch-hi: #e23a3a;
+    --ch-base: #5f6b80;
+    --ch-grid: var(--border);
+    --ch-axis: var(--border-strong);
+}
+[data-theme="light"] .article-diagram {
+    --ch-hi: #c81e1e;
+    --ch-base: #6b778c;
+}
+.article-diagram svg text { font-family: var(--font); }
+/* El respaldo para RSS atenua con opacity/fill-opacity/stroke-opacity; con el
+   tema cargado el color ya viene del token, asi que se anula para no atenuar
+   dos veces. */
+.article-diagram [class^="ch-"],
+.article-diagram [class*=" ch-"] { opacity: 1; stroke-opacity: 1; }
+.article-diagram .ch-dot, .article-diagram .ch-dot-hi { fill-opacity: 1; }
+.article-diagram .ch-title { fill: var(--text); font-weight: 650; }
+.article-diagram .ch-sub,
+.article-diagram .ch-label { fill: var(--text-muted); }
+.article-diagram .ch-value { fill: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
+.article-diagram .ch-strong { fill: var(--text); font-weight: 600; }
+.article-diagram .ch-note { fill: var(--text-subtle); }
+.article-diagram .ch-tick { fill: var(--text-subtle); font-variant-numeric: tabular-nums; }
+/* Texto dentro de una barra: blanco en los dos temas, porque los dos rellenos
+   (el rojo y el gris) son de luminancia media-baja en claro y en oscuro. */
+.article-diagram .ch-inbar { fill: #ffffff; font-weight: 600; font-variant-numeric: tabular-nums; }
+.article-diagram .ch-grid { stroke: var(--ch-grid); stroke-width: 1; fill: none; }
+.article-diagram .ch-axis { stroke: var(--ch-axis); stroke-width: 1; fill: none; }
+.article-diagram .ch-arrow { stroke: var(--text-subtle); stroke-width: 1.5; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.article-diagram .ch-bar { fill: var(--ch-base); fill-opacity: 1; }
+.article-diagram .ch-bar-hi { fill: var(--ch-hi); fill-opacity: 1; }
+.article-diagram .ch-band { fill: var(--ch-hi); fill-opacity: 0.1; }
+.article-diagram .ch-line { stroke: var(--ch-base); stroke-width: 2; fill: none; stroke-linecap: round; }
+.article-diagram .ch-line-hi { stroke: var(--ch-hi); stroke-width: 2; fill: none; stroke-linecap: round; }
+.article-diagram .ch-dot { fill: var(--ch-base); stroke: var(--surface); stroke-width: 2; }
+.article-diagram .ch-dot-hi { fill: var(--ch-hi); stroke: var(--surface); stroke-width: 2; }
+.article-diagram .ch-dot-open { fill: var(--surface); stroke: var(--ch-base); stroke-width: 2; }
+.article-diagram .ch-box { fill: var(--surface-hover); stroke: var(--ch-grid); stroke-width: 1; }
+.article-diagram .ch-box-hi { fill: var(--primary-soft); stroke: var(--ch-hi); stroke-width: 1.5; }
+/* Hover: cada marca trae su <title>, que el navegador muestra como tooltip.
+   El cambio de opacidad confirma cual se esta leyendo. */
+.article-diagram .ch-mark { transition: fill-opacity var(--transition-fast); }
+.article-diagram .ch-mark:hover { fill-opacity: 0.78; }
+
 /* Las tablas scrollean dentro de su caja en cualquier ancho: una tabla mide
    por su contenido y sin esto empuja la pagina entera. */
 .article-body table {
@@ -1052,6 +1109,37 @@ code, pre { font-family: var(--font-mono); font-size: 0.92em; }
     color: var(--text-muted);
     max-width: 70ch;
     margin: 0 0 var(--s-3);
+}
+
+/* ==== SECCIONES DE NOTICIAS ==== */
+.article-list-intro {
+    color: var(--text-muted);
+    max-width: 70ch;
+    margin: 0 0 var(--s-1);
+}
+.section-tabs {
+    display: flex;
+    gap: var(--s-1);
+    flex-wrap: wrap;
+    margin: var(--s-3) 0 0;
+}
+.section-tabs a {
+    padding: 0.35rem 0.9rem;
+    border: 1px solid var(--border);
+    border-radius: 99px;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    transition: all var(--transition-fast);
+}
+.section-tabs a:hover {
+    color: var(--text);
+    border-color: var(--border-strong);
+    text-decoration: none;
+}
+.section-tabs a[aria-current="page"] {
+    color: var(--primary);
+    border-color: var(--primary);
+    background: var(--primary-soft);
 }
 
 /* ==== FILTERS BAR ==== */

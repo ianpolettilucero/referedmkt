@@ -162,9 +162,33 @@ if (!function_exists('active_sections')) {
         $conContenido = [];
         foreach (\Core\Content::publishedArticles() as $a) {
             $conContenido[$a['article_type']] = true;
+            if (!empty($a['news_section'])) {
+                $conContenido['news:' . $a['news_section']] = true;
+            }
+        }
+
+        // Las secciones de Noticias van justo despues de Noticias, con la
+        // misma regla: aparecen cuando tienen al menos una nota publicada.
+        foreach (news_sections() as $key => $sec) {
+            $defs['news:' . $key] = ['path' => $sec['path'], 'label' => $sec['label']];
         }
 
         $cache = array_intersect_key($defs, $conContenido);
         return $cache;
+    }
+}
+
+if (!function_exists('news_sections')) {
+    /**
+     * Secciones dentro de Noticias. La clave es el valor de `section:` en el
+     * front matter; las notas siguen viviendo en /noticia/{slug}.
+     *
+     * @return array<string, array{path:string, label:string, breadcrumb:string}>
+     */
+    function news_sections(): array
+    {
+        return [
+            'mundo' => ['path' => '/noticias/mundo', 'label' => 'Mundo', 'breadcrumb' => 'Mundo'],
+        ];
     }
 }

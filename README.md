@@ -94,6 +94,15 @@ Dos reglas para que se vea bien:
   escala solo al ancho disponible; dibujá en las coordenadas que te resulten
   cómodas.
 
+Para gráficos de datos hay además un vocabulario de clases `ch-*` (título,
+etiquetas, valores, barras, grilla, hitos, cajas) definido en
+`public/theme-assets/default/css/site.css`. Cada clase toma los colores del
+tema, con una paleta validada para daltonismo y contraste, y la marca que
+lleva un `<title>` muestra su dato al pasar el mouse. El atributo `fill` o
+`stroke` con `currentColor` se deja igual como respaldo para donde no llega la
+hoja de estilos, como los lectores de RSS. La tabla de clases, las reglas de
+diseño y las plantillas están en `docs/noticias.md`, sección Diagramas.
+
 Es la única vía por la que entra markup sin escapar, y pasa siempre por la
 lista blanca de `core/Svg.php`: se caen `script`, `foreignObject`, `image`,
 `use`, `style`, los atributos `on*`, `href` y `xlink:href`, los `url()` que no

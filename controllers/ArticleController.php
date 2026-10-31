@@ -51,8 +51,12 @@ final class ArticleController extends Controller
         $breadcrumb = [
             ['Inicio', '/'],
             [$this->breadcrumbLabelForType($a['article_type']), $this->sectionPathForType($a['article_type'])],
-            [$a['title'], article_url($a)],
         ];
+        $newsSection = news_sections()[$a['news_section'] ?? ''] ?? null;
+        if ($newsSection !== null) {
+            $breadcrumb[] = [$newsSection['breadcrumb'], $newsSection['path']];
+        }
+        $breadcrumb[] = [$a['title'], article_url($a)];
 
         $this->seo
             ->title($a['meta_title'] ?: $a['title'])
@@ -94,10 +98,23 @@ final class ArticleController extends Controller
         $type = $params['__type'] ?? 'guide';
         $page = max(1, (int)($_GET['page'] ?? 1));
 
+        // Seccion dentro de Noticias (/noticias/mundo). Solo existe para news;
+        // una clave desconocida es un 404, no un listado vacio.
+        $sectionKey = $params['__section'] ?? null;
+        $section = null;
+        if ($sectionKey !== null) {
+            $section = news_sections()[$sectionKey] ?? null;
+            if ($type !== 'news' || $section === null) {
+                $this->notFound('Seccion no encontrada');
+                return;
+            }
+        }
+
         // Filtros via query string
         $filters = [
-            'type'        => $type,
-            'category_id' => null,
+            'type'         => $type,
+            'news_section' => $sectionKey,
+            'category_id'  => null,
             'sort'        => array_key_exists($_GET['sort'] ?? '', Article::SORTS)
                              ? $_GET['sort'] : 'recent',
         ];
@@ -114,16 +131,22 @@ final class ArticleController extends Controller
 
         $categories = \Models\Category::all($this->site->id);
 
-        $label = $this->breadcrumbLabelForType($type);
+        $label    = $this->breadcrumbLabelForType($type);
+        $basePath = $this->sectionPathForType($type);
+        $crumbs   = [['Inicio', '/'], [$label, $basePath]];
+        if ($section !== null) {
+            $crumbs[] = [$section['breadcrumb'], $section['path']];
+            $basePath = $section['path'];
+        }
 
         // Titulo y descripcion propios por seccion: "Guías | Capa Cero" no dice
         // nada y desaprovecha el espacio del SERP.
-        $meta = $this->sectionMeta($type, $data['total']);
+        $meta = $this->sectionMeta($sectionKey !== null ? "news:$sectionKey" : $type, $data['total']);
         $this->seo
             ->title($meta['title'])
             ->description($meta['description'])
-            ->canonical($this->sectionPathForType($type))
-            ->breadcrumb([['Inicio', '/'], [$label, $this->sectionPathForType($type)]]);
+            ->canonical($basePath)
+            ->breadcrumb($crumbs);
 
         // Filtros activos -> noindex follow (canonical apunta a la base sin params).
         $hasFilters = !empty($filters['category_id'])
@@ -133,13 +156,32 @@ final class ArticleController extends Controller
             $this->seo->noindex(true);
         }
 
+        // Pestanas de Noticias: "Todas" y una por seccion con contenido. Solo
+        // se muestran si existe al menos una seccion, para no poner una
+        // pestana sola en el listado general.
+        $subnav = [];
+        if ($type === 'news') {
+            $activas = active_sections();
+            foreach (news_sections() as $key => $sec) {
+                if (isset($activas['news:' . $key])) {
+                    $subnav[] = ['label' => $sec['label'], 'path' => $sec['path'], 'active' => $sectionKey === $key];
+                }
+            }
+            if ($subnav) {
+                array_unshift($subnav, ['label' => 'Todas', 'path' => '/noticias', 'active' => $sectionKey === null]);
+            }
+        }
+
         $this->render('article_list', [
             'articles'   => $data['items'],
             'total'      => $data['total'],
             'page'       => $data['page'],
             'per_page'   => $data['per_page'],
             'type'       => $type,
-            'label'      => $label,
+            'label'      => $section !== null ? $meta['h1'] : $label,
+            'intro'      => $section !== null ? $meta['description'] : null,
+            'base_path'  => $basePath,
+            'subnav'     => $subnav,
             'filters'    => $filters,
             'sorts'      => Article::SORTS,
             'categories' => $categories,
@@ -150,12 +192,17 @@ final class ArticleController extends Controller
      * Metadatos del listado por tipo. El conteo real entra en la descripcion:
      * es una senal concreta y se actualiza sola al publicar.
      *
-     * @return array{title:string, description:string}
+     * @return array{title:string, description:string, h1?:string}
      */
     private function sectionMeta(string $type, int $total): array
     {
         $n = $total > 0 ? "$total " : '';
         return match ($type) {
+            'news:mundo' => [
+                'title'       => 'Noticias de ciberseguridad del mundo',
+                'h1'          => 'Noticias del mundo',
+                'description' => "Lo que pasa en ciberseguridad más allá de los CVE: robos, filtraciones, operaciones policiales, leyes y movimientos de la industria, con la fuente primaria y qué cambia para una empresa de la región.",
+            ],
             'review' => [
                 'title'       => 'Reseñas de herramientas de ciberseguridad',
                 'description' => "Análisis independientes de {$n}herramientas de seguridad, probadas en escenarios reales. Qué hace bien cada una, qué no, y para qué tamaño de empresa conviene.",

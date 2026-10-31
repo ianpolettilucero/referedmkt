@@ -27,7 +27,8 @@ sección, por resonante que sea el titular.
 
 La sección aparece sola. `active_sections()` la muestra en la navegación, el
 sitemap y `llms.txt` en cuanto existe una nota con `status: published`, y la
-esconde si no hay ninguna. No hay nada que activar.
+esconde si no hay ninguna. No hay nada que activar. Lo mismo vale para la
+sección Mundo, que se explica más abajo.
 
 ## La regla que define la sección
 
@@ -139,16 +140,89 @@ La sección publica varios formatos, no uno. Elegí el que le calce a la histori
 Todos comparten la misma columna vertebral: el hecho arriba con su fuente, a
 quién le toca y a quién no, y qué hacer en orden.
 
+## La sección Mundo
+
+Desde el 31 de octubre de 2026, Noticias tiene una sección propia para lo que
+no es una alerta de vulnerabilidad: **robos y brechas, operaciones policiales,
+regulación, movimientos de industria e informes**. Son los frentes 3 a 6 de la
+tabla de arriba cuando la historia no gira alrededor de un CVE.
+
+- **Cómo se marca:** `type: news` más `section: mundo` en el front matter. La
+  URL sigue siendo `/noticia/{slug}`.
+- **Qué aparece solo:** el listado `/noticias/mundo`, la entrada "Mundo" en el
+  menú, la pestaña en `/noticias`, la miga de pan Inicio › Noticias › Mundo y
+  `articleSection: "Mundo"` en el schema. Igual que la sección general, se
+  muestra en cuanto hay una nota publicada.
+- **Qué rechaza el build:** `section` en algo que no sea `type: news`, o un
+  valor distinto de `mundo`.
+
+**El estándar es el mismo**, con una lectura distinta del punto 2. Una nota de
+Mundo califica aunque el lector no use el producto afectado, siempre que una
+empresa de la región se lleve algo concreto: dónde estuvo la puerta de entrada,
+qué control revisar, qué riesgo corren sus clientes o sus empleados. El robo a
+Binance de octubre de 2026 es el ejemplo: la entrada fue la notebook de un
+ingeniero con acceso a producción, y esa lección le sirve a cualquier empresa
+con alguien en ese rol.
+
+**Fuentes de una nota de Mundo:** el comunicado de la parte afectada, los
+documentos de la policía, la fiscalía o el juzgado, el texto del regulador, y
+el informe de quien investigó, con nombre, fecha y **hora de corte**. En un
+incidente en curso las cifras cambian de un día para el otro: cada número va
+con quién lo midió y cuándo, y si dos fuentes difieren, se dan las dos.
+
+**Comunicados que no cargan.** X exige sesión para leer un post largo, pero
+muchas empresas replican sus comunicados en otro lado. En el caso Binance, su
+sistema de anuncios y su canal público de Telegram (`t.me/s/<canal>`, que se
+sirve como HTML) tenían los textos completos. El endpoint público de embebido
+de X (`cdn.syndication.twimg.com/tweet-result?id=<id>&token=4`) devuelve la
+fecha exacta y los primeros 280 caracteres de un post.
+
+**Sin alarmismo, también acá.** "El mayor robo de la historia" se escribe "el
+mayor robo registrado", con la fuente que lo midió.
+
 ## Diagramas
 
 **Mínimo dos por nota**, y tres cuando el tema los pide. Un dato que se puede
-dibujar entra mucho mejor dibujado, y son propios: se escriben a mano en un
-bloque cercado con lenguaje `svg`, sin librerías ni imágenes externas.
+dibujar entra mucho mejor dibujado, y son propios: se escriben en un bloque
+cercado con lenguaje `svg`, sin librerías ni imágenes externas. Las coordenadas
+pueden salir de un script propio en el scratchpad, que es más exacto que
+calcularlas a mano; lo que se publica es el SVG autocontenido.
 
-Reglas que no cambian:
+### El sistema de clases
 
-- **`currentColor` para trazos y texto**, así funciona en tema claro y oscuro.
-  Un color fijo oscuro desaparece en modo oscuro. Para acentos, `#e23a3a`.
+Desde octubre de 2026 los diagramas usan clases `ch-*` que define
+`public/theme-assets/default/css/site.css`. Cada clase toma los colores del
+tema, así que el mismo SVG se ve bien en claro y en oscuro sin `currentColor`
+con opacidades a ojo.
+
+| Clase | Para qué | Respaldo que lleva como atributo |
+|---|---|---|
+| `ch-title` | título del diagrama | `fill="currentColor"` |
+| `ch-sub` | subtítulo: unidad, total, aclaración | `fill="currentColor" opacity="0.8"` |
+| `ch-label` | etiqueta de categoría o texto común | `fill="currentColor" opacity="0.8"` |
+| `ch-strong` | etiqueta de lo que importa, frase de cierre | `fill="currentColor"` |
+| `ch-value` | valor al final de una barra | `fill="currentColor"` |
+| `ch-inbar` | texto **dentro** de una barra (blanco en los dos temas) | `fill="currentColor"` |
+| `ch-tick` | números del eje | `fill="currentColor" opacity="0.6"` |
+| `ch-note` | fuente y corte de los datos | `fill="currentColor" opacity="0.65"` |
+| `ch-bar` | barra común (gris) | `fill="currentColor" fill-opacity="0.45"` |
+| `ch-bar-hi` | la barra que importa (rojo) | `fill="#e23a3a"` |
+| `ch-grid` | grilla: línea fina y apagada | `stroke="currentColor" stroke-opacity="0.15"` |
+| `ch-axis` | eje o línea de tiempo | `stroke="currentColor" stroke-opacity="0.3"` |
+| `ch-arrow` | flecha entre cajas | `stroke="currentColor" stroke-opacity="0.5"` |
+| `ch-box` / `ch-box-hi` | caja de una cadena de pasos | `fill="none" stroke=…` |
+| `ch-dot` / `ch-dot-hi` / `ch-dot-open` | hito de una línea de tiempo; el vacío es una fecha anunciada | `fill=…` |
+| `ch-mark` | se suma a toda marca con dato: activa el efecto al pasar el mouse | — |
+
+**El atributo de respaldo no es opcional.** Es lo que se ve donde no llega la
+hoja de estilos: lectores de RSS y vistas previas. El CSS lo pisa en el sitio.
+
+La paleta está validada con el script de la guía de visualización: el rojo
+resalta el dato que importa y el gris es "el resto". Separación para daltonismo
+ΔE 10,2 en oscuro y 14,5 en claro; los dos superan 3:1 contra la superficie.
+
+### Reglas que no cambian
+
 - **Siempre `viewBox` y `aria-label`.** La etiqueta describe el diagrama **con
   sus datos**, no "gráfico de barras": es lo que oye un lector de pantalla y es
   también lo único que llega a `llms-full.txt`, donde el SVG se aplana a esa
@@ -156,71 +230,90 @@ Reglas que no cambian:
 - **El ancho útil es 660-680.** Nada de texto más allá de x=650 ni por debajo
   del alto del `viewBox`, o se recorta.
 - **`text-anchor="middle"` centra sobre el punto**, así que una etiqueta larga
-  cerca del borde izquierdo se sale. Cerca de los bordes, anclar al inicio.
+  cerca del borde se sale. Cerca de los bordes, anclar al inicio o al final.
 - El SVG pasa por la lista blanca de `core/Svg.php`. Si algo no se puede
   sanear, el bloque sale como código escapado en vez de romper la página.
 - **Un diagrama que no aclara nada, no va.** Es para mostrar el mecanismo o el
   dato, nunca para decorar.
+- **Dos diagramas no van pegados**: entre medio va texto.
+
+### Reglas de diseño
+
+- **Barras finas**: 18 px de alto, nunca más de 24. Base recta y **extremo
+  redondeado de 4 px**, que se dibuja con un `path` (un `rect` con `rx`
+  redondea las dos puntas).
+- **Un solo rojo por diagrama**, en la marca que cuenta la historia. El resto,
+  gris. Si todo está resaltado, nada lo está.
+- **El texto nunca va en el color del dato.** Las etiquetas usan `ch-label` o
+  `ch-strong`; la identidad la da la marca de al lado (la barra, el punto). La
+  excepción es el texto dentro de una barra, que va con `ch-inbar`.
+- **Etiquetas selectivas**: el valor al final de cada barra sí; un número en
+  cada punto de una línea, no.
+- **Grilla de línea fina, nunca punteada.** Un trazo punteado se lee como
+  "umbral" o "proyección".
+- **Una serie no lleva leyenda**: el título dice qué se dibuja. Dos o más
+  series llevan leyenda, además de las etiquetas directas.
+- **Un solo eje.** Dos magnitudes de escala distinta van en dos diagramas.
+- **Cada marca con dato lleva su `<title>`** adentro. El navegador lo muestra
+  al pasar el mouse, sin JavaScript. Ejemplo:
+  `<path d="…" class="ch-bar-hi ch-mark" fill="#e23a3a"><title>Ethereum: 3.790 millones (59,6%)</title></path>`
+- **Fuente y corte en la última línea** (`ch-note`): quién lo midió y a qué
+  hora o fecha, porque los números de un incidente en curso cambian.
 
 ### Qué dibujar según el dato
 
 | Si la nota tiene… | Va este diagrama |
 |---|---|
-| Porcentajes o magnitudes comparables | Barras horizontales |
-| Una cronología: cuándo entró, cuándo lo detectaron | Línea de tiempo |
+| Magnitudes comparables (montos, cantidades, porcentajes) | Barras horizontales, ordenadas de mayor a menor |
+| Una cronología: cuándo entró, cuándo lo detectaron | Línea de tiempo vertical, con fecha a la izquierda |
 | Pasos encadenados de un ataque o un flujo | Cadena de cajas con flechas |
 | Dos situaciones enfrentadas: con y sin, antes y después | Dos bloques apilados |
-| Varios CVE con severidad y plazo distintos | Barras de severidad con la fecha de vencimiento |
+| Plazos o ventanas de tiempo que se superponen | Barras de rango sobre un eje de horas o días |
+| Un solo número que es la noticia | No es un diagrama: va en el texto, en negrita |
 
 ### Plantillas
 
-Están probadas y no se desbordan. Se cambian los textos y los valores.
-
-**Barras horizontales.** Ancho de barra = porcentaje × 10.
+**Barra horizontal** (una fila). Etiqueta anclada al final en x=198, barras
+desde x=208, valor 6 px después de la punta.
 
 ````markdown
 ```svg
-<svg viewBox="0 0 660 180" role="img" aria-label="Qué muestra, con los números">
-  <text x="20" y="24" font-size="12.5" font-weight="700" fill="currentColor">Título</text>
-  <text x="192" y="61" text-anchor="end" font-size="10.5" fill="currentColor">Etiqueta larga</text>
-  <rect x="200" y="46" width="380" height="20" rx="3" fill="currentColor" opacity="0.3"/>
-  <text x="588" y="61" font-size="10.5" font-weight="700" fill="currentColor">38%</text>
-  <text x="192" y="93" text-anchor="end" font-size="10.5" font-weight="700" fill="#e23a3a">La que importa</text>
-  <rect x="200" y="78" width="210" height="20" rx="3" fill="#e23a3a" opacity="0.65"/>
-  <text x="418" y="93" font-size="10.5" font-weight="700" fill="#e23a3a">21%</text>
-  <text x="20" y="150" font-size="11.5" font-weight="600" fill="#e23a3a">La conclusión, en una línea</text>
+<svg viewBox="0 0 680 160" role="img" aria-label="Qué muestra, con todos los números">
+  <text x="20" y="24" class="ch-title" font-size="13" font-weight="650" fill="currentColor">Título que nombra la entidad</text>
+  <text x="20" y="43" class="ch-sub" font-size="11" fill="currentColor" opacity="0.8">Unidad y total</text>
+  <path d="M208 58 V96" class="ch-grid" stroke="currentColor" stroke-opacity="0.15" fill="none"/>
+  <text x="198" y="77" class="ch-strong" font-size="11" text-anchor="end" fill="currentColor">La que importa</text>
+  <path d="M208,64 H571.8 A4,4 0 0 1 575.8,68 V78 A4,4 0 0 1 571.8,82 H208 Z" class="ch-bar-hi ch-mark" fill="#e23a3a"><title>La que importa: 3.790</title></path>
+  <text x="581.8" y="77" class="ch-value" font-size="11" font-weight="600" fill="currentColor">3.790</text>
+  <text x="20" y="150" class="ch-note" font-size="9.5" fill="currentColor" opacity="0.65">Fuente: quién lo midió, corte del día y hora.</text>
 </svg>
 ```
 ````
 
-**Cadena de pasos.** Cinco cajas de 118 de ancho en x = 16, 146, 276, 406, 536.
+**Hito de línea de tiempo** (una fila). Fecha en x=20, eje en x=118, texto en
+x=134, 26 px entre filas.
 
 ````markdown
 ```svg
-<svg viewBox="0 0 680 190" role="img" aria-label="Qué muestra, paso por paso">
-  <text x="340" y="26" text-anchor="middle" font-size="12.5" font-weight="700" fill="currentColor">Título</text>
-  <rect x="16" y="48" width="118" height="76" rx="6" fill="currentColor" opacity="0.08"/>
-  <rect x="16" y="48" width="118" height="76" rx="6" fill="none" stroke="currentColor" stroke-width="1.3" opacity="0.55"/>
-  <text x="75" y="74" text-anchor="middle" font-size="11.5" font-weight="700" fill="currentColor">Paso 1</text>
-  <text x="75" y="95" text-anchor="middle" font-size="10.5" fill="currentColor" opacity="0.8">qué deja</text>
-  <path d="M136 86 L144 86" stroke="currentColor" stroke-width="1.4" opacity="0.6"/>
-  <text x="340" y="160" text-anchor="middle" font-size="11.5" font-weight="600" fill="currentColor">Lo que el lector se lleva</text>
-</svg>
+  <text x="20" y="70" class="ch-strong" font-size="10.5" font-weight="600" fill="currentColor">29 oct. 20:05</text>
+  <circle cx="118" cy="66" r="5" class="ch-dot-hi" fill="#e23a3a"/>
+  <text x="134" y="70" class="ch-strong" font-size="10.5" fill="currentColor">Lo que pasó, con la entidad</text>
 ```
 ````
 
-**Línea de tiempo.** Eje en y=120; los hitos, círculos sobre el eje con la
-etiqueta arriba o abajo alternada para que no choquen. Una banda `rect` detrás
-marca el intervalo que importa.
-
-**Dos bloques enfrentados.** Dos `rect` de 600×66 en y=26 e y=112, el segundo
-con `stroke="#e23a3a"`, y una línea de cierre abajo con la diferencia.
+Ejemplos completos y vistos en los dos temas: los cuatro diagramas de la nota
+del hackeo a Binance y los tres de la de Ivanti Connect Secure del 31 de
+octubre de 2026.
 
 ### Antes de publicar el diagrama
 
-Que ningún texto se salga del `viewBox`. Se mira a ojo comparando la `x` más
-grande contra el ancho, y recordando que `text-anchor="middle"` reparte el
-ancho del texto a los dos lados del punto.
+**Renderizalo y miralo en los dos temas.** El chequeo de coordenadas no ve
+superposiciones ni contraste. Con el servidor local levantado
+(`DEV_SITE_DOMAIN=capacero.online php -S 127.0.0.1:8123 -t public bin/dev-server.php`),
+un script de Playwright que ponga `data-theme="light"` y después `"dark"` en
+`<html>`, tome `getBBox()` de cada `<text>` y saque una captura de cada
+`figure.article-diagram` alcanza. Ningún texto puede pasar de x=650 ni salirse
+del `viewBox`, y dos textos no pueden pisarse.
 
 El detalle completo está en el README, sección Diagramas.
 

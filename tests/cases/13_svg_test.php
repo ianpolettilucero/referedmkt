@@ -16,6 +16,17 @@ TestRunner::group('SVG', function () {
         assert_contains('viewBox="0 0 10 10"', $h);
     });
 
+    // Los graficos dependen de dos cosas que el saneador tiene que dejar
+    // pasar: las clases ch-* que toman los colores del tema, y el <title>
+    // de cada marca, que es el tooltip al pasar el mouse.
+    TestRunner::run('las clases ch-* y el title de una marca se conservan', function () {
+        $out = Svg::sanitize('<svg viewBox="0 0 10 10"><path d="M0 0 H5 V5 Z" class="ch-bar-hi ch-mark" fill="#e23a3a"><title>Ethereum: 3.790</title></path><text x="1" y="9" class="ch-label">x</text></svg>', 'd1');
+        assert_true($out !== null);
+        assert_contains('class="ch-bar-hi ch-mark"', $out);
+        assert_contains('<title>Ethereum: 3.790</title>', $out);
+        assert_contains('class="ch-label"', $out);
+    });
+
     // --- Intentos de inyeccion -------------------------------------------
 
     TestRunner::run('script adentro del svg se elimina', function () {

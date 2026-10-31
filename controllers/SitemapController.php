@@ -84,6 +84,11 @@ final class SitemapController
             if ($newestOverall === null || $stamp > $newestOverall) { $newestOverall = $stamp; }
             $t = $a['article_type'] ?? '';
             if (!isset($newestByType[$t]) || $stamp > $newestByType[$t]) { $newestByType[$t] = $stamp; }
+            // Las secciones de Noticias usan la misma clave que active_sections().
+            if (!empty($a['news_section'])) {
+                $k = 'news:' . $a['news_section'];
+                if (!isset($newestByType[$k]) || $stamp > $newestByType[$k]) { $newestByType[$k] = $stamp; }
+            }
         }
 
         // El listado de productos se mueve cuando se toca una ficha, no una nota.

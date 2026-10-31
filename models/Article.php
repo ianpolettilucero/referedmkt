@@ -76,7 +76,7 @@ final class Article extends Model
     ];
 
     /**
-     * @param array{type?:?string, category_id?:?int, sort?:string} $filters
+     * @param array{type?:?string, news_section?:?string, category_id?:?int, sort?:string} $filters
      * @return array{items: array<int, array<string, mixed>>, total: int, page: int, per_page: int}
      */
     public static function paginate(int $siteId, array $filters = [], int $page = 1, int $perPage = 20): array
@@ -86,6 +86,10 @@ final class Article extends Model
 
         if (!empty($filters['type'])) {
             $rows = array_filter($rows, fn($a) => $a['article_type'] === $filters['type']);
+        }
+        if (!empty($filters['news_section'])) {
+            $sec = (string)$filters['news_section'];
+            $rows = array_filter($rows, fn($a) => ($a['news_section'] ?? null) === $sec);
         }
         if (!empty($filters['category_id'])) {
             $cat = (int)$filters['category_id'];

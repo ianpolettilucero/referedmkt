@@ -482,6 +482,10 @@ final class SEO
             '@type'         => ($a['article_type'] ?? '') === 'news' ? 'NewsArticle' : 'Article',
             'headline'      => $a['title'],
             'description'   => $a['excerpt'] ?? null,
+            // La seccion de Noticias manda sobre la categoria: "Mundo" describe
+            // mejor una nota sobre un robo que "Fundamentos y educacion".
+            'articleSection' => (news_sections()[$a['news_section'] ?? '']['label'] ?? null)
+                                ?? ($a['category_name'] ?? null),
             'image'         => $this->absUrl($a['featured_image'] ?? null),
             'datePublished' => $a['published_at'] ? date('c', strtotime($a['published_at'])) : null,
             'dateModified'  => $a['updated_at']   ? date('c', strtotime($a['updated_at']))   : null,

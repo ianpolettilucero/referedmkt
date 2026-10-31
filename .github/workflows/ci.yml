@@ -103,6 +103,7 @@ jobs:
           check /resenas             200
           check /comparativas        200
           check /noticias            200
+          check /noticias/mundo      200
           check "/buscar?q=seguridad" 200
           check /comparar            200
           check /sitemap.xml         200
