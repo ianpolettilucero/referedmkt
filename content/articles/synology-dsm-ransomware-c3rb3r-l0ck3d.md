@@ -7,7 +7,7 @@ status: published
 category: backup-y-recuperacion
 author: ian-poletti-lucero
 published: 2026-11-05
-updated: 2026-11-05
+updated: 2026-11-19
 products: []
 meta_title: "Ransomware C3RB3R en Synology: qué DSM instalar"
 meta_description: "El ransomware C3RB3R cifra NAS Synology con DSM viejo y deja archivos .L0CK3D. Qué versión corrige, cómo saber si tu NAS está expuesto y qué hacer hoy."
@@ -16,6 +16,8 @@ meta_description: "El ransomware C3RB3R cifra NAS Synology con DSM viejo y deja 
 **Synology** confirmó el 29 de octubre que hay atacantes cifrando NAS que corren versiones viejas de su sistema, **DSM**. El [comunicado de Synology](https://www.synology.com/en-global/company/news/article/C3RB3R/Synology%20urges%20users%20to%20update%20DSM%20following%20ransomware%20attacks%20on%20outdated%20DSM%20versions) es corto: *"Synology has identified threat actors exploiting a vulnerability patched in December 2024 to target devices running outdated versions of DSM. These attacks aim to encrypt data and extort ransom."* Es decir, una falla con casi 2 años de corrección disponible.
 
 El mismo día, la empresa china de seguridad **Qihoo 360** publicó una [alerta con el análisis de equipos atacados](https://news.safe.360.cn/n/13055.html). Dice que desde octubre recibió varios pedidos de ayuda, que el ransomware es **C3RB3R**, una variante de la familia Cerber, y que la entrada son dos fallas que Synology corrigió el **18 de septiembre de 2026**: **CVE-2026-13639** y **CVE-2026-13684**. Lo describe como un ataque de día uno: las fallas tenían apenas 1 mes de publicadas y muchos equipos seguían sin actualizar.
+
+**Actualización del 19 de noviembre:** CISA sumó el 18 de noviembre **CVE-2024-10441**, la falla más grave del aviso SA-24:20, a su [catálogo de vulnerabilidades explotadas](https://www.cisa.gov/known-exploited-vulnerabilities-catalog), con plazo al 21 de noviembre: 3 días, con triaje forense para las agencias federales de Estados Unidos. Es la primera confirmación de un organismo público de que esa falla se explota. CISA no dice si es la que usa C3RB3R, y marca su uso en campañas de ransomware como desconocido.
 
 Las dos fuentes no coinciden en la falla. Para el dueño del NAS cambia poco: las versiones actuales de las ramas con soporte corrigen las dos. Lo que importa es cuál es la tuya y si el NAS se ve desde internet.
 
@@ -26,7 +28,7 @@ Las dos fuentes no coinciden en la falla. Para el dueño del NAS cambia poco: la
 | Entrada, según Qihoo 360 | CVE-2026-13639 y CVE-2026-13684, del aviso SA-26:13 |
 | Puntaje | 9,8, crítico, en CVSS 3.1, asignado por Synology a las dos de 2026 |
 | NVD | Sin análisis propio de las dos de 2026 al 5 de noviembre |
-| Catálogo de CISA | Ninguna de las tres fallas citadas figura al 5 de noviembre |
+| Catálogo de CISA | CVE-2024-10441, desde el 18 de noviembre; las dos de 2026 no figuran al 19 de noviembre |
 
 ## Synology DSM: qué dicen los avisos SA-24:20 y SA-26:13
 
