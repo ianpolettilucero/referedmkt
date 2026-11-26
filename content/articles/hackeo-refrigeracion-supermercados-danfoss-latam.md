@@ -8,7 +8,7 @@ status: published
 category: vpn-y-acceso-remoto
 author: ian-poletti-lucero
 published: 2026-11-09
-updated: 2026-11-09
+updated: 2026-11-26
 products: []
 meta_title: "Ataques a refrigeración: 291 equipos en LATAM"
 meta_description: "Atacan controladores de refrigeración Danfoss, Copeland y Dixell en supermercados. En América Latina hay 291 expuestos a internet. Cómo saber si el tuyo está."
@@ -19,6 +19,8 @@ Desde el 11 de octubre, atacantes entran a distancia a los controladores que man
 En 25 días, el problema pasó de una alerta francesa a una de cinco agencias de Estados Unidos. El 5 de noviembre, **CISA, el FBI y los departamentos de Salud, Agricultura y Transporte de Estados Unidos** publicaron una [hoja informativa conjunta](https://www.cisa.gov/resources-tools/resources/us-government-partners-urge-hardening-industrial-refrigeration-and-cold-chain-monitoring-systems). El mismo día, la Agencia Nacional de Ciberseguridad de **Chile** (ANCI) emitió una alerta, y el 6, ENISA y la Comisión Europea pidieron a las organizaciones actuar de inmediato.
 
 Para la región, el dato lo puso la empresa chilena NIVEL4 Labs: en América Latina hay **291 controladores de refrigeración expuestos a internet**, **203 de ellos en Brasil**. No significa que estén comprometidos. Significa que tienen la misma puerta que usaron en Europa: la interfaz de administración a la vista de cualquiera.
+
+**Actualización del 26 de noviembre:** CISA sumó el 25 de noviembre a su catálogo de vulnerabilidades explotadas tres fallas del Danfoss AK-SM 800A: CVE-2023-25914 y CVE-2023-25915, corregidas en 2023, y CVE-2025-41450. No dijo dónde se explotaron ni las vinculó con los ataques a supermercados. Qué versión las corrige y qué no arregla un cambio de contraseña está en [la nota sobre las tres fallas](/noticia/danfoss-ak-sm-800a-cve-2023-25915-explotadas-cisa).
 
 ## Qué pasó en los supermercados de Francia y del resto de Europa
 

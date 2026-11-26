@@ -7,7 +7,7 @@ status: published
 category: hostings-y-cloud
 author: ian-poletti-lucero
 published: 2026-11-16
-updated: 2026-11-16
+updated: 2026-11-26
 products: []
 meta_title: "Xen Orchestra VSA-2026-062 ya se explota"
 meta_description: "Xen Orchestra VSA-2026-062 da acceso de administrador sin credenciales y ya se explota. Qué versión corrige, qué sigue abierto y cómo buscar rastros."
@@ -20,7 +20,7 @@ Vates, la empresa detrás de **XCP-ng** y **Xen Orchestra**, publicó el 10 de n
 | VSA-2026-062 | Entrar como administrador a Xen Orchestra sin credenciales | Crítica | Corregida en 6.9.2 y 6.10.1 |
 | [VSA-2026-063](https://docs.vates.tech/security-advisories/advisories/2026/vates-sa-2026-063) | Que un usuario con permiso de importar VM tome el host XCP-ng | Importante | Sin corrección |
 
-Ninguno de los dos tiene número de CVE ni puntaje CVSS: Vates los publica con su propia numeración, y en los dos casos el puntaje figura como *"Not available yet"*. Por eso no aparecen en NVD ni en el catálogo de vulnerabilidades explotadas de CISA, aunque Vates confirme ataques.
+**Actualización del 26 de noviembre:** VSA-2026-062 ya tiene número, [CVE-2026-133469](https://nvd.nist.gov/vuln/detail/CVE-2026-133469), con un puntaje de 9,8 asignado por GitHub como autoridad de numeración; NVD no cargó uno propio. CISA la sumó el 25 de noviembre a su [catálogo de vulnerabilidades explotadas](https://www.cisa.gov/known-exploited-vulnerabilities-catalog), con plazo al 28. Las versiones que la corrigen son las mismas, 6.9.2 y 6.10.1. Cuando se publicó esta nota, ninguno de los dos avisos tenía CVE ni puntaje CVSS, porque Vates los publica con su propia numeración.
 
 XCP-ng y Xen Orchestra son de código abierto y se usan como alternativa a VMware: Xen Orchestra incluso trae una función para importar máquinas desde VMware ESXi, que aparece en la lista de avisos de Vates. El panel concentra el control de todas las máquinas virtuales, los backups y las credenciales de los servidores: es la llave de todo lo demás.
 
@@ -111,7 +111,7 @@ Porque el que controla el panel controla todos los servidores a la vez. No es la
 
 Quien no use Xen Orchestra. XCP-ng administrado solo con la consola del host o con otra herramienta queda fuera de VSA-2026-062, que es una falla del panel. Pero el mismo 10 de noviembre Vates publicó otros avisos para XCP-ng 8.3, así que conviene revisar la [lista completa de avisos de Vates](https://docs.vates.tech/security-advisories/advisories/). El orden general de prioridades está en [la guía de ciberseguridad para PyMEs de LATAM](/guia/guia-ciberseguridad-pymes-latam-2026).
 
-**Fuentes leídas:** los avisos VSA-2026-062 y VSA-2026-063 de Vates, del 10 de noviembre de 2026, y el índice de avisos, consultado el 16 de noviembre; y la documentación del actualizador de Xen Orchestra. **Sin confirmar:** quién está detrás de los ataques y a cuántas instalaciones llegaron, porque Vates no da cifras; desde cuándo se explota la falla; y si va a recibir un número de CVE.
+**Fuentes leídas:** los avisos VSA-2026-062 y VSA-2026-063 de Vates, del 10 de noviembre de 2026, y el índice de avisos, consultado el 16 de noviembre; la documentación del actualizador de Xen Orchestra; y, el 26 de noviembre, la ficha de NVD de CVE-2026-133469 y el catálogo de CISA. **Sin confirmar:** quién está detrás de los ataques y a cuántas instalaciones llegaron, porque Vates no da cifras; y desde cuándo se explota la falla.
 
 ## Preguntas frecuentes sobre Xen Orchestra VSA-2026-062
 
@@ -121,7 +121,7 @@ La 6.9.2 en el canal stable y la 6.10.1 en el canal latest, con xo-server 5.211.
 
 ### ¿VSA-2026-062 tiene número de CVE?
 
-No. Vates la publicó con su propia numeración y sin puntaje CVSS. Por eso no figura en NVD ni en el catálogo de CISA, aunque Vates confirma que se explota.
+Sí, desde el 23 de noviembre: CVE-2026-133469, con 9,8 según GitHub, que emitió el número. Vates la había publicado con su propia numeración y sin puntaje CVSS. CISA la sumó a su catálogo de explotadas el 25 de noviembre.
 
 ### ¿Alcanza con actualizar Xen Orchestra?
 
