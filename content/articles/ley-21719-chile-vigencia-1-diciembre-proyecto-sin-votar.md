@@ -1,17 +1,19 @@
 ---
 title: "Ley 21.719 de Chile: vigencia el 1 de diciembre y el proyecto que la posterga sin votar"
 subtitle: Faltan 42 días para que entre en vigencia la primera ley chilena de datos personales con agencia fiscalizadora. El Ejecutivo pidió postergarla un año, puso 5 mensajes de urgencia en 5 semanas y la comisión todavía no emitió informe.
-excerpt: La ley entra en vigencia el 1 de diciembre de 2026. El proyecto que la posterga a 2027 lleva 49 días en comisión sin informe. Qué significa para una empresa que trata datos en Chile.
+excerpt: Actualizado: la Ley 21.855 postergó la Ley 21.719 al 15 de octubre de 2027. Esta nota cuenta cómo estaba el proyecto en octubre y qué pedía el Ejecutivo.
 type: news
 status: published
 category: fundamentos-y-educacion
 author: ian-poletti-lucero
 published: 2026-10-20
-updated: 2026-10-20
+updated: 2026-11-27
 products: []
-meta_title: "Ley 21.719 de Chile: vigencia el 1 de diciembre"
-meta_description: "La Ley 21.719 de datos personales rige en Chile desde el 1 de diciembre de 2026. El proyecto que la posterga a 2027 sigue sin informe de comisión."
+meta_title: "Ley 21.719 de Chile: el proyecto de postergación"
+meta_description: "Actualizado: la Ley 21.855 postergó la Ley 21.719 de Chile al 15 de octubre de 2027. Cómo estaba el proyecto en octubre y qué pedía el Ejecutivo."
 ---
+
+**Actualización del 27 de noviembre:** la postergación ya es ley. La Cámara de Diputados aprobó el proyecto sin modificaciones el 17 de noviembre y el 23 se publicó en el Diario Oficial como **Ley 21.855**. La Ley 21.719 entra en vigencia el **15 de octubre de 2027**, no el 1 de diciembre de 2026. El detalle, en [la nota sobre la Ley 21.855](/noticia/ley-21855-chile-posterga-ley-21719-15-octubre-2027).
 
 La **Ley N° 21.719**, que regula el tratamiento de datos personales en Chile y crea la **Agencia de Protección de Datos Personales**, entra en vigencia el **1 de diciembre de 2026**. Faltan **42 días**.
 
@@ -184,7 +186,7 @@ Una aclaración sobre las fuentes, porque esta nota se apoya en dos documentos y
 
 ### ¿La ley entra en vigencia el 1 de diciembre o se postergó?
 
-Al 20 de octubre de 2026 entra en vigencia el 1 de diciembre de 2026. Existe un proyecto del Ejecutivo, el boletín 18.623-07, que la postergaría hasta el 1 de diciembre de 2027, pero está en primer trámite constitucional en el Senado, en la subetapa de primer informe de la Comisión de Constitución, y el registro muestra las secciones de informes e indicaciones vacías. Un proyecto no cambia una fecha legal: hace falta que se apruebe, se promulgue y se publique. A 42 días, planificar sobre eso es apostar.
+Al 20 de octubre de 2026 entra en vigencia el 1 de diciembre de 2026. Existe un proyecto del Ejecutivo, el boletín 18.623-07, que la postergaría hasta el 1 de diciembre de 2027, pero está en primer trámite constitucional en el Senado, en la subetapa de primer informe de la Comisión de Constitución, y el registro muestra las secciones de informes e indicaciones vacías. Un proyecto no cambia una fecha legal: hace falta que se apruebe, se promulgue y se publique. A 42 días, planificar sobre eso es apostar. **Actualización del 27 de noviembre:** eso pasó; la Ley 21.855, publicada el 23 de noviembre, fijó la vigencia en el 15 de octubre de 2027.
 
 ### Si la Agencia no está instalada, ¿igual tengo que cumplir?
 

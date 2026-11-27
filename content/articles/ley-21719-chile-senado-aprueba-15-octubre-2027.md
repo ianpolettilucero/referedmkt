@@ -1,18 +1,20 @@
 ---
 title: "Ley 21.719 de Chile: el Senado aprobó correr la vigencia al 15 de octubre de 2027"
-subtitle: Es mes y medio antes de lo que pedía el Ejecutivo, y el Senado sacó la amonestación para todas las empresas. Falta la Cámara de Diputados; hasta que se publique, la fecha legal sigue siendo el 1 de diciembre de 2026.
-excerpt: El Senado de Chile aprobó postergar la Ley 21.719 al 15 de octubre de 2027, con cambios. Todavía no es ley: rige el 1 de diciembre de 2026.
+subtitle: Es mes y medio antes de lo que pedía el Ejecutivo, y el Senado sacó la amonestación para todas las empresas. Actualización: la Cámara lo aprobó sin cambios y se publicó como Ley 21.855 el 23 de noviembre.
+excerpt: El Senado de Chile aprobó postergar la Ley 21.719 al 15 de octubre de 2027, con cambios. Diputados lo aprobó igual y es la Ley 21.855, del 23 de noviembre.
 type: news
 section: mundo
 status: published
 category: fundamentos-y-educacion
 author: ian-poletti-lucero
 published: 2026-11-01
-updated: 2026-11-01
+updated: 2026-11-27
 products: []
 meta_title: "Ley 21.719 de Chile: Senado aprueba postergación"
-meta_description: "El Senado de Chile aprobó correr la Ley 21.719 de datos personales al 15 de octubre de 2027. Falta Diputados: hasta publicarse, rige el 1 de diciembre."
+meta_description: "El Senado de Chile aprobó correr la Ley 21.719 de datos personales al 15 de octubre de 2027. Diputados lo aprobó igual: es la Ley 21.855, del 23 de noviembre."
 ---
+
+**Actualización del 27 de noviembre:** la postergación ya es ley. La Cámara de Diputados aprobó el proyecto sin modificaciones el 17 de noviembre y el 23 se publicó en el Diario Oficial como **Ley 21.855**. La Ley 21.719 entra en vigencia el **15 de octubre de 2027**, no el 1 de diciembre de 2026. El detalle, en [la nota sobre la Ley 21.855](/noticia/ley-21855-chile-posterga-ley-21719-15-octubre-2027).
 
 El **Senado de Chile** aprobó el 28 de octubre, en general y en particular a la vez, el proyecto que posterga la **Ley 21.719** de protección de datos personales. La [ficha del boletín 18.623-07](https://tramitacion.senado.cl/appsenado/templates/tramitacion/index.php?boletin_ini=18623-07) lo registra en la sesión 75/374, y el 29 de octubre el proyecto pasó a la **Cámara de Diputados**. Al 1 de noviembre sigue ahí, en la etapa "Cuenta de proyecto", con urgencia de discusión inmediata.
 
@@ -145,15 +147,15 @@ Las medidas técnicas de base, como [copias con historial](/productos/backup-y-r
 
 ### ¿La Ley 21.719 ya está postergada?
 
-No. El Senado aprobó el proyecto el 28 de octubre de 2026, pero falta la Cámara de Diputados y la publicación en el Diario Oficial. Mientras tanto, la fecha legal sigue siendo el 1 de diciembre de 2026.
+Sí, desde el 23 de noviembre de 2026, cuando se publicó la Ley 21.855. Al publicarse esta nota, el 1 de noviembre, faltaban la Cámara de Diputados y la publicación en el Diario Oficial.
 
 ### ¿Cuál es la nueva fecha de vigencia de la Ley 21.719?
 
-Si el proyecto se aprueba como salió del Senado, el 15 de octubre de 2027. El Ejecutivo había pedido el 1 de diciembre de 2027; el Senado la adelantó 47 días.
+El 15 de octubre de 2027, según la Ley 21.855. El Ejecutivo había pedido el 1 de diciembre de 2027; el Senado la adelantó 47 días y la Cámara aprobó ese texto sin cambios.
 
 ### ¿Qué pasa si la Cámara de Diputados no vota antes del 1 de diciembre?
 
-La Ley 21.719 entra en vigencia el 1 de diciembre de 2026, que es lo que dice hoy su artículo primero transitorio. La fecha solo cambia cuando el proyecto se publica como ley.
+Ya no aplica: la Cámara votó el 17 de noviembre y la Ley 21.855 se publicó el 23, antes del 1 de diciembre. La fecha de vigencia pasó al 15 de octubre de 2027.
 
 ### ¿Las PyMEs tienen un régimen especial en la Ley 21.719?
 
